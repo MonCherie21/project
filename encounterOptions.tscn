@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://dwmloalpivh48"]
+
+[ext_resource type="Texture2D" uid="uid://4e3su2gxvtuj" path="res://Sprites/loc1_house.jpg" id="1_dy1f8"]
+[ext_resource type="Texture2D" uid="uid://blwrdhe26buw1" path="res://Sprites/btn-run.png" id="2_fd51j"]
+[ext_resource type="Texture2D" uid="uid://cmrxsg1bgmdxv" path="res://Sprites/btn-feed.png" id="3_efg1m"]
+[ext_resource type="Texture2D" uid="uid://611lt7c1eauy" path="res://Sprites/btn-attack.png" id="4_45gyb"]
+[ext_resource type="Texture2D" uid="uid://l7ajv42lc7fv" path="res://Sprites/M1_Front.png" id="5_lebui"]
+
+[node name="Node2D" type="Node2D" unique_id=1305653177]
+
+[node name="level1_bg" type="TextureRect" parent="." unique_id=1736562880]
+offset_right = 1150.0
+offset_bottom = 648.0
+texture = ExtResource("1_dy1f8")
+stretch_mode = 5
+
+[node name="btn-run" type="TextureRect" parent="." unique_id=685055185]
+offset_left = 314.0
+offset_top = 352.0
+offset_right = 543.0
+offset_bottom = 401.0
+texture = ExtResource("2_fd51j")
+
+[node name="btn-feed" type="TextureRect" parent="." unique_id=1427551882]
+offset_left = 585.0
+offset_top = 347.0
+offset_right = 815.0
+offset_bottom = 396.0
+texture = ExtResource("3_efg1m")
+
+[node name="btn-attack" type="TextureRect" parent="." unique_id=1894456972]
+offset_left = 470.0
+offset_top = 428.0
+offset_right = 700.0
+offset_bottom = 477.0
+texture = ExtResource("4_45gyb")
+
+[node name="M1Front" type="Sprite2D" parent="." unique_id=36554449]
+position = Vector2(568, 246)
+scale = Vector2(2.8428571, 2.3314607)
+texture = ExtResource("5_lebui")
