@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://b138crnh4uvfe"]
+
+[ext_resource type="Script" uid="uid://ctycceldy0dgp" path="res://MainMenu.cs" id="1_7vrkn"]
+[ext_resource type="Texture2D" uid="uid://b8txo8psk0k2h" path="res://Assets/Main Menu.png" id="2_fu7sn"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g6pdq"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2hig5"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yh4jw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vhmtu"]
+
+[node name="MainMenu" type="Control" unique_id=224439792]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_transform_enabled = true
+script = ExtResource("1_7vrkn")
+
+[node name="Background" type="TextureRect" parent="." unique_id=19155845]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+texture = ExtResource("2_fu7sn")
+expand_mode = 2
+stretch_mode = 6
+
+[node name="Control" type="Control" parent="." unique_id=850917372]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NewGame" type="Button" parent="." unique_id=891485770]
+layout_mode = 0
+offset_left = 496.0
+offset_top = 342.0
+offset_right = 783.0
+offset_bottom = 404.0
+offset_transform_enabled = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_g6pdq")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_2hig5")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_yh4jw")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vhmtu")
+
+[node name="Continue" type="Button" parent="." unique_id=782754060]
+layout_mode = 0
+offset_left = 500.0
+offset_top = 424.0
+offset_right = 785.0
+offset_bottom = 482.0
+offset_transform_enabled = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_g6pdq")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_2hig5")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_yh4jw")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vhmtu")
+
+[node name="Collections" type="Button" parent="." unique_id=247398557]
+layout_mode = 0
+offset_left = 499.0
+offset_top = 505.0
+offset_right = 787.0
+offset_bottom = 568.0
+offset_transform_enabled = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_g6pdq")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_2hig5")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_yh4jw")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vhmtu")
+
+[node name="Exit" type="Button" parent="." unique_id=942191500]
+layout_mode = 0
+offset_left = 496.0
+offset_top = 587.0
+offset_right = 787.0
+offset_bottom = 648.0
+offset_transform_enabled = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_g6pdq")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_2hig5")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_yh4jw")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vhmtu")

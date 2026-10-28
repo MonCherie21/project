@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://bxfl84hs33pop"]
+
+[ext_resource type="Script" uid="uid://cndxpkejc4frw" path="res://Player.cs" id="1_4flbx"]
+[ext_resource type="Texture2D" uid="uid://2n3jifw2je5v" path="res://Assets/P1_Front.png" id="2_onrkg"]
+[ext_resource type="Texture2D" uid="uid://c4ov2o0whk3de" path="res://Assets/P1_Back.png" id="3_i3pqv"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_4flbx"]
+load_path = "res://.godot/imported/P1_Front.png-ea2fd609b5935a1b62c084f8dd6411bd.ctex"
+
+[node name="Player" type="CharacterBody2D" unique_id=931329393]
+script = ExtResource("1_4flbx")
+FrontTexture = ExtResource("2_onrkg")
+BackTexture = ExtResource("3_i3pqv")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1045029439]
+position = Vector2(35, 49)
+texture = SubResource("CompressedTexture2D_4flbx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=40556087]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=209112102]
+position = Vector2(35, 56)
+zoom = Vector2(2, 2)
