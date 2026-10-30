@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://dkuprl4yxx7wr"]
+
+[ext_resource type="Script" uid="uid://ck4kxs1rtxrog" path="res://BattleScene.cs" id="1_bqhns"]
+[ext_resource type="Texture2D" uid="uid://4e3su2gxvtuj" path="res://Sprites/loc1_house.jpg" id="2_donlu"]
+[ext_resource type="Texture2D" uid="uid://l7ajv42lc7fv" path="res://Sprites/M1_Front.png" id="3_xj46k"]
+[ext_resource type="Texture2D" uid="uid://8c31xnuuhibb" path="res://Sprites/P1_Whole.png" id="4_qysdf"]
+[ext_resource type="Texture2D" uid="uid://w2jxrhg2l3yn" path="res://Sprites/m1s-slap.png" id="5_1u76d"]
+[ext_resource type="Texture2D" uid="uid://dpewwnuekw5h7" path="res://Sprites/m1s_gpunch.png" id="6_8n4bb"]
+[ext_resource type="Texture2D" uid="uid://611lt7c1eauy" path="res://Sprites/btn-attack.png" id="7_ks08g"]
+
+[node name="Node2D" type="Node2D" unique_id=1462485367]
+script = ExtResource("1_bqhns")
+
+[node name="level1_bg" type="TextureRect" parent="." unique_id=1735875026]
+offset_right = 1281.0
+offset_bottom = 720.0
+texture = ExtResource("2_donlu")
+stretch_mode = 5
+
+[node name="m1_m" type="Sprite2D" parent="." unique_id=2124249452]
+position = Vector2(1016, 408)
+scale = Vector2(3.2982135, 3.5948029)
+texture = ExtResource("3_xj46k")
+
+[node name="P1Whole" type="Sprite2D" parent="." unique_id=15126330]
+position = Vector2(240.00002, 464.00003)
+scale = Vector2(1.6353657, 1.8467076)
+texture = ExtResource("4_qysdf")
+
+[node name="m1_py2" type="Sprite2D" parent="." unique_id=2099272630]
+position = Vector2(336.00003, 368)
+scale = Vector2(2.3348196, 1.9771765)
+texture = ExtResource("3_xj46k")
+
+[node name="TextureButton" type="TextureButton" parent="." unique_id=664962030]
+offset_left = 360.0
+offset_top = 384.0
+offset_right = 642.0
+offset_bottom = 695.0
+texture_normal = ExtResource("5_1u76d")
+
+[node name="TextureButton2" type="TextureButton" parent="." unique_id=1675303203]
+offset_left = 632.0
+offset_top = 384.0
+offset_right = 929.0
+offset_bottom = 710.0
+texture_normal = ExtResource("6_8n4bb")
+
+[node name="btn-attack" type="TextureRect" parent="." unique_id=1464852214]
+offset_left = 72.0
+offset_top = 80.0
+offset_right = 302.0
+offset_bottom = 129.0
+texture = ExtResource("7_ks08g")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=874227602]
+
+[node name="hp_p" type="ProgressBar" parent="CanvasLayer" unique_id=1535025064]
+offset_left = 152.0
+offset_top = 160.0
+offset_right = 464.0
+offset_bottom = 192.0
+
+[node name="hptext_p" type="TextEdit" parent="CanvasLayer" unique_id=1867132208]
+offset_left = 376.0
+offset_top = 192.0
+offset_right = 464.0
+offset_bottom = 232.0
+text = "100/100"
+
+[node name="hp_py" type="ProgressBar" parent="CanvasLayer" unique_id=2050685450]
+offset_left = 144.0
+offset_top = 224.0
+offset_right = 456.0
+offset_bottom = 256.0
+
+[node name="hptext_py" type="TextEdit" parent="CanvasLayer" unique_id=816001728]
+offset_left = 376.0
+offset_top = 256.0
+offset_right = 464.0
+offset_bottom = 296.0
+text = "100/100"
+
+[node name="hp_m" type="ProgressBar" parent="CanvasLayer" unique_id=877872172]
+offset_left = 832.0
+offset_top = 208.0
+offset_right = 1144.0
+offset_bottom = 240.0
+
+[node name="hptext_m" type="TextEdit" parent="CanvasLayer" unique_id=631508804]
+offset_left = 1064.0
+offset_top = 240.0
+offset_right = 1152.0
+offset_bottom = 280.0
+text = "100/100"
+
+[node name="ultCooldown" type="ProgressBar" parent="CanvasLayer" unique_id=368640398]
+offset_left = 624.0
+offset_top = 648.0
+offset_right = 936.0
+offset_bottom = 680.0
