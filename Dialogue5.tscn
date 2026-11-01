@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://o64c7sg2kyca"]
+
+[ext_resource type="Texture2D" uid="uid://svscgw3ht0xu" path="res://Assets/D5.png" id="1_p2mhr"]
+
+[node name="Dialogue5" type="Node" unique_id=445280633]
+
+[node name="BackD5" type="TextureRect" parent="." unique_id=1887054851]
+offset_right = 1278.0
+offset_bottom = 717.0
+texture = ExtResource("1_p2mhr")
+expand_mode = 2
+stretch_mode = 6

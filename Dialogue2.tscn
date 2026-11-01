@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://bm1twrk65l3vb"]
+
+[ext_resource type="Texture2D" uid="uid://2abmubd4y6s6" path="res://Assets/D2.png" id="1_8cbln"]
+
+[node name="Dialogue2" type="Node" unique_id=411102752]
+
+[node name="BackD2" type="TextureRect" parent="." unique_id=99373209]
+offset_right = 1281.0
+offset_bottom = 717.0
+focus_mode = 2
+texture = ExtResource("1_8cbln")
+expand_mode = 2
+stretch_mode = 6
