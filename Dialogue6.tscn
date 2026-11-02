@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://mu6kv7uol8tb"]
+
+[ext_resource type="Texture2D" uid="uid://ls0mk656gwy6" path="res://Assets/D6.png" id="1_u2opj"]
+
+[node name="Dialogue6" type="Node" unique_id=1513739968]
+
+[node name="BackD6" type="TextureRect" parent="." unique_id=227296128]
+offset_right = 1282.0
+offset_bottom = 720.0
+texture = ExtResource("1_u2opj")
+expand_mode = 2
+stretch_mode = 6

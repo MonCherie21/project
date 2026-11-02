@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://bm1vjpx2ulbon"]
+
+[ext_resource type="Texture2D" uid="uid://wqfnwkvb04r0" path="res://Assets/D4.png" id="1_5n6vt"]
+
+[node name="Dialogue4" type="Node" unique_id=1445662468]
+
+[node name="BackD4" type="TextureRect" parent="." unique_id=1336726140]
+offset_right = 1279.0
+offset_bottom = 716.0
+texture = ExtResource("1_5n6vt")
+expand_mode = 2
+stretch_mode = 6
