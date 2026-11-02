@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://cbgtcad0cbltm"]
+
+[ext_resource type="Texture2D" uid="uid://4e3su2gxvtuj" path="res://Sprites/loc1_house.jpg" id="1_msfug"]
+[ext_resource type="Texture2D" uid="uid://cmrxsg1bgmdxv" path="res://Sprites/btn-feed.png" id="2_puap6"]
+[ext_resource type="Texture2D" uid="uid://l7ajv42lc7fv" path="res://Sprites/M1_Front.png" id="3_lqs7e"]
+[ext_resource type="Texture2D" uid="uid://do3g8dbpyiwnq" path="res://Sprites/feedCandy.png" id="4_jtgvd"]
+
+[node name="Node2D" type="Node2D" unique_id=1700894073]
+
+[node name="level1_bg" type="TextureRect" parent="." unique_id=1862648717]
+offset_right = 1281.0
+offset_bottom = 720.0
+texture = ExtResource("1_msfug")
+stretch_mode = 5
+
+[node name="btn-feed" type="TextureRect" parent="." unique_id=65084650]
+offset_left = 72.0
+offset_top = 64.0
+offset_right = 302.0
+offset_bottom = 113.0
+texture = ExtResource("2_puap6")
+
+[node name="M1Front" type="Sprite2D" parent="." unique_id=679185707]
+position = Vector2(656, 320)
+scale = Vector2(3.564286, 2.7865167)
+texture = ExtResource("3_lqs7e")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=682633733]
+
+[node name="CandyFeed" type="TextureButton" parent="CanvasLayer" unique_id=1576531549]
+offset_left = 480.0
+offset_top = 472.0
+offset_right = 841.0
+offset_bottom = 548.0
+texture_normal = ExtResource("4_jtgvd")
+
+[node name="CandyCount" type="TextEdit" parent="CanvasLayer" unique_id=1768966224]
+offset_left = 752.0
+offset_top = 488.0
+offset_right = 816.0
+offset_bottom = 528.0
+theme_override_font_sizes/font_size = 25
+text = "x 05"
