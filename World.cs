@@ -37,7 +37,7 @@ public partial class World : Node2D
 
 		GetNode<Node2D>("../MapBackground").AddChild(player);
 
-		player.Position = new Vector2(1, -3);
+		player.Position = new Vector2(-193, -405);
 
 		GD.Print("Player spawned successfully!");
 	}
