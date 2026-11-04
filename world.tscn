@@ -1,9 +1,10 @@
 [gd_scene format=4 uid="uid://m2vdfp4jlklc"]
 
+[ext_resource type="Script" uid="uid://e7knaaf8hbsq" path="res://World.cs" id="1_aqk2v"]
 [ext_resource type="Texture2D" uid="uid://dxrgcohiubom2" path="res://icon.svg" id="1_f3sb7"]
-[ext_resource type="PackedScene" uid="uid://bxfl84hs33pop" path="res://player.tscn" id="2_fj7yv"]
 [ext_resource type="Texture2D" uid="uid://c8vcen4dnde24" path="res://Assets/Maps/Bg_map.jpg" id="2_tlwt5"]
 [ext_resource type="Texture2D" uid="uid://b0aqjjej6f6eg" path="res://Assets/Maps/FillerAndPlace_br.png" id="3_aqk2v"]
+[ext_resource type="Script" uid="uid://bk6w7uifwbsp" path="res://Area2d.cs" id="4_036b0"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fj7yv"]
 texture = ExtResource("1_f3sb7")
@@ -75,9 +76,13 @@ texture = ExtResource("1_f3sb7")
 [sub_resource type="TileSet" id="TileSet_g6pdq"]
 sources/0 = SubResource("TileSetAtlasSource_fj7yv")
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ih478"]
+size = Vector2(172.80003, 169.5135)
+
 [node name="World" type="Node2D" unique_id=761772831]
 
 [node name="Root" type="Node2D" parent="." unique_id=806218832]
+script = ExtResource("1_aqk2v")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1796064317]
 visible = false
@@ -156,6 +161,14 @@ texture = ExtResource("3_aqk2v")
 region_enabled = true
 region_rect = Rect2(288, 32, 192, 192)
 
+[node name="Area2D" type="Area2D" parent="MapBackground/Buildings/House2" unique_id=470516111]
+script = ExtResource("4_036b0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/House2/Area2D" unique_id=746345185]
+position = Vector2(5.16922, -1.7297363)
+scale = Vector2(1, 0.9999999)
+shape = SubResource("RectangleShape2D_ih478")
+
 [node name="SariSariStore" type="Sprite2D" parent="MapBackground/Buildings" unique_id=608511060]
 position = Vector2(602.00006, 328)
 scale = Vector2(0.675, 0.59659094)
@@ -176,6 +189,3 @@ scale = Vector2(0.68892026, 0.6249998)
 texture = ExtResource("3_aqk2v")
 region_enabled = true
 region_rect = Rect2(560, 312, 176, 152)
-
-[node name="Player" parent="MapBackground" unique_id=1096190205 instance=ExtResource("2_fj7yv")]
-position = Vector2(-178.08696, -352.62256)

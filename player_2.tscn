@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://cil32yr8s0bnn"]
+
+[ext_resource type="Script" uid="uid://cndxpkejc4frw" path="res://Player.cs" id="1_ufh5k"]
+[ext_resource type="Texture2D" uid="uid://bnxonplcdlp4f" path="res://Assets/P2_Front.png" id="2_x3sgo"]
+[ext_resource type="Texture2D" uid="uid://3fysdemiwoae" path="res://Assets/P2_Back.png" id="3_ryqyf"]
+
+[node name="Player2" type="CharacterBody2D" unique_id=931329393]
+script = ExtResource("1_ufh5k")
+FrontTexture = ExtResource("2_x3sgo")
+BackTexture = ExtResource("3_ryqyf")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1045029439]
+position = Vector2(35, 49)
+texture = ExtResource("2_x3sgo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=40556087]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=209112102]
+position = Vector2(35, 56)
+zoom = Vector2(2, 2)
