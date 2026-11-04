@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dkuprl4yxx7wr"]
 
 [ext_resource type="Script" uid="uid://ck4kxs1rtxrog" path="res://BattleScene.cs" id="1_bqhns"]
-[ext_resource type="Texture2D" uid="uid://4e3su2gxvtuj" path="res://Sprites/loc1_house.jpg" id="2_donlu"]
+[ext_resource type="Texture2D" uid="uid://4e3su2gxvtuj" path="res://Sprites/loc/loc1_house.jpg" id="2_donlu"]
 [ext_resource type="Texture2D" uid="uid://l7ajv42lc7fv" path="res://Sprites/M1_Front.png" id="3_xj46k"]
 [ext_resource type="Texture2D" uid="uid://8c31xnuuhibb" path="res://Sprites/P1_Whole.png" id="4_qysdf"]
 [ext_resource type="Texture2D" uid="uid://w2jxrhg2l3yn" path="res://Sprites/m1s-slap.png" id="5_1u76d"]

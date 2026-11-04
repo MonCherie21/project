@@ -1,0 +1,74 @@
+[gd_scene format=3 uid="uid://0251e7g7etsw"]
+
+[ext_resource type="Script" uid="uid://dc3gts6wvkwvr" path="res://EFeed1.cs" id="1_jdrrq"]
+[ext_resource type="Texture2D" uid="uid://buywha7w3h0sd" path="res://Sprites/loc/loc6_school.png" id="2_jdrrq"]
+[ext_resource type="Texture2D" uid="uid://cmrxsg1bgmdxv" path="res://Sprites/btn-feed.png" id="3_652ai"]
+[ext_resource type="Texture2D" uid="uid://w4a8glvlk8t6" path="res://Sprites/YokaiEnemy/M6_Front.png" id="4_ijl6p"]
+[ext_resource type="Texture2D" uid="uid://do3g8dbpyiwnq" path="res://Sprites/feedCandy.png" id="5_rn7ip"]
+
+[node name="Node2D" type="Node2D" unique_id=1700894073]
+script = ExtResource("1_jdrrq")
+
+[node name="level1_bg" type="TextureRect" parent="." unique_id=1862648717]
+offset_right = 1281.0
+offset_bottom = 720.0
+texture = ExtResource("2_jdrrq")
+stretch_mode = 5
+
+[node name="friendshipLvl_bar" type="ProgressBar" parent="." unique_id=548600089]
+offset_left = 504.0
+offset_top = 560.0
+offset_right = 816.0
+offset_bottom = 592.0
+
+[node name="frienshipLvl" type="TextEdit" parent="friendshipLvl_bar" unique_id=663041796]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -1.6150001
+anchor_top = -17.25
+anchor_right = -1.6150001
+anchor_bottom = -17.25
+offset_left = 727.88
+offset_top = 600.0
+offset_right = 831.88
+offset_bottom = 640.0
+theme_override_font_sizes/font_size = 20
+text = "Level 01"
+
+[node name="btn-feed" type="TextureRect" parent="." unique_id=65084650]
+offset_left = 72.0
+offset_top = 64.0
+offset_right = 302.0
+offset_bottom = 113.0
+mouse_filter = 0
+texture = ExtResource("3_652ai")
+
+[node name="TextEdit" type="TextEdit" parent="." unique_id=1634642351]
+offset_left = 496.0
+offset_top = 152.0
+offset_right = 816.0
+offset_bottom = 200.0
+theme_override_font_sizes/font_size = 30
+text = "- GIMME 2 CANDIES!"
+
+[node name="M1Front" type="Sprite2D" parent="." unique_id=679185707]
+position = Vector2(668.9518, 359.47192)
+scale = Vector2(1.3568252, 1.0602654)
+texture = ExtResource("4_ijl6p")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=682633733]
+
+[node name="CandyFeed" type="TextureButton" parent="CanvasLayer" unique_id=1576531549]
+offset_left = 480.0
+offset_top = 472.0
+offset_right = 841.0
+offset_bottom = 548.0
+texture_normal = ExtResource("5_rn7ip")
+
+[node name="CandyCount" type="TextEdit" parent="CanvasLayer" unique_id=1768966224]
+offset_left = 752.0
+offset_top = 488.0
+offset_right = 816.0
+offset_bottom = 528.0
+theme_override_font_sizes/font_size = 25
+text = "x 05"
