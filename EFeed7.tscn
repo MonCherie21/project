@@ -49,7 +49,7 @@ offset_top = 152.0
 offset_right = 816.0
 offset_bottom = 200.0
 theme_override_font_sizes/font_size = 30
-text = "- GIMME 2 CANDIES!"
+text = "- GIMME 5 CANDIES!"
 
 [node name="M1Front" type="Sprite2D" parent="." unique_id=679185707]
 position = Vector2(656.94196, 345.20224)

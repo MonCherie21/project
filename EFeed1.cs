@@ -32,24 +32,11 @@ public partial class EFeed1 : Node2D
 	public override void _Ready()
 	{
 		// Get nodes using their actual Scene Tree paths
-
-		CandyFeed = GetNode<TextureButton>(
-			"CanvasLayer/CandyFeed"
-		);
-
-		CandyCount = GetNode<Control>(
-			"CanvasLayer/CandyCount"
-		);
-
-		friendshipLvl_bar = GetNode<Range>(
-			"friendshipLvl_bar"
-		);
-
-		// =========================================
-		// 3. INITIALIZATION (inside _Ready)
-		// =========================================
-		// Make sure your node path matches your exact scene tree:
-		// If friendshipLvl is a direct child of friendshipLvl_bar, keep it as:
+		CandyFeed = GetNode<TextureButton>("CanvasLayer/CandyFeed");
+		CandyCount = GetNode<Control>("CanvasLayer/CandyCount");
+		friendshipLvl_bar = GetNode<Range>("friendshipLvl_bar");
+		
+		// friendshipLvl is a child of friendshipLvl_bar
 		friendshipLvl = GetNode<Control>("friendshipLvl_bar/friendshipLvl");
 
 		if (friendshipLvl == null)
@@ -61,12 +48,9 @@ public partial class EFeed1 : Node2D
 			GD.Print("friendshipLvl node found successfully: " + friendshipLvl.Name);
 		}
 
-		M1Front = GetNode<CanvasItem>(
-			"M1Front"
-		);
+		M1Front = GetNode<CanvasItem>("M1Front");
 
 		// Initialize values
-
 		candyCount = 5;
 		friendshipLevel = 0;
 
@@ -78,14 +62,11 @@ public partial class EFeed1 : Node2D
 		UpdateFriendshipLevel();
 
 		// Button settings
-
 		CandyFeed.Disabled = false;
 		CandyFeed.MouseFilter = Control.MouseFilterEnum.Stop;
-
 		CandyCount.MouseFilter = Control.MouseFilterEnum.Ignore;
 
-		// Prevent editing if controls are TextEdits
-
+		// Prevent editing if it's left as a TextEdit
 		if (CandyCount is TextEdit candyText)
 		{
 			candyText.Editable = false;
@@ -97,7 +78,6 @@ public partial class EFeed1 : Node2D
 		}
 
 		// Connect button signal
-
 		CandyFeed.Pressed += OnCandyFeedPressed;
 
 		GD.Print("FEEDING SYSTEM READY!");
@@ -129,13 +109,14 @@ public partial class EFeed1 : Node2D
 	{
 		string levelText = $"Level {friendshipLevel:00}";
 
-		if (friendshipLvl is TextEdit textEdit)
-		{
-			textEdit.Text = levelText;
-		}
-		else if (friendshipLvl is Label label)
+		// Supports both Label and TextEdit nodes seamlessly
+		if (friendshipLvl is Label label)
 		{
 			label.Text = levelText;
+		}
+		else if (friendshipLvl is TextEdit textEdit)
+		{
+			textEdit.Text = levelText;
 		}
 	}
 
@@ -145,7 +126,6 @@ public partial class EFeed1 : Node2D
 
 	private void OnCandyFeedPressed()
 	{
-		// Check if max level is already reached
 		if (friendshipLevel >= 3)
 		{
 			GD.Print("FRIENDSHIP IS ALREADY AT MAX LEVEL (3)!");
@@ -153,21 +133,16 @@ public partial class EFeed1 : Node2D
 			return;
 		}
 
-		// Check if candies are available
 		if (candyCount <= 0)
 		{
 			GD.Print("NO CANDIES LEFT!");
 			return;
 		}
 
-		// Decrease candy count
 		candyCount--;
 		UpdateCandyCount();
 
-		// Make Yokai turn green
 		FlashYokai();
-
-		// Increase friendship progress and handle level ups
 		IncreaseFriendship();
 
 		GD.Print("CANDY FED!");
@@ -182,30 +157,18 @@ public partial class EFeed1 : Node2D
 
 	private void FlashYokai()
 	{
-		// Stop previous animation if necessary
-
 		if (flashTween != null && flashTween.IsRunning())
 		{
 			flashTween.Kill();
 		}
 
-		// Turn Yokai green
-
 		M1Front.Modulate = Colors.Green;
 
-		// Return to original color after 1 second
-
 		flashTween = CreateTween();
-
 		flashTween.TweenInterval(1.0);
-
-		flashTween.TweenProperty(
-			M1Front,
-			"modulate",
-			Colors.White,
-			0.15
-		);
+		flashTween.TweenProperty(M1Front, "modulate", Colors.White, 0.15);
 	}
+
 	// =========================================
 	// 8. FRIENDSHIP PROGRESS & LEVEL UPS
 	// =========================================
@@ -216,7 +179,6 @@ public partial class EFeed1 : Node2D
 
 		friendshipLvl_bar.Value += FriendshipIncrease;
 
-		// Check if bar fills up to 100% for the current level tier
 		if (friendshipLvl_bar.Value >= 100)
 		{
 			friendshipLevel++;
@@ -230,11 +192,10 @@ public partial class EFeed1 : Node2D
 			}
 			else
 			{
-				friendshipLvl_bar.Value = 0; // Reset bar to 0 for the next level
+				friendshipLvl_bar.Value = 0; 
 				GD.Print("FRIENDSHIP LEVEL UP! Current Level: " + friendshipLevel);
 			}
 
-			// FORCE UPDATE THE UI TEXT HERE
 			UpdateFriendshipLevel();
 		}
 	}
