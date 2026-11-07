@@ -36,11 +36,12 @@ public partial class BattleScene : Node2D
 
 
 	// =========================================
-	// 4. BATTLE STATE
+	// 4. BATTLE STATE & COOLDOWNS
 	// =========================================
 
 	private bool battleFinished = false;
 	private bool playerTurn = true;
+	private int ghostPunchCooldown = 0;
 
 	private readonly Random random = new Random();
 
@@ -128,6 +129,7 @@ public partial class BattleScene : Node2D
 	{
 		battleFinished = false;
 		playerTurn = true;
+		ghostPunchCooldown = 0;
 
 		// Initialize HP.
 		playerHP = PlayerMaxHP;
@@ -443,16 +445,6 @@ public partial class BattleScene : Node2D
 			slapButton.Show();
 			slapButton.ZIndex = 100;
 			slapButton.MoveToFront();
-
-			GD.Print(
-				"Slap visibility: " + slapButton.Visible
-			);
-		}
-		else
-		{
-			GD.PushWarning(
-				"Cannot show Slap: the button reference is null."
-			);
 		}
 
 
@@ -465,36 +457,16 @@ public partial class BattleScene : Node2D
 			ghostPunchButton.ZIndex = 100;
 			ghostPunchButton.MoveToFront();
 
-			GD.Print(
-				"Ghost Punch visibility: " +
-				ghostPunchButton.Visible
-			);
-		}
-		else
-		{
-			GD.PushWarning(
-				"Cannot show Ghost Punch: the button reference is null."
-			);
-		}
-
-
-		// Report whether the buttons are visible
-		// together with their parent containers.
-
-		if (slapButton != null)
-		{
-			GD.Print(
-				"Slap visible in tree: " +
-				slapButton.IsVisibleInTree()
-			);
-		}
-
-		if (ghostPunchButton != null)
-		{
-			GD.Print(
-				"Ghost Punch visible in tree: " +
-				ghostPunchButton.IsVisibleInTree()
-			);
+			// Optional: Visually grey out Ghost Punch if it's on cooldown
+			if (ghostPunchCooldown > 0)
+			{
+				ghostPunchButton.Modulate = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+				GD.Print($"Ghost Punch is on cooldown. Turns remaining: {ghostPunchCooldown}");
+			}
+			else
+			{
+				ghostPunchButton.Modulate = Colors.White;
+			}
 		}
 	}
 
@@ -532,6 +504,12 @@ public partial class BattleScene : Node2D
 
 		HideAttackChoices();
 
+		// Reduce Ghost Punch cooldown when using regular attack
+		if (ghostPunchCooldown > 0)
+		{
+			ghostPunchCooldown--;
+		}
+
 		GD.Print("Used Slap!");
 
 		await PlayYokaiGlow(
@@ -564,9 +542,19 @@ public partial class BattleScene : Node2D
 		if (battleFinished || !playerTurn)
 			return;
 
+		// Prevent using Ghost Punch if it's still cooling down
+		if (ghostPunchCooldown > 0)
+		{
+			GD.Print($"Ghost Punch is on cooldown! ({ghostPunchCooldown} turns left)");
+			return;
+		}
+
 		playerTurn = false;
 
 		HideAttackChoices();
+
+		// Set cooldown to 2 turns (can adjust this number as needed)
+		ghostPunchCooldown = 2;
 
 		GD.Print("Used Ghost Punch!");
 
@@ -817,6 +805,12 @@ public partial class BattleScene : Node2D
 		// PLAYER'S TURN STARTS AGAIN
 		// -------------------------------------
 
+		// Reduce Ghost Punch cooldown at the end of the full round
+		if (ghostPunchCooldown > 0)
+		{
+			ghostPunchCooldown--;
+		}
+
 		playerTurn = true;
 
 		// Skills become available again.
@@ -844,6 +838,12 @@ public partial class BattleScene : Node2D
 		playerTurn = false;
 
 		HideAttackChoices();
+
+		// Reduce cooldown if feeding counts as an action turn
+		if (ghostPunchCooldown > 0)
+		{
+			ghostPunchCooldown--;
+		}
 
 		yokaiHP = Math.Min(
 			YokaiMaxHP,

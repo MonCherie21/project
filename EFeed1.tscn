@@ -1,10 +1,10 @@
-[gd_scene format=3 uid="uid://cbgtcad0cbltm"]
+[gd_scene format=3 uid="uid://cy50py2j1nj1e"]
 
 [ext_resource type="Script" uid="uid://dc3gts6wvkwvr" path="res://EFeed1.cs" id="1_rv0xm"]
-[ext_resource type="Texture2D" uid="uid://b3b0qv0yo36ru" path="res://Sprites/loc/loc2_sst.jpg" id="2_4c6kj"]
+[ext_resource type="Texture2D" uid="uid://4e3su2gxvtuj" path="res://Sprites/loc/loc1_house.jpg" id="2_4c6kj"]
 [ext_resource type="Texture2D" uid="uid://cmrxsg1bgmdxv" path="res://Sprites/btn-feed.png" id="2_rv0xm"]
 [ext_resource type="Texture2D" uid="uid://do3g8dbpyiwnq" path="res://Sprites/feedCandy.png" id="4_p2cne"]
-[ext_resource type="Texture2D" uid="uid://bcguk4xqwj6it" path="res://Sprites/YokaiEnemy/M2_Front.png" id="4_vvjos"]
+[ext_resource type="Texture2D" uid="uid://l7ajv42lc7fv" path="res://Sprites/M1_Front.png" id="4_vvjos"]
 
 [node name="Node2D" type="Node2D" unique_id=1700894073]
 script = ExtResource("1_rv0xm")
@@ -72,11 +72,3 @@ offset_right = 816.0
 offset_bottom = 528.0
 theme_override_font_sizes/font_size = 25
 text = "x 05"
-
-[node name="TextEdit2" type="TextEdit" parent="." unique_id=551648323]
-offset_left = 496.0
-offset_top = 152.0
-offset_right = 816.0
-offset_bottom = 200.0
-theme_override_font_sizes/font_size = 30
-text = "- GIMME 2 CANDIES!"
