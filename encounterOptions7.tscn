@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://prs1v7q256of"]
+
+[ext_resource type="Texture2D" uid="uid://px43mfxlixfw" path="res://Sprites/loc/loc7_hhouse.jpg" id="1_b7dcy"]
+[ext_resource type="Texture2D" uid="uid://blwrdhe26buw1" path="res://Sprites/btn-run.png" id="2_tnl1k"]
+[ext_resource type="Texture2D" uid="uid://cmrxsg1bgmdxv" path="res://Sprites/btn-feed.png" id="3_4bsqu"]
+[ext_resource type="Texture2D" uid="uid://611lt7c1eauy" path="res://Sprites/btn-attack.png" id="4_l5tbf"]
+[ext_resource type="Texture2D" uid="uid://efgs6fxk7olv" path="res://Sprites/YokaiEnemy/M7_Front.png" id="5_tnl1k"]
+
+[node name="Node2D" type="Node2D" unique_id=1305653177]
+
+[node name="level1_bg" type="TextureRect" parent="." unique_id=1736562880]
+offset_right = 1281.0
+offset_bottom = 720.0
+texture = ExtResource("1_b7dcy")
+stretch_mode = 5
+
+[node name="btn-run" type="TextureRect" parent="." unique_id=685055185]
+offset_left = 400.0
+offset_top = 401.75
+offset_right = 629.0
+offset_bottom = 450.75
+texture = ExtResource("2_tnl1k")
+
+[node name="btn-feed" type="TextureRect" parent="." unique_id=1427551882]
+offset_left = 671.0
+offset_top = 396.75
+offset_right = 901.0
+offset_bottom = 445.75
+texture = ExtResource("3_4bsqu")
+
+[node name="btn-attack" type="TextureRect" parent="." unique_id=1894456972]
+offset_left = 556.0
+offset_top = 477.75
+offset_right = 786.0
+offset_bottom = 526.75
+texture = ExtResource("4_l5tbf")
+
+[node name="M1Front" type="Sprite2D" parent="." unique_id=36554449]
+position = Vector2(632, 272)
+scale = Vector2(2.190841, 1.7748512)
+texture = ExtResource("5_tnl1k")

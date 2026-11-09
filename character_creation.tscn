@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://d3ttcor3j8kp"]
+
+[ext_resource type="Script" uid="uid://dd7bmvlbwrpll" path="res://CharacterCreation.cs" id="1_855gl"]
+[ext_resource type="Texture2D" uid="uid://dtcohgpsmv8n6" path="res://Assets/MainMenu.png" id="2_855gl"]
+[ext_resource type="FontFile" uid="uid://dr3gfdyy1260a" path="res://Assets/PressStart2P-Regular.ttf" id="3_w5c8v"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_w5c8v"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_akliv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_855gl"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q5hsa"]
+
+[node name="CharacterCreation" type="Control" unique_id=1484871461]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_855gl")
+
+[node name="Background" type="TextureRect" parent="." unique_id=721986948]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 2528.0
+offset_bottom = 1382.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_855gl")
+
+[node name="NameInput" type="LineEdit" parent="." unique_id=546653590]
+layout_mode = 0
+offset_left = 451.0
+offset_top = 279.0
+offset_right = 830.0
+offset_bottom = 340.0
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_fonts/font = ExtResource("3_w5c8v")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxEmpty_w5c8v")
+placeholder_text = "Enter Name"
+alignment = 1
+
+[node name="Female" type="Button" parent="." unique_id=650155149]
+layout_mode = 0
+offset_left = 658.0
+offset_top = 378.0
+offset_right = 880.0
+offset_bottom = 437.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_akliv")
+
+[node name="Male" type="Button" parent="." unique_id=2096063550]
+layout_mode = 0
+offset_left = 387.0
+offset_top = 378.0
+offset_right = 614.0
+offset_bottom = 440.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_855gl")
+
+[node name="Start" type="Button" parent="." unique_id=1348126424]
+layout_mode = 0
+offset_left = 480.0
+offset_top = 522.0
+offset_right = 805.0
+offset_bottom = 591.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_q5hsa")

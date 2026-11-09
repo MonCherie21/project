@@ -12,10 +12,10 @@ public partial class MainMenu : Control
 	}
 
 	private void OnNewGamePressed()
-	{
-		GetTree().ChangeSceneToFile("res://world.tscn");
-	}
-
+{
+	GetTree().ChangeSceneToFile("res://character_creation.tscn");
+}
+	
 	private void OnExitPressed()
 	{
 		GetTree().Quit();
