@@ -8,6 +8,7 @@ public partial class MainMenu : Control
 		GetNode<Button>("NewGame").Pressed += OnNewGamePressed;
 		GetNode<Button>("Exit").Pressed += OnExitPressed;
 		GetNode<Button>("Collections").Pressed += OnCollectionsPressed;
+		GetNode<Button>("Continue").Pressed += OnContinuePressed;
 	}
 
 	private void OnNewGamePressed()
@@ -23,5 +24,10 @@ public partial class MainMenu : Control
 	private void OnCollectionsPressed()
 	{
 		GetTree().ChangeSceneToFile("res://Collection.tscn");
+	}
+	
+	private void OnContinuePressed()
+	{
+		GetTree().ChangeSceneToFile("res://Continue.tscn");
 	}
 }

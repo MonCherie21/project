@@ -53,6 +53,11 @@ public partial class CollectionManager : Control
 
 		if (leftBtn != null) leftBtn.Pressed += OnLeftButtonPressed;
 		if (rightBtn != null) rightBtn.Pressed += OnRightButtonPressed;
+		
+		var button = GetNode<Button>("Button3");
+		
+		// I-connect ang pressed signal sa iyong method
+		button.Pressed += BackMenu;
 
 		UpdateDisplay();
 	}
@@ -110,5 +115,11 @@ public partial class CollectionManager : Control
 			_currentIndex = 0;
 		}
 		UpdateDisplay();
+	}
+	
+	private void BackMenu()
+	{
+		// Palitan ang path ng tscn file na nais mong puntahan
+		GetTree().ChangeSceneToFile("res://main_menu.tscn");
 	}
 }
