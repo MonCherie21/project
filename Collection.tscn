@@ -1,0 +1,160 @@
+[gd_scene format=3 uid="uid://ce4blvg2jua50"]
+
+[ext_resource type="Script" uid="uid://118ur7qgprr2" path="res://CollectionManager.cs" id="1_su8b8"]
+[ext_resource type="Texture2D" uid="uid://s45r3xixycyy" path="res://Assets/Collections.png" id="2_qij2x"]
+[ext_resource type="Texture2D" uid="uid://8w85aiqcs1h1" path="res://Characters/one.png" id="4_1kais"]
+[ext_resource type="Texture2D" uid="uid://cmivfe6d10kdr" path="res://Characters/seven.jpg" id="4_03kgx"]
+[ext_resource type="Texture2D" uid="uid://ndioorgv6v5k" path="res://Characters/three.png" id="4_qij2x"]
+[ext_resource type="Texture2D" uid="uid://bfru2wip4hika" path="res://Characters/two.png" id="5_1o1hs"]
+[ext_resource type="Texture2D" uid="uid://cri7vs3rmnpot" path="res://Characters/six.jpg" id="5_hlx7d"]
+[ext_resource type="Texture2D" uid="uid://ll81w2ag0mek" path="res://Characters/five.png" id="6_tnsjy"]
+[ext_resource type="Texture2D" uid="uid://batnydab1eujt" path="res://Characters/four.png" id="7_fd27m"]
+
+[node name="Control" type="Control" unique_id=680060375]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_su8b8")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=711221271]
+layout_mode = 0
+offset_right = 1279.0
+offset_bottom = 720.0
+focus_mode = 2
+texture = ExtResource("2_qij2x")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Character 1" type="TextureRect" parent="." unique_id=1227063890]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 193.0
+offset_right = 641.0
+offset_bottom = 530.0
+texture = ExtResource("4_1kais")
+expand_mode = 1
+
+[node name="Character 2" type="TextureRect" parent="." unique_id=787740599]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 193.0
+offset_right = 641.0
+offset_bottom = 530.0
+texture = ExtResource("5_1o1hs")
+expand_mode = 1
+
+[node name="Character 3" type="TextureRect" parent="." unique_id=599643328]
+layout_mode = 0
+offset_left = 421.0
+offset_top = 193.0
+offset_right = 640.0
+offset_bottom = 529.0
+texture = ExtResource("4_qij2x")
+expand_mode = 1
+
+[node name="Character 4" type="TextureRect" parent="." unique_id=1533058433]
+layout_mode = 0
+offset_left = 419.0
+offset_top = 193.0
+offset_right = 641.0
+offset_bottom = 530.0
+texture = ExtResource("7_fd27m")
+expand_mode = 1
+
+[node name="Character 5" type="TextureRect" parent="." unique_id=61913094]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 193.0
+offset_right = 641.0
+offset_bottom = 530.0
+texture = ExtResource("6_tnsjy")
+expand_mode = 1
+
+[node name="Character 6" type="TextureRect" parent="." unique_id=358838004]
+layout_mode = 0
+offset_left = 419.0
+offset_top = 194.0
+offset_right = 640.0
+offset_bottom = 529.0
+texture = ExtResource("5_hlx7d")
+expand_mode = 1
+
+[node name="Character 7" type="TextureRect" parent="." unique_id=1795072097]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 194.0
+offset_right = 640.0
+offset_bottom = 530.0
+texture = ExtResource("4_03kgx")
+expand_mode = 1
+
+[node name="Button" type="Button" parent="." unique_id=1508052554]
+layout_mode = 0
+offset_left = 768.0
+offset_top = 554.0
+offset_right = 826.0
+offset_bottom = 601.0
+
+[node name="Button2" type="Button" parent="." unique_id=342841904]
+layout_mode = 0
+offset_left = 642.0
+offset_top = 553.0
+offset_right = 699.0
+offset_bottom = 600.0
+
+[node name="CounterLabel" type="Label" parent="." unique_id=1136089483]
+layout_mode = 0
+offset_left = 478.0
+offset_top = 563.0
+offset_right = 505.0
+offset_bottom = 586.0
+text = "1/7"
+
+[node name="NameLabel" type="Label" parent="." unique_id=1448460025]
+layout_mode = 0
+offset_left = 882.0
+offset_top = 206.0
+offset_right = 1022.0
+offset_bottom = 229.0
+text = "Character Name 1"
+
+[node name="HpLabel" type="Label" parent="." unique_id=1589523759]
+layout_mode = 0
+offset_left = 895.0
+offset_top = 238.0
+offset_right = 935.0
+offset_bottom = 261.0
+text = "- HP"
+
+[node name="AttackLabel" type="Label" parent="." unique_id=35975774]
+layout_mode = 0
+offset_left = 895.0
+offset_top = 265.0
+offset_right = 964.0
+offset_bottom = 288.0
+text = "- ATTACK"
+
+[node name="LevelLabel" type="Label" parent="." unique_id=1429804139]
+layout_mode = 0
+offset_left = 895.0
+offset_top = 292.0
+offset_right = 950.0
+offset_bottom = 315.0
+text = "- LEVEL"
+
+[node name="RsLevelLabel" type="Label" parent="." unique_id=2080857670]
+layout_mode = 0
+offset_left = 895.0
+offset_top = 317.0
+offset_right = 973.0
+offset_bottom = 340.0
+text = "- RS LEVEL"
+
+[node name="Button3" type="Button" parent="." unique_id=1046123703]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 139.0
+offset_right = 210.0
+offset_bottom = 182.0
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]
