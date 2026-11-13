@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://bh4pxipj7ntyg"]
+
+[ext_resource type="Texture2D" uid="uid://x3vsw2trx4qt" path="res://Assets/Escape (New).png" id="1_hmbvg"]
+[ext_resource type="Script" uid="uid://c7nayi6vs2yuk" path="res://Escape.cs" id="1_ibwhi"]
+[ext_resource type="Script" uid="uid://iscr8bdab5ri" path="res://BackButton.cs" id="3_1whbs"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_alusk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ih478"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ndcg1"]
+
+[node name="Escape" type="CanvasLayer" unique_id=936605418]
+script = ExtResource("1_ibwhi")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=220602641]
+offset_right = 1280.0
+offset_bottom = 720.0
+texture = ExtResource("1_hmbvg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Button Continue" type="Button" parent="." unique_id=491091131]
+offset_left = 475.0
+offset_top = 262.0
+offset_right = 806.0
+offset_bottom = 336.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_alusk")
+script = ExtResource("3_1whbs")
+
+[node name="Button Save" type="Button" parent="." unique_id=1226296715]
+offset_left = 474.0
+offset_top = 358.0
+offset_right = 806.0
+offset_bottom = 432.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ih478")
+
+[node name="Button Load" type="Button" parent="." unique_id=839030867]
+offset_left = 473.0
+offset_top = 452.0
+offset_right = 805.0
+offset_bottom = 525.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ndcg1")
+
+[node name="Button Exit" type="Button" parent="." unique_id=1065015013]
+offset_left = 475.0
+offset_top = 552.0
+offset_right = 806.0
+offset_bottom = 626.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_alusk")

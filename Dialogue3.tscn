@@ -1,8 +1,14 @@
 [gd_scene format=3 uid="uid://bs12j6oeu20cs"]
 
+[ext_resource type="Script" uid="uid://bo0v5l2bnmgm" path="res://Dialogue3.cs" id="1_fnpwx"]
 [ext_resource type="Texture2D" uid="uid://b8xeg75twcngv" path="res://Assets/D3.png" id="1_iwddw"]
+[ext_resource type="Texture2D" uid="uid://cxde4vdi0gvna" path="res://Assets/escape button.png" id="3_ibhki"]
+[ext_resource type="Script" uid="uid://bv3tt6av0tccb" path="res://PauseButton.cs" id="4_q0h8s"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wgjs5"]
 
 [node name="Dialogue3" type="Node" unique_id=1343366263]
+script = ExtResource("1_fnpwx")
 
 [node name="BackD3" type="TextureRect" parent="." unique_id=1271375311]
 offset_right = 1288.0
@@ -10,3 +16,20 @@ offset_bottom = 717.0
 texture = ExtResource("1_iwddw")
 expand_mode = 2
 stretch_mode = 6
+
+[node name="Escape Picture" type="TextureRect" parent="." unique_id=1276857635]
+offset_left = 1118.0
+offset_top = 69.0
+offset_right = 1215.0
+offset_bottom = 162.0
+texture = ExtResource("3_ibhki")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EscapeButton" type="Button" parent="." unique_id=721877716]
+offset_left = 1121.0
+offset_top = 70.0
+offset_right = 1213.0
+offset_bottom = 163.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_wgjs5")
+script = ExtResource("4_q0h8s")

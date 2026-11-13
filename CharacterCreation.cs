@@ -20,6 +20,7 @@ public partial class CharacterCreation : Control
 		};
 
 		GetNode<Button>("Start").Pressed += OnStartPressed;
+		GetNode<Button>("Button").Pressed += OnBackPressed;
 	}
 
 	private void OnStartPressed()
@@ -45,5 +46,10 @@ public partial class CharacterCreation : Control
 		PlayerData.Gender = _gender;
 
 		GetTree().ChangeSceneToFile("res://world.tscn");
+	}
+	
+	private void OnBackPressed()
+	{
+		GetTree().ChangeSceneToFile("res://main_menu.tscn");
 	}
 }

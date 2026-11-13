@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-DialogueController="*uid://ch0bbe78254am"
+SceneManager="*uid://cfw0cu4kxwppc"
 
 [display]
 

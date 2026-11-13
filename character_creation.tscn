@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dd7bmvlbwrpll" path="res://CharacterCreation.cs" id="1_855gl"]
 [ext_resource type="Texture2D" uid="uid://dtcohgpsmv8n6" path="res://Assets/MainMenu.png" id="2_855gl"]
 [ext_resource type="FontFile" uid="uid://dr3gfdyy1260a" path="res://Assets/PressStart2P-Regular.ttf" id="3_w5c8v"]
+[ext_resource type="Texture2D" uid="uid://chcy5ow0plruu" path="res://Assets/left button.png" id="4_mqqgk"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_w5c8v"]
 
@@ -11,6 +12,8 @@
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_855gl"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q5hsa"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mqqgk"]
 
 [node name="CharacterCreation" type="Control" unique_id=1484871461]
 layout_mode = 3
@@ -67,3 +70,21 @@ offset_top = 522.0
 offset_right = 805.0
 offset_bottom = 591.0
 theme_override_styles/normal = SubResource("StyleBoxEmpty_q5hsa")
+
+[node name="Back Photo" type="TextureRect" parent="." unique_id=607801311]
+layout_mode = 0
+offset_left = 52.0
+offset_top = 48.0
+offset_right = 143.0
+offset_bottom = 141.0
+texture = ExtResource("4_mqqgk")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Button" type="Button" parent="." unique_id=2084304547]
+layout_mode = 0
+offset_left = 54.0
+offset_top = 49.0
+offset_right = 141.0
+offset_bottom = 139.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_mqqgk")

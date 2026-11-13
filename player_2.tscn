@@ -3,6 +3,9 @@
 [ext_resource type="Script" uid="uid://cndxpkejc4frw" path="res://Player.cs" id="1_ufh5k"]
 [ext_resource type="Texture2D" uid="uid://bnxonplcdlp4f" path="res://Assets/P2_Front.png" id="2_x3sgo"]
 [ext_resource type="Texture2D" uid="uid://3fysdemiwoae" path="res://Assets/P2_Back.png" id="3_ryqyf"]
+[ext_resource type="Texture2D" uid="uid://chcy5ow0plruu" path="res://Assets/left button.png" id="4_x3sgo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ih478"]
 
 [node name="Player2" type="CharacterBody2D" unique_id=931329393]
 script = ExtResource("1_ufh5k")
@@ -18,3 +21,19 @@ texture = ExtResource("2_x3sgo")
 [node name="Camera2D" type="Camera2D" parent="." unique_id=209112102]
 position = Vector2(35, 56)
 zoom = Vector2(2, 2)
+
+[node name="Back Picture" type="TextureRect" parent="." unique_id=2131345838]
+offset_left = -234.0
+offset_top = -89.0
+offset_right = -194.0
+offset_bottom = -49.0
+texture = ExtResource("4_x3sgo")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Button" type="Button" parent="." unique_id=907933370]
+offset_left = -233.0
+offset_top = -88.0
+offset_right = -194.0
+offset_bottom = -50.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ih478")

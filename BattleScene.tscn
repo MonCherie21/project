@@ -7,6 +7,10 @@
 [ext_resource type="Texture2D" uid="uid://w2jxrhg2l3yn" path="res://Sprites/m1s-slap.png" id="5_1u76d"]
 [ext_resource type="Texture2D" uid="uid://dpewwnuekw5h7" path="res://Sprites/m1s_gpunch.png" id="6_8n4bb"]
 [ext_resource type="Texture2D" uid="uid://611lt7c1eauy" path="res://Sprites/btn-attack.png" id="7_ks08g"]
+[ext_resource type="Script" uid="uid://bv3tt6av0tccb" path="res://PauseButton.cs" id="8_xj46k"]
+[ext_resource type="Texture2D" uid="uid://cxde4vdi0gvna" path="res://Assets/escape button.png" id="9_qysdf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1u76d"]
 
 [node name="Node2D" type="Node2D" unique_id=1462485367]
 script = ExtResource("1_bqhns")
@@ -52,6 +56,23 @@ offset_top = 80.0
 offset_right = 302.0
 offset_bottom = 129.0
 texture = ExtResource("7_ks08g")
+
+[node name="Escape Picture" type="TextureRect" parent="." unique_id=880147515]
+offset_left = 1118.0
+offset_top = 69.0
+offset_right = 1215.0
+offset_bottom = 162.0
+texture = ExtResource("9_qysdf")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EscapeButton" type="Button" parent="." unique_id=2115465884]
+offset_left = 1121.0
+offset_top = 70.0
+offset_right = 1213.0
+offset_bottom = 163.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_1u76d")
+script = ExtResource("8_xj46k")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=874227602]
 
