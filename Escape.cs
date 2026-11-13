@@ -14,6 +14,9 @@ public partial class Escape : CanvasLayer
 		// Palitan ang "Button Load" ng eksaktong pangalan ng node mo sa Scene tree kung kinakailangan
 		var loadButton = GetNode<Button>("Button Load");
 		loadButton.Pressed += OnLoadButtonPressed;
+
+		var saveButton = GetNode<Button>("Button Save");
+		saveButton.Pressed += () => SaveSlotPanel.Open(this, SaveSlotPanel.SlotMode.Save);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

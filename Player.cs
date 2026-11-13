@@ -36,6 +36,7 @@ public partial class Player : CharacterBody2D
 
 		Velocity = direction * Speed;
 		MoveAndSlide();
+		PlayerData.WorldPosition = Position;
 
 		if (direction.Y < 0 && BackTexture != null)
 		{

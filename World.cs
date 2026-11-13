@@ -26,7 +26,11 @@ public partial class World : Node2D
 
         Node2D player = playerScene.Instantiate<Node2D>();
         GetNode<Node2D>("../MapBackground").AddChild(player);
-        player.Position = new Vector2(-193, -405);
+        player.Position = PlayerData.HasLoadedPosition
+            ? PlayerData.WorldPosition
+            : new Vector2(-193, -405);
+        PlayerData.WorldPosition = player.Position;
+        PlayerData.HasLoadedPosition = false;
 
         // Added programmatically, so the existing world.tscn is untouched.
         var overlay = new CanvasLayer();
@@ -34,6 +38,16 @@ public partial class World : Node2D
         var nameLabel = new Label { Position = new Vector2(15, 15),
                                     Text = "Loading player profile..." };
         overlay.AddChild(nameLabel);
+
+        // Temporary Save entry point while the separate pause-menu UX is being fixed.
+        var saveButton = new Button
+        {
+            Text = "SAVE GAME",
+            Position = new Vector2(15, 48),
+            Size = new Vector2(145, 42)
+        };
+        saveButton.Pressed += () => SaveSlotPanel.Open(this, SaveSlotPanel.SlotMode.Save);
+        overlay.AddChild(saveButton);
 
         if (PlayerData.PlayerId <= 0 || PlayerData.AccessToken.Length == 0)
         {

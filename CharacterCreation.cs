@@ -111,6 +111,10 @@ public partial class CharacterCreation : Control
                 PlayerData.Gender = row.GetProperty("gender").GetString() ?? "";
                 PlayerData.AccessToken = _accessToken;
                 PlayerData.RefreshToken = _refreshToken;
+                PlayerData.WorldPosition = new Vector2(-193, -405);
+                PlayerData.HasLoadedPosition = false;
+                if (!PlayerData.RememberLocalSession())
+                    GD.PushWarning("Character registered, but this device could not remember the login.");
                 GetTree().ChangeSceneToFile("res://world.tscn");
             }
             catch (Exception ex)

@@ -10,6 +10,8 @@ public partial class Continue : Control
 		
 		// I-connect ang pressed signal sa iyong method
 		button.Pressed += BackMenu;
+		// Reopen the previous anonymous Supabase account and list its save slots.
+		SaveSlotPanel.Open(this, SaveSlotPanel.SlotMode.Load);
 	}
 	
 	private void BackMenu()
