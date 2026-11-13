@@ -74,7 +74,7 @@ public partial class SaveSlotPanel : CanvasLayer
 
         content.AddChild(new Label
         {
-            Text = _mode == SlotMode.Save ? "SAVE YOUR GAME" : "CONTINUE YOUR GAME",
+            Text = _mode == SlotMode.Save ? "SAVE YOUR GAME" : "LOAD YOUR GAME",
             HorizontalAlignment = HorizontalAlignment.Center
         });
 

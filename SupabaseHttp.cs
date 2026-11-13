@@ -24,7 +24,13 @@ public static class SupabaseHttp
         Node caller, string url, HttpClient.Method method,
         string payload = "", string accessToken = "", string preference = "")
     {
-        var request = new HttpRequest { Timeout = 20.0 };
+        // Pause is an overlay: the scene tree is paused while Save/Load is open.
+        // HTTPRequest must keep processing, or the UI stays at "Checking...".
+        var request = new HttpRequest
+        {
+            Timeout = 20.0,
+            ProcessMode = Node.ProcessModeEnum.Always
+        };
         caller.GetTree().Root.AddChild(request);
         var completion = new TaskCompletionSource<Response>();
 

@@ -17,7 +17,7 @@ public static class SaveLoadService
     {
         if (!await SupabaseSession.RestoreAsync(caller))
             throw new InvalidOperationException(
-                "Cannot restore your login. Check your internet connection and try again.");
+                "Cannot restore your login: " + SupabaseSession.LastError);
 
         if (PlayerData.PlayerId <= 0)
             throw new InvalidOperationException("No registered player found on this device.");
