@@ -67,6 +67,7 @@ public partial class Continue : Control
                 if (_slots.TryGetValue(number, out GameSaveSlot saved))
                 {
                     button.Text = "SLOT " + number + " — " +
+                        saved.Data.CompletedLevels + "/7 cleared — " +
                         saved.SavedAt.ToLocalTime().ToString("MMM d, yyyy  h:mm tt");
                     button.Disabled = false;
                 }

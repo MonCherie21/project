@@ -10,7 +10,7 @@ public partial class Area2d : Area2D
 	{
 		if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
 		{
-			GetTree().ChangeSceneToFile("res://Dialogue1.tscn");
+			GameProgress.EnterBuilding(this, 1, "res://Dialogue1.tscn");
 		}
 	}
 }

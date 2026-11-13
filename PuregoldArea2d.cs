@@ -15,7 +15,7 @@ public partial class PuregoldArea2d : Area2D
 		if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
 		{
 			// Palitan ang "res://Dialogue2.tscn" ng gusto mong puntahang scene para sa Puregold
-			GetTree().ChangeSceneToFile("res://Dialogue4.tscn");
+			GameProgress.EnterBuilding(this, 4, "res://Dialogue4.tscn");
 		}
 	}
 

@@ -113,6 +113,7 @@ public partial class CharacterCreation : Control
                 PlayerData.RefreshToken = _refreshToken;
                 PlayerData.WorldPosition = new Vector2(-193, -405);
                 PlayerData.HasLoadedPosition = false;
+                GameProgress.StartNewGame();
                 if (!PlayerData.RememberLocalSession())
                     GD.PushWarning("Character registered, but this device could not remember the login.");
                 GetTree().ChangeSceneToFile("res://world.tscn");

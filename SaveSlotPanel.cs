@@ -128,6 +128,7 @@ public partial class SaveSlotPanel : CanvasLayer
                 if (_existing.TryGetValue(slot, out GameSaveSlot existing))
                 {
                     button.Text = "SLOT " + slot + "  —  " +
+                        existing.Data.CompletedLevels + "/7 cleared — " +
                         existing.SavedAt.ToLocalTime().ToString("MMM d, yyyy  h:mm tt");
                     button.Disabled = false;
                 }
@@ -205,7 +206,10 @@ public partial class SaveSlotPanel : CanvasLayer
         _status.Text = "Saving slot " + slot + "...";
         try
         {
-            await SaveLoadService.SaveAsync(this, slot, GameSaveData.Capture());
+            GameSaveData snapshot = GameSaveData.Capture();
+            await SaveLoadService.SaveAsync(this, slot, snapshot);
+            GameProgress.SetActiveSlot(slot);
+            GameProgress.MarkSaved(snapshot.CompletedLevels);
             await RefreshAsync();
             _status.Text = "Saved slot " + slot + " successfully!";
         }

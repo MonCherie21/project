@@ -974,7 +974,16 @@ public partial class BattleScene : Node2D
 
 		GD.Print("VICTORY!");
 		GD.Print("You defeated the enemy Yo-kai!");
-		ShowResult("VICTORY!", "You defeated the enemy Yo-kai! Return to Wawa?");
+
+		string path = GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath;
+		int level = GameProgress.LevelFromBattleScene(path);
+		bool advanced = GameProgress.CompleteLevel(level);
+		string message = advanced
+			? level == GameProgress.TotalLevels
+				? "You cleared all seven levels! Wawa is safe. Return to the map."
+				: $"Level {level} cleared! Next: {GameProgress.NextBuilding}. Return to Wawa."
+			: "Enemy defeated! Return to Wawa.";
+		ShowResult("VICTORY!", message);
 	}
 
 

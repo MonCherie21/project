@@ -2,11 +2,16 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 // Uses the three-slot player_saves table already created in Supabase.
 public static class SaveLoadService
 {
+    // A quick succession of victories must not let an older autosave
+    // finish after and overwrite a newer progress snapshot.
+    private static readonly SemaphoreSlim SaveLock = new SemaphoreSlim(1, 1);
+
     private static void CheckSlot(int slot)
     {
         if (slot < 1 || slot > 3)
@@ -60,26 +65,34 @@ public static class SaveLoadService
     public static async Task SaveAsync(Node caller, int slot, GameSaveData snapshot)
     {
         CheckSlot(slot);
-        await EnsureSessionAsync(caller);
-
-        string url = SupabaseConfig.DataUrl +
-            "/player_saves?on_conflict=player_id,slot_number";
-        string payload = JsonSerializer.Serialize(new
+        await SaveLock.WaitAsync();
+        try
         {
-            player_id = PlayerData.PlayerId,
-            slot_number = slot,
-            save_data = snapshot,
-            saved_at = DateTimeOffset.UtcNow
-        });
+            await EnsureSessionAsync(caller);
 
-        var response = await SupabaseHttp.SendAsync(
-            caller, url, HttpClient.Method.Post, payload,
-            PlayerData.AccessToken, "resolution=merge-duplicates,return=minimal");
+            string url = SupabaseConfig.DataUrl +
+                "/player_saves?on_conflict=player_id,slot_number";
+            string payload = JsonSerializer.Serialize(new
+            {
+                player_id = PlayerData.PlayerId,
+                slot_number = slot,
+                save_data = snapshot,
+                saved_at = DateTimeOffset.UtcNow
+            });
 
-        if (!response.IsSuccess)
-            throw new InvalidOperationException(
-                "Could not save slot " + slot + " (HTTP " + response.StatusCode +
-                ", request " + response.StartError + ").");
+            var response = await SupabaseHttp.SendAsync(
+                caller, url, HttpClient.Method.Post, payload,
+                PlayerData.AccessToken, "resolution=merge-duplicates,return=minimal");
+
+            if (!response.IsSuccess)
+                throw new InvalidOperationException(
+                    "Could not save slot " + slot + " (HTTP " + response.StatusCode +
+                    ", request " + response.StartError + ").");
+        }
+        finally
+        {
+            SaveLock.Release();
+        }
     }
 
     public static void PrepareLoad(GameSaveSlot slot)
@@ -90,5 +103,6 @@ public static class SaveLoadService
 
         PlayerData.WorldPosition = new Vector2(slot.Data.PositionX, slot.Data.PositionY);
         PlayerData.HasLoadedPosition = true;
+        GameProgress.LoadProgress(slot.Data.CompletedLevels, slot.Number);
     }
 }

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 public partial class World : Node2D
 {
@@ -48,6 +49,17 @@ public partial class World : Node2D
         };
         saveButton.Pressed += () => SaveSlotPanel.Open(this, SaveSlotPanel.SlotMode.Save);
         overlay.AddChild(saveButton);
+
+        var progressLabel = new Label
+        {
+            Position = new Vector2(15, 109),
+            Text = "CLEARED: " + GameProgress.CompletedLevels + "/" +
+                   GameProgress.TotalLevels + "   NEXT: " + GameProgress.NextBuilding
+        };
+        overlay.AddChild(progressLabel);
+
+        if (GameProgress.PendingAutoSave)
+            _ = AutoSaveProgressAsync(progressLabel);
 
         if (PlayerData.PlayerId <= 0 || PlayerData.AccessToken.Length == 0)
         {
@@ -101,6 +113,26 @@ public partial class World : Node2D
             request.QueueFree();
             nameLabel.Text = "Unable to request profile.";
             GD.PrintErr("Profile request could not start: " + error);
+        }
+    }
+
+    private async Task AutoSaveProgressAsync(Label progressLabel)
+    {
+        GameSaveData snapshot = GameSaveData.Capture();
+        int slot = GameProgress.ActiveSlot;
+        try
+        {
+            await SaveLoadService.SaveAsync(this, slot, snapshot);
+            GameProgress.MarkSaved(snapshot.CompletedLevels);
+            if (GodotObject.IsInstanceValid(progressLabel))
+                progressLabel.Text += "  (saved to Slot " + slot + ")";
+            GD.Print("Level progress automatically saved to Slot " + slot + ".");
+        }
+        catch (Exception ex)
+        {
+            GD.PushWarning("Progress autosave failed. Save manually to retry: " + ex.Message);
+            if (GodotObject.IsInstanceValid(progressLabel))
+                progressLabel.Text += "  (save pending)";
         }
     }
 }
