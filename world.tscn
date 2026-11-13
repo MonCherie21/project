@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://b7t0n22ci0rqp" path="res://McdoArea2d.cs" id="7_wse8f"]
 [ext_resource type="Script" uid="uid://dqredalused6t" path="res://HauntedHouseArea2d.cs" id="8_ic0uy"]
 [ext_resource type="Script" uid="uid://cnqkp6nej0p7p" path="res://SariSariStoreArea2d.cs" id="8_ioo17"]
+[ext_resource type="Texture2D" uid="uid://b42udyntoskbr" path="res://Assets/Flag.png" id="12_k3n1d"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fj7yv"]
 texture = ExtResource("1_f3sb7")
@@ -88,24 +89,6 @@ size = Vector2(209.96643, 133.89478)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ywtwn"]
 size = Vector2(180.82196, 153.26323)
 
-[sub_resource type="CSharpScript" id="CSharpScript_gbfbk"]
-script/source = "using Godot;
-using System;
-
-public partial class PuregoldClick : CollisionShape2D
-{
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
-}
-"
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_alusk"]
 size = Vector2(148.52945, 116.927475)
 
@@ -169,7 +152,6 @@ script = ExtResource("4_pkg7o")
 position = Vector2(2.739624, -1.4736938)
 scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_ywtwn")
-script = SubResource("CSharpScript_gbfbk")
 
 [node name="GasStation" type="Sprite2D" parent="MapBackground/Buildings" unique_id=16223720]
 position = Vector2(585.00006, 445)
@@ -278,3 +260,66 @@ scale = Vector2(0.68892026, 0.6249998)
 texture = ExtResource("3_aqk2v")
 region_enabled = true
 region_rect = Rect2(560, 312, 176, 152)
+
+[node name="House Flag" type="TextureRect" parent="." unique_id=627743395]
+offset_left = 313.0
+offset_top = 220.0
+offset_right = 357.0
+offset_bottom = 267.0
+texture = ExtResource("12_k3n1d")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Sari-Sari Store Flag" type="TextureRect" parent="." unique_id=782937872]
+offset_left = 585.0
+offset_top = 226.0
+offset_right = 629.0
+offset_bottom = 273.0
+texture = ExtResource("12_k3n1d")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Gas Station Flag" type="TextureRect" parent="." unique_id=1958595488]
+offset_left = 576.0
+offset_top = 359.0
+offset_right = 620.0
+offset_bottom = 406.0
+texture = ExtResource("12_k3n1d")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Pure Gold Flag" type="TextureRect" parent="." unique_id=95202555]
+offset_left = 545.0
+offset_top = 542.0
+offset_right = 589.0
+offset_bottom = 589.0
+texture = ExtResource("12_k3n1d")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="McDo Flag" type="TextureRect" parent="." unique_id=390984098]
+offset_left = 120.0
+offset_top = 732.0
+offset_right = 164.0
+offset_bottom = 779.0
+texture = ExtResource("12_k3n1d")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="School Flag" type="TextureRect" parent="." unique_id=1110607364]
+offset_left = 798.0
+offset_top = 345.0
+offset_right = 842.0
+offset_bottom = 392.0
+texture = ExtResource("12_k3n1d")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Abandoned House Flag" type="TextureRect" parent="." unique_id=273239021]
+offset_left = 939.0
+offset_top = 723.0
+offset_right = 983.0
+offset_bottom = 770.0
+texture = ExtResource("12_k3n1d")
+expand_mode = 1
+stretch_mode = 5

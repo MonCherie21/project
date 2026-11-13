@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ce4blvg2jua50"]
 
 [ext_resource type="Script" uid="uid://118ur7qgprr2" path="res://CollectionManager.cs" id="1_su8b8"]
-[ext_resource type="Texture2D" uid="uid://s45r3xixycyy" path="res://Assets/Collections.png" id="2_qij2x"]
+[ext_resource type="Texture2D" uid="uid://ddwrn1k7lpepk" path="res://Assets/Collections New.png" id="2_hlx7d"]
 [ext_resource type="Texture2D" uid="uid://8w85aiqcs1h1" path="res://Characters/one.png" id="4_1kais"]
 [ext_resource type="Texture2D" uid="uid://cmivfe6d10kdr" path="res://Characters/seven.jpg" id="4_03kgx"]
 [ext_resource type="Texture2D" uid="uid://ndioorgv6v5k" path="res://Characters/three.png" id="4_qij2x"]
@@ -9,6 +9,14 @@
 [ext_resource type="Texture2D" uid="uid://cri7vs3rmnpot" path="res://Characters/six.jpg" id="5_hlx7d"]
 [ext_resource type="Texture2D" uid="uid://ll81w2ag0mek" path="res://Characters/five.png" id="6_tnsjy"]
 [ext_resource type="Texture2D" uid="uid://batnydab1eujt" path="res://Characters/four.png" id="7_fd27m"]
+[ext_resource type="Texture2D" uid="uid://ijhbrrm7d83v" path="res://Assets/right button.png" id="10_tnsjy"]
+[ext_resource type="Texture2D" uid="uid://chcy5ow0plruu" path="res://Assets/left button.png" id="11_fd27m"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ktf04"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_oqmiw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_c5l6o"]
 
 [node name="Control" type="Control" unique_id=680060375]
 layout_mode = 3
@@ -20,7 +28,7 @@ layout_mode = 0
 offset_right = 1279.0
 offset_bottom = 720.0
 focus_mode = 2
-texture = ExtResource("2_qij2x")
+texture = ExtResource("2_hlx7d")
 expand_mode = 1
 stretch_mode = 6
 
@@ -87,19 +95,41 @@ offset_bottom = 530.0
 texture = ExtResource("4_03kgx")
 expand_mode = 1
 
+[node name="Right Picture" type="TextureRect" parent="." unique_id=294349619]
+layout_mode = 0
+offset_left = 799.0
+offset_top = 542.0
+offset_right = 870.0
+offset_bottom = 608.0
+texture = ExtResource("10_tnsjy")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Button" type="Button" parent="." unique_id=1508052554]
 layout_mode = 0
-offset_left = 768.0
-offset_top = 554.0
-offset_right = 826.0
-offset_bottom = 601.0
+offset_left = 802.0
+offset_top = 541.0
+offset_right = 867.0
+offset_bottom = 605.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ktf04")
+
+[node name="Left Picture" type="TextureRect" parent="." unique_id=1616204677]
+layout_mode = 0
+offset_left = 691.0
+offset_top = 542.0
+offset_right = 759.0
+offset_bottom = 609.0
+texture = ExtResource("11_fd27m")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Button2" type="Button" parent="." unique_id=342841904]
 layout_mode = 0
-offset_left = 642.0
-offset_top = 553.0
-offset_right = 699.0
-offset_bottom = 600.0
+offset_left = 692.0
+offset_top = 543.0
+offset_right = 760.0
+offset_bottom = 606.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_oqmiw")
 
 [node name="CounterLabel" type="Label" parent="." unique_id=1136089483]
 layout_mode = 0
@@ -149,12 +179,23 @@ offset_right = 973.0
 offset_bottom = 340.0
 text = "- RS LEVEL"
 
+[node name="Back Picture" type="TextureRect" parent="." unique_id=950977]
+layout_mode = 0
+offset_left = 154.0
+offset_top = 128.0
+offset_right = 244.0
+offset_bottom = 221.0
+texture = ExtResource("11_fd27m")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Button3" type="Button" parent="." unique_id=1046123703]
 layout_mode = 0
-offset_left = 156.0
-offset_top = 139.0
-offset_right = 210.0
-offset_bottom = 182.0
+offset_left = 153.0
+offset_top = 129.0
+offset_right = 244.0
+offset_bottom = 219.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_c5l6o")
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]

@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bv86ckwyr7j5t"]
+
+[ext_resource type="Texture2D" uid="uid://cxde4vdi0gvna" path="res://Assets/escape button.png" id="1_x3hg7"]
+[ext_resource type="Script" uid="uid://bv3tt6av0tccb" path="res://PauseButton.cs" id="2_qcs01"]
+
+[node name="PauseButton" type="TextureRect" unique_id=772682025]
+offset_left = 1149.0
+offset_top = 55.0
+offset_right = 1228.0
+offset_bottom = 133.0
+texture = ExtResource("1_x3hg7")
+expand_mode = 1
+stretch_mode = 5
+script = ExtResource("2_qcs01")
+
+[node name="Button" type="Button" parent="." unique_id=220511889]
+layout_mode = 0
+offset_top = -1.0
+offset_right = 79.0
+offset_bottom = 78.0

@@ -1,4 +1,3 @@
-
 using Godot;
 using System;
 
@@ -9,6 +8,7 @@ public partial class Player : CharacterBody2D
 	[Export] public Texture2D BackTexture;
 
 	private Sprite2D _sprite;
+	private Button _myButton;
 
 	public override void _Ready()
 	{
@@ -16,6 +16,13 @@ public partial class Player : CharacterBody2D
 
 		if (FrontTexture != null)
 			_sprite.Texture = FrontTexture;
+
+		// Kunin ang Button node na nasa loob ng Player
+		_myButton = GetNode<Button>("Button");
+		if (_myButton != null)
+		{
+			_myButton.Pressed += OnButtonPressed;
+		}
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -24,7 +31,7 @@ public partial class Player : CharacterBody2D
 			"move_left",
 			"move_right",
 			"move_up",
-            "move_down"
+			"move_down"
 		);
 
 		Velocity = direction * Speed;
@@ -38,5 +45,10 @@ public partial class Player : CharacterBody2D
 		{
 			_sprite.Texture = FrontTexture;
 		}
+	}
+
+	private void OnButtonPressed()
+	{
+		GetTree().ChangeSceneToFile("res://character_creation.tscn");
 	}
 }
