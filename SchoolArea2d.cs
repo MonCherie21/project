@@ -15,7 +15,7 @@ public partial class SchoolArea2d : Area2D
 		if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
 		{
 			// Palitan ang "res://Dialogue2.tscn" ng gusto mong puntahang scene para sa School
-			GetTree().ChangeSceneToFile("res://Dialogue6.tscn");
+			GameProgress.EnterBuilding(this, 6, "res://Dialogue6.tscn");
 		}
 	}
 

@@ -99,12 +99,6 @@ offset_right = 1152.0
 offset_bottom = 280.0
 text = "100/100"
 
-[node name="ultCooldown" type="ProgressBar" parent="CanvasLayer" unique_id=368640398]
-offset_left = 624.0
-offset_top = 648.0
-offset_right = 936.0
-offset_bottom = 680.0
-
 [node name="Escape Picture" type="TextureRect" parent="." unique_id=1574546682]
 offset_left = 1118.0
 offset_top = 69.0

@@ -9,8 +9,7 @@ public partial class PauseButton : Button
 
 	private void OnPauseButtonPressed()
 	{
-		// Ise-save nito ang current scene bago lumipat sa Escape.tscn
 		SceneManager sceneManager = GetNode<SceneManager>("/root/SceneManager");
-		sceneManager.LoadScene("res://Escape.tscn");
+		sceneManager.ShowPause();
 	}
 }

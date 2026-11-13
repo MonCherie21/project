@@ -7,6 +7,7 @@ public partial class Load : Node2D
 	{
 		var backButton = GetNode<Button>("Button Back");
 		backButton.Pressed += OnBackButtonPressed;
+		SaveSlotPanel.Open(this, SaveSlotPanel.SlotMode.Load);
 	}
 	
 	public void OnBackButtonPressed()

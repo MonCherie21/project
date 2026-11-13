@@ -11,10 +11,10 @@ offset_bottom = 133.0
 texture = ExtResource("1_x3hg7")
 expand_mode = 1
 stretch_mode = 5
-script = ExtResource("2_qcs01")
 
 [node name="Button" type="Button" parent="." unique_id=220511889]
 layout_mode = 0
 offset_top = -1.0
 offset_right = 79.0
 offset_bottom = 78.0
+script = ExtResource("2_qcs01")

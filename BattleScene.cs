@@ -10,7 +10,7 @@ public partial class BattleScene : Node2D
 
 	[Export] public int PlayerMaxHP = 100;
 	[Export] public int YokaiMaxHP = 100;
-	[Export] public int EnemyMaxHP = 100;
+	[Export] public int EnemyMaxHP = 70;
 
 	private int playerHP;
 	private int yokaiHP;
@@ -21,10 +21,10 @@ public partial class BattleScene : Node2D
 	// 2. DAMAGE AND HEALING
 	// =========================================
 
-	[Export] public int SlapDamage = 5;
-	[Export] public int GhostPunchDamage = 10;
+	[Export] public int SlapDamage = 8;
+	[Export] public int GhostPunchDamage = 16;
 
-	[Export] public int EnemyDamage = 8;
+	[Export] public int EnemyDamage = 6;
 	[Export] public int FeedHealing = 20;
 
 
@@ -57,6 +57,8 @@ public partial class BattleScene : Node2D
 	private Color playerOriginalModulate = Colors.White;
 	private Color friendlyOriginalModulate = Colors.White;
 	private Color enemyOriginalModulate = Colors.White;
+	private Tween _friendlyIdleTween;
+	private Tween _enemyIdleTween;
 
 
 	// =========================================
@@ -323,10 +325,23 @@ public partial class BattleScene : Node2D
 		// -------------------------------------
 
 		UpdateAllHP();
+		StartIdleAnimations();
 
 		GD.Print("Battle initialized!");
 		GD.Print("Friendship Level: " + FriendshipLevel);
 		GD.Print("Enemy damage: " + EnemyDamage);
+
+		if (GameProgress.LevelFromBattleScene(GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath) == 1
+			&& !GameProgress.HasSeenBattleTutorial)
+		{
+			GameProgress.MarkBattleTutorialSeen();
+			TutorialOverlay.Show(this, "YOUR FIRST YO-KAI BATTLE",
+				"It is your turn first! Choose an attack below.\n\n" +
+				"SLAP is a reliable quick hit. GHOST PUNCH does more damage, " +
+				"but needs time to recharge.\n\n" +
+				"FEED heals your team. RUN leaves the battle. " +
+				"Watch the HP bars and wait for your turn!");
+		}
 	}
 
 
@@ -338,15 +353,15 @@ public partial class BattleScene : Node2D
 	{
 		if (FriendshipLevel <= 0)
 		{
-			EnemyDamage = 12;
+			EnemyDamage = 6;
 		}
 		else if (FriendshipLevel == 1)
 		{
-			EnemyDamage = 8;
+			EnemyDamage = 5;
 		}
 		else if (FriendshipLevel == 2)
 		{
-			EnemyDamage = 5;
+			EnemyDamage = 4;
 		}
 		else
 		{
@@ -457,7 +472,8 @@ public partial class BattleScene : Node2D
 			ghostPunchButton.ZIndex = 100;
 			ghostPunchButton.MoveToFront();
 
-			// Optional: Visually grey out Ghost Punch if it's on cooldown
+			// Grey out and disable the skill while it is on cooldown.
+			ghostPunchButton.Disabled = ghostPunchCooldown > 0;
 			if (ghostPunchCooldown > 0)
 			{
 				ghostPunchButton.Modulate = new Color(0.5f, 0.5f, 0.5f, 1.0f);
@@ -512,14 +528,8 @@ public partial class BattleScene : Node2D
 
 		GD.Print("Used Slap!");
 
-		await PlayYokaiGlow(
-			new Color(0.65f, 0.90f, 1.0f)
-		);
-
-		if (battleFinished)
-			return;
-
-		await DamageEnemy(SlapDamage, 4.0f);
+		await PlayFriendlyAttack(new Color(0.65f, 0.90f, 1.0f),
+			43.0f, SlapDamage, 4.0f);
 
 		if (battleFinished)
 			return;
@@ -558,14 +568,8 @@ public partial class BattleScene : Node2D
 
 		GD.Print("Used Ghost Punch!");
 
-		await PlayYokaiGlow(
-			new Color(0.15f, 0.45f, 1.0f)
-		);
-
-		if (battleFinished)
-			return;
-
-		await DamageEnemy(GhostPunchDamage, 12.0f);
+		await PlayFriendlyAttack(new Color(0.15f, 0.65f, 1.0f),
+			72.0f, GhostPunchDamage, 12.0f);
 
 		if (battleFinished)
 			return;
@@ -580,7 +584,7 @@ public partial class BattleScene : Node2D
 
 
 	// =========================================
-	// 19. RED FLASH WHEN TAKING DAMAGE
+	// 19. RED FLASH AND SHAKE WHEN TAKING DAMAGE
 	// =========================================
 
 	private async Task FlashRed(Sprite2D character)
@@ -589,50 +593,82 @@ public partial class BattleScene : Node2D
 			return;
 
 		Color originalColor = character.Modulate;
-
-		character.Modulate =
-			new Color(1.0f, 0.0f, 0.0f, 1.0f);
-
-		await WaitSeconds(0.2);
-
-		if (GodotObject.IsInstanceValid(character))
-		{
-			character.Modulate = originalColor;
-		}
+		Vector2 start = character.Position;
+		Tween tween = CreateTween();
+		tween.TweenProperty(character, "modulate", new Color(1.0f, 0.22f, 0.22f), 0.06);
+		tween.Parallel().TweenProperty(character, "position", start + new Vector2(-7, 0), 0.06);
+		tween.TweenProperty(character, "position", start + new Vector2(7, 0), 0.07);
+		tween.TweenProperty(character, "position", start - new Vector2(4, 0), 0.06);
+		tween.TweenProperty(character, "position", start, 0.10);
+		tween.Parallel().TweenProperty(character, "modulate", originalColor, 0.10);
+		await ToSignal(tween, Tween.SignalName.Finished);
 	}
 
 
 	// =========================================
-	// 20. FRIENDLY YO-KAI GLOW
+	// 20. FRIENDLY YO-KAI LUNGE AND GLOW
 	// =========================================
 
-	private async Task PlayYokaiGlow(Color glowColor)
+	private async Task PlayFriendlyAttack(Color glowColor, float distance,
+		int damage, float shakeAmount)
 	{
 		if (friendlyYokaiSprite == null)
+		{
+			await DamageEnemy(damage, shakeAmount);
 			return;
+		}
 
+		Vector2 start = friendlyYokaiSprite.Position;
+		float startRotation = friendlyYokaiSprite.Rotation;
 		Tween tween = CreateTween();
+		tween.SetTrans(Tween.TransitionType.Cubic);
+		tween.SetEase(Tween.EaseType.Out);
+		tween.TweenProperty(friendlyYokaiSprite, "position", start + new Vector2(distance, -8), 0.18);
+		tween.Parallel().TweenProperty(friendlyYokaiSprite, "modulate", glowColor, 0.18);
+		tween.Parallel().TweenProperty(friendlyYokaiSprite, "rotation", startRotation - 0.07f, 0.18);
+		await ToSignal(tween, Tween.SignalName.Finished);
 
-		tween.TweenProperty(
-			friendlyYokaiSprite,
-			"modulate",
-			glowColor,
-			0.15
-		);
+		// Damage happens at the forward impact, while the attacker recoils.
+		Task impact = DamageEnemy(damage, shakeAmount);
+		Tween recoil = CreateTween();
+		recoil.SetTrans(Tween.TransitionType.Sine);
+		recoil.SetEase(Tween.EaseType.Out);
+		recoil.TweenProperty(friendlyYokaiSprite, "position", start, 0.24);
+		recoil.Parallel().TweenProperty(friendlyYokaiSprite, "modulate", friendlyOriginalModulate, 0.24);
+		recoil.Parallel().TweenProperty(friendlyYokaiSprite, "rotation", startRotation, 0.24);
+		await ToSignal(recoil, Tween.SignalName.Finished);
+		await impact;
+	}
 
-		tween.TweenInterval(0.25);
+	// Gentle looping movement makes the static Yo-kai sprites feel alive.
+	// Offset is animated separately from Position, so it doesn't fight lunges.
+	private void StartIdleAnimations()
+	{
+		_friendlyIdleTween = CreateIdleBob(friendlyYokaiSprite, 3.0f, 0.76);
+		_enemyIdleTween = CreateIdleBob(enemySprite, 4.0f, 0.95);
+	}
 
-		tween.TweenProperty(
-			friendlyYokaiSprite,
-			"modulate",
-			friendlyOriginalModulate,
-			0.20
-		);
+	private Tween CreateIdleBob(Sprite2D sprite, float height, double halfCycle)
+	{
+		if (sprite == null)
+			return null;
 
-		await ToSignal(
-			tween,
-			Tween.SignalName.Finished
-		);
+		Vector2 baseOffset = sprite.Offset;
+		Tween tween = CreateTween();
+		tween.SetTrans(Tween.TransitionType.Sine);
+		tween.SetEase(Tween.EaseType.InOut);
+		tween.SetLoops();
+		tween.TweenProperty(sprite, "offset", baseOffset + new Vector2(0, -height), halfCycle);
+		tween.TweenProperty(sprite, "offset", baseOffset, halfCycle);
+		return tween;
+	}
+
+	private void StopIdleAnimations()
+	{
+		if (GodotObject.IsInstanceValid(_friendlyIdleTween))
+			_friendlyIdleTween.Kill();
+		if (GodotObject.IsInstanceValid(_enemyIdleTween))
+			_enemyIdleTween.Kill();
 	}
 
 
@@ -678,29 +714,51 @@ public partial class BattleScene : Node2D
 			return;
 
 		Vector2 originalPosition = enemySprite.Position;
-
-		enemySprite.Modulate =
-			new Color(1.0f, 0.4f, 0.4f, 1.0f);
-
-		enemySprite.Position =
-			originalPosition + new Vector2(-shakeAmount, 0);
-
-		await WaitSeconds(0.06);
-
-		enemySprite.Position =
-			originalPosition + new Vector2(shakeAmount, 0);
-
-		await WaitSeconds(0.06);
-
-		enemySprite.Position = originalPosition;
-
-		enemySprite.Modulate = enemyOriginalModulate;
+		Tween tween = CreateTween();
+		tween.SetTrans(Tween.TransitionType.Sine);
+		tween.TweenProperty(enemySprite, "modulate", new Color(1.0f, 0.16f, 0.16f), 0.06);
+		tween.Parallel().TweenProperty(enemySprite, "position",
+			originalPosition + new Vector2(-shakeAmount, 0), 0.06);
+		tween.TweenProperty(enemySprite, "position",
+			originalPosition + new Vector2(shakeAmount, 0), 0.07);
+		tween.TweenProperty(enemySprite, "position",
+			originalPosition + new Vector2(-shakeAmount / 2, 0), 0.07);
+		tween.TweenProperty(enemySprite, "position", originalPosition, 0.10);
+		tween.Parallel().TweenProperty(enemySprite, "modulate", enemyOriginalModulate, 0.10);
+		await ToSignal(tween, Tween.SignalName.Finished);
 	}
 
 
 	// =========================================
 	// 23. ENEMY TURN
 	// =========================================
+	private async Task PlayEnemyLunge(Action onImpact)
+	{
+		if (enemySprite == null)
+		{
+			onImpact();
+			return;
+		}
+
+		Vector2 start = enemySprite.Position;
+		float startRotation = enemySprite.Rotation;
+		Tween tween = CreateTween();
+		tween.SetTrans(Tween.TransitionType.Cubic);
+		tween.SetEase(Tween.EaseType.Out);
+		tween.TweenProperty(enemySprite, "position", start + new Vector2(-54, -7), 0.18);
+		tween.Parallel().TweenProperty(enemySprite, "rotation", startRotation + 0.07f, 0.18);
+		await ToSignal(tween, Tween.SignalName.Finished);
+
+		// The HP hit and target flash begin when the enemy reaches the apex.
+		onImpact();
+		Tween recoil = CreateTween();
+		recoil.SetTrans(Tween.TransitionType.Sine);
+		recoil.SetEase(Tween.EaseType.Out);
+		recoil.TweenProperty(enemySprite, "position", start, 0.23);
+		recoil.Parallel().TweenProperty(enemySprite, "rotation", startRotation, 0.23);
+		recoil.Parallel().TweenProperty(enemySprite, "modulate", enemyOriginalModulate, 0.23);
+		await ToSignal(recoil, Tween.SignalName.Finished);
+	}
 
 	private async Task EnemyTurn()
 	{
@@ -722,35 +780,35 @@ public partial class BattleScene : Node2D
 				new Color(0.35f, 0.65f, 1.0f, 1.0f);
 		}
 
-		await WaitSeconds(0.6);
+		await WaitSeconds(0.35);
 
 		if (battleFinished)
 			return;
 
-
-		// ENEMY ATTACKS PLAYER
-
-		playerHP = Math.Max(
-			0,
-			playerHP - EnemyDamage
-		);
-
-		_ = FlashRed(playerSprite);
-
-
-		// ENEMY ATTACKS FRIENDLY YO-KAI
-
-		yokaiHP = Math.Max(
-			0,
-			yokaiHP - EnemyDamage
-		);
-
-		_ = FlashRed(friendlyYokaiSprite);
-
-
-		// UPDATE HP
-
-		UpdateAllHP();
+		// One enemy action hits ONE target. Previously it damaged both characters
+		// every round, making the opening fights disproportionately punishing.
+		bool hitPlayer = playerHP > 0 &&
+			(yokaiHP <= 0 || random.NextDouble() < 0.4);
+		Sprite2D target = hitPlayer ? playerSprite : friendlyYokaiSprite;
+		Task hitReaction = Task.CompletedTask;
+		await PlayEnemyLunge(() =>
+		{
+			if (hitPlayer)
+			{
+				playerHP = Math.Max(0, playerHP - EnemyDamage);
+				GD.Print("Enemy hit the player for " + EnemyDamage + ".");
+			}
+			else
+			{
+				yokaiHP = Math.Max(0, yokaiHP - EnemyDamage);
+				GD.Print("Enemy hit the friendly Yo-kai for " + EnemyDamage + ".");
+			}
+			UpdateAllHP();
+			hitReaction = FlashRed(target);
+		});
+		await hitReaction;
+		if (battleFinished)
+			return;
 
 		GD.Print(
 			$"Player HP: {playerHP}/{PlayerMaxHP}"
@@ -759,28 +817,6 @@ public partial class BattleScene : Node2D
 		GD.Print(
 			$"Friendly Yo-kai HP: {yokaiHP}/{YokaiMaxHP}"
 		);
-
-
-		// ENEMY ATTACK MOVEMENT
-
-		if (enemySprite != null)
-		{
-			Vector2 originalPosition = enemySprite.Position;
-
-			enemySprite.Position =
-				originalPosition + new Vector2(-6, 0);
-
-			await WaitSeconds(0.06);
-
-			enemySprite.Position =
-				originalPosition + new Vector2(6, 0);
-
-			await WaitSeconds(0.06);
-
-			enemySprite.Position = originalPosition;
-
-			enemySprite.Modulate = enemyOriginalModulate;
-		}
 
 
 		// DEFEAT CHECK
@@ -889,17 +925,7 @@ public partial class BattleScene : Node2D
 			GD.Print("Escaped successfully!");
 
 			battleFinished = true;
-
-			Error error = GetTree().ChangeSceneToFile(
-				"res://world.tscn"
-			);
-
-			if (error != Error.Ok)
-			{
-				GD.PushError(
-					"Could not open res://world.tscn. Check the scene filename."
-				);
-			}
+			ReturnToWorld();
 
 			return;
 		}
@@ -971,6 +997,7 @@ public partial class BattleScene : Node2D
 	private void WinBattle()
 	{
 		battleFinished = true;
+		StopIdleAnimations();
 
 		HideAttackChoices();
 
@@ -985,6 +1012,16 @@ public partial class BattleScene : Node2D
 
 		GD.Print("VICTORY!");
 		GD.Print("You defeated the enemy Yo-kai!");
+
+		string path = GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath;
+		int level = GameProgress.LevelFromBattleScene(path);
+		bool advanced = GameProgress.CompleteLevel(level);
+		string message = advanced
+			? level == GameProgress.TotalLevels
+				? "You cleared all seven levels! Wawa is safe. Return to the map."
+				: $"Level {level} cleared! Next: {GameProgress.NextBuilding}. Return to Wawa."
+			: "Enemy defeated! Return to Wawa.";
+		ShowResult("VICTORY!", message);
 	}
 
 
@@ -995,6 +1032,7 @@ public partial class BattleScene : Node2D
 	private void LoseBattle()
 	{
 		battleFinished = true;
+		StopIdleAnimations();
 
 		HideAttackChoices();
 
@@ -1009,6 +1047,26 @@ public partial class BattleScene : Node2D
 
 		GD.Print("DEFEAT!");
 		GD.Print("Your team can no longer fight.");
+		ShowResult("DEFEAT", "Your team can no longer fight. Return to Wawa and try again.");
+	}
+
+	private void ShowResult(string title, string message)
+	{
+		var dialog = new AcceptDialog { Title = title, DialogText = message };
+		AddChild(dialog);
+		dialog.Confirmed += ReturnToWorld;
+		dialog.CloseRequested += ReturnToWorld;
+		dialog.PopupCentered();
+	}
+
+	private void ReturnToWorld()
+	{
+		// Preserve the last map position after a battle or successful escape.
+		PlayerData.HasLoadedPosition = true;
+		GetTree().Paused = false;
+		Error error = GetTree().ChangeSceneToFile("res://world.tscn");
+		if (error != Error.Ok)
+			GD.PushError("Could not return to Wawa: " + error);
 	}
 
 
@@ -1019,7 +1077,7 @@ public partial class BattleScene : Node2D
 	private async Task WaitSeconds(double seconds)
 	{
 		await ToSignal(
-			GetTree().CreateTimer(seconds),
+			GetTree().CreateTimer(seconds, processAlways: false),
 			SceneTreeTimer.SignalName.Timeout
 		);
 	}

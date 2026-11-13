@@ -15,7 +15,7 @@ public partial class SariSariStoreArea2d : Area2D
 		if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
 		{
 			// Palitan ang "res://Dialogue2.tscn" ng gusto mong puntahang scene para sa School
-			GetTree().ChangeSceneToFile("res://Dialogue2.tscn");
+			GameProgress.EnterBuilding(this, 2, "res://Dialogue2.tscn");
 		}
 	}
 

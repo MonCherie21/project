@@ -7,6 +7,9 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ih478"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player_footprint"]
+size = Vector2(26, 18)
+
 [node name="Player2" type="CharacterBody2D" unique_id=931329393]
 script = ExtResource("1_ufh5k")
 FrontTexture = ExtResource("2_x3sgo")
@@ -14,9 +17,12 @@ BackTexture = ExtResource("3_ryqyf")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1045029439]
 position = Vector2(35, 49)
+scale = Vector2(0.78, 0.78)
 texture = ExtResource("2_x3sgo")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=40556087]
+position = Vector2(35, 92)
+shape = SubResource("RectangleShape2D_player_footprint")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=209112102]
 position = Vector2(35, 56)

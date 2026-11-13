@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://dqredalused6t" path="res://HauntedHouseArea2d.cs" id="8_ic0uy"]
 [ext_resource type="Script" uid="uid://cnqkp6nej0p7p" path="res://SariSariStoreArea2d.cs" id="8_ioo17"]
 [ext_resource type="Texture2D" uid="uid://b42udyntoskbr" path="res://Assets/Flag.png" id="12_k3n1d"]
+[ext_resource type="Script" path="res://WorldCollisionGenerator.cs" id="13_world_collision"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fj7yv"]
 texture = ExtResource("1_f3sb7")
@@ -323,3 +324,6 @@ offset_bottom = 770.0
 texture = ExtResource("12_k3n1d")
 expand_mode = 1
 stretch_mode = 5
+
+[node name="WorldCollision" type="Node2D" parent="."]
+script = ExtResource("13_world_collision")

@@ -9,8 +9,7 @@ public partial class BackButton : Button
 
 	private void OnBackButtonPressed()
 	{
-		// Awtomatiko nitong ibabalik ka sa huling scene na binisita mo
 		SceneManager sceneManager = GetNode<SceneManager>("/root/SceneManager");
-		sceneManager.GoBack();
+		sceneManager.ResumeFromPause();
 	}
 }

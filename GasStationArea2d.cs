@@ -15,7 +15,7 @@ public partial class GasStationArea2d : Area2D
 		if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
 		{
 			// Palitan ang "res://Dialogue2.tscn" ng gusto mong puntahang scene para sa gas station
-			GetTree().ChangeSceneToFile("res://Dialogue3.tscn");
+			GameProgress.EnterBuilding(this, 3, "res://Dialogue3.tscn");
 		}
 	}
 

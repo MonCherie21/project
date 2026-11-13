@@ -15,7 +15,7 @@ public partial class HauntedHouseArea2d : Area2D
 		if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
 		{
 			// Palitan ang "res://Dialogue2.tscn" ng gusto mong puntahang scene para sa School
-			GetTree().ChangeSceneToFile("res://Dialogue7.tscn");
+			GameProgress.EnterBuilding(this, 7, "res://Dialogue7.tscn");
 		}
 	}
 
