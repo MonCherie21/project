@@ -10,7 +10,7 @@ public partial class BattleScene : Node2D
 
 	[Export] public int PlayerMaxHP = 100;
 	[Export] public int YokaiMaxHP = 100;
-	[Export] public int EnemyMaxHP = 100;
+	[Export] public int EnemyMaxHP = 70;
 
 	private int playerHP;
 	private int yokaiHP;
@@ -21,10 +21,10 @@ public partial class BattleScene : Node2D
 	// 2. DAMAGE AND HEALING
 	// =========================================
 
-	[Export] public int SlapDamage = 5;
-	[Export] public int GhostPunchDamage = 10;
+	[Export] public int SlapDamage = 8;
+	[Export] public int GhostPunchDamage = 16;
 
-	[Export] public int EnemyDamage = 8;
+	[Export] public int EnemyDamage = 6;
 	[Export] public int FeedHealing = 20;
 
 
@@ -338,15 +338,15 @@ public partial class BattleScene : Node2D
 	{
 		if (FriendshipLevel <= 0)
 		{
-			EnemyDamage = 12;
+			EnemyDamage = 6;
 		}
 		else if (FriendshipLevel == 1)
 		{
-			EnemyDamage = 8;
+			EnemyDamage = 5;
 		}
 		else if (FriendshipLevel == 2)
 		{
-			EnemyDamage = 5;
+			EnemyDamage = 4;
 		}
 		else
 		{
@@ -457,7 +457,8 @@ public partial class BattleScene : Node2D
 			ghostPunchButton.ZIndex = 100;
 			ghostPunchButton.MoveToFront();
 
-			// Optional: Visually grey out Ghost Punch if it's on cooldown
+			// Grey out and disable the skill while it is on cooldown.
+			ghostPunchButton.Disabled = ghostPunchCooldown > 0;
 			if (ghostPunchCooldown > 0)
 			{
 				ghostPunchButton.Modulate = new Color(0.5f, 0.5f, 0.5f, 1.0f);
@@ -728,24 +729,22 @@ public partial class BattleScene : Node2D
 			return;
 
 
-		// ENEMY ATTACKS PLAYER
-
-		playerHP = Math.Max(
-			0,
-			playerHP - EnemyDamage
-		);
-
-		_ = FlashRed(playerSprite);
-
-
-		// ENEMY ATTACKS FRIENDLY YO-KAI
-
-		yokaiHP = Math.Max(
-			0,
-			yokaiHP - EnemyDamage
-		);
-
-		_ = FlashRed(friendlyYokaiSprite);
+		// One enemy action hits ONE target. Previously it damaged both characters
+		// every round, making the opening fights disproportionately punishing.
+		bool hitPlayer = playerHP > 0 &&
+			(yokaiHP <= 0 || random.NextDouble() < 0.4);
+		if (hitPlayer)
+		{
+			playerHP = Math.Max(0, playerHP - EnemyDamage);
+			_ = FlashRed(playerSprite);
+			GD.Print("Enemy hit the player for " + EnemyDamage + ".");
+		}
+		else
+		{
+			yokaiHP = Math.Max(0, yokaiHP - EnemyDamage);
+			_ = FlashRed(friendlyYokaiSprite);
+			GD.Print("Enemy hit the friendly Yo-kai for " + EnemyDamage + ".");
+		}
 
 
 		// UPDATE HP
@@ -889,17 +888,7 @@ public partial class BattleScene : Node2D
 			GD.Print("Escaped successfully!");
 
 			battleFinished = true;
-
-			Error error = GetTree().ChangeSceneToFile(
-				"res://world.tscn"
-			);
-
-			if (error != Error.Ok)
-			{
-				GD.PushError(
-					"Could not open res://world.tscn. Check the scene filename."
-				);
-			}
+			ReturnToWorld();
 
 			return;
 		}
@@ -985,6 +974,7 @@ public partial class BattleScene : Node2D
 
 		GD.Print("VICTORY!");
 		GD.Print("You defeated the enemy Yo-kai!");
+		ShowResult("VICTORY!", "You defeated the enemy Yo-kai! Return to Wawa?");
 	}
 
 
@@ -1009,6 +999,26 @@ public partial class BattleScene : Node2D
 
 		GD.Print("DEFEAT!");
 		GD.Print("Your team can no longer fight.");
+		ShowResult("DEFEAT", "Your team can no longer fight. Return to Wawa and try again.");
+	}
+
+	private void ShowResult(string title, string message)
+	{
+		var dialog = new AcceptDialog { Title = title, DialogText = message };
+		AddChild(dialog);
+		dialog.Confirmed += ReturnToWorld;
+		dialog.CloseRequested += ReturnToWorld;
+		dialog.PopupCentered();
+	}
+
+	private void ReturnToWorld()
+	{
+		// Preserve the last map position after a battle or successful escape.
+		PlayerData.HasLoadedPosition = true;
+		GetTree().Paused = false;
+		Error error = GetTree().ChangeSceneToFile("res://world.tscn");
+		if (error != Error.Ok)
+			GD.PushError("Could not return to Wawa: " + error);
 	}
 
 
@@ -1019,7 +1029,7 @@ public partial class BattleScene : Node2D
 	private async Task WaitSeconds(double seconds)
 	{
 		await ToSignal(
-			GetTree().CreateTimer(seconds),
+			GetTree().CreateTimer(seconds, processAlways: false),
 			SceneTreeTimer.SignalName.Timeout
 		);
 	}

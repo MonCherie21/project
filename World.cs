@@ -39,11 +39,11 @@ public partial class World : Node2D
                                     Text = "Loading player profile..." };
         overlay.AddChild(nameLabel);
 
-        // Temporary Save entry point while the separate pause-menu UX is being fixed.
+		// Keep the quick-save entry point clear of the player's return/pause arrow.
         var saveButton = new Button
         {
             Text = "SAVE GAME",
-            Position = new Vector2(15, 48),
+			Position = new Vector2(175, 48),
             Size = new Vector2(145, 42)
         };
         saveButton.Pressed += () => SaveSlotPanel.Open(this, SaveSlotPanel.SlotMode.Save);

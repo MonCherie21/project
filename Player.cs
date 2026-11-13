@@ -50,6 +50,6 @@ public partial class Player : CharacterBody2D
 
 	private void OnButtonPressed()
 	{
-		GetTree().ChangeSceneToFile("res://character_creation.tscn");
+		GetNode<SceneManager>("/root/SceneManager").ShowPause();
 	}
 }

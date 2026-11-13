@@ -165,7 +165,7 @@ public partial class SaveSlotPanel : CanvasLayer
                     return;
 
                 SaveLoadService.PrepareLoad(selected);
-                GetTree().Paused = false;
+				GetNode<SceneManager>("/root/SceneManager").ResumeFromPause();
                 Error error = GetTree().ChangeSceneToFile("res://world.tscn");
                 if (error != Error.Ok)
                 {
