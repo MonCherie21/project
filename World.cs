@@ -41,14 +41,16 @@ public partial class World : Node2D
                                     Text = "Loading player profile..." };
         overlay.AddChild(nameLabel);
 
-		// Keep the quick-save entry point clear of the player's return/pause arrow.
+        // Quick Save always writes directly to Slot 1; the pause menu still
+        // offers all three slots and their overwrite confirmations.
         var saveButton = new Button
         {
-            Text = "SAVE GAME",
-			Position = new Vector2(175, 48),
-            Size = new Vector2(145, 42)
+            Text = "QUICK SAVE",
+            Position = new Vector2(175, 48),
+            Size = new Vector2(145, 42),
+            TooltipText = "Save immediately to Slot 1 (overwrites Slot 1)"
         };
-        saveButton.Pressed += () => SaveSlotPanel.Open(this, SaveSlotPanel.SlotMode.Save);
+        saveButton.Pressed += () => _ = QuickSaveSlotOneAsync(saveButton, overlay);
         overlay.AddChild(saveButton);
 
         // The journal replaces the oversized progress banner. The active quest
@@ -88,7 +90,7 @@ public partial class World : Node2D
                     ? "All seven stages are cleared!\nYou have protected Wawa."
                     : "STORY PROGRESS  " + GameProgress.CompletedLevels + "/" + GameProgress.TotalLevels +
                       "\n\nCURRENT OBJECTIVE\nGo to " + GameProgress.NextBuilding +
-                      " and complete the Yo-kai battle.\n\nFollow the yellow flag on the map."
+                      " and complete the Yo-kai battle.\n\nFollow the white flag on the map."
             };
             overlay.AddChild(journal);
             journal.Confirmed += journal.QueueFree;
@@ -105,7 +107,7 @@ public partial class World : Node2D
             TutorialOverlay.Show(this, "WELCOME TO WAWA!",
                 "Use W, A, S, D or the arrow keys to walk around.\n\n" +
                 "Tap the clipboard with the yellow ! to check your next objective.\n" +
-                "Look for the yellow flag to find your next battle.");
+                "Look for the white flag to find your next battle.");
         }
 
         if (PlayerData.PlayerId <= 0 || PlayerData.AccessToken.Length == 0)
@@ -203,11 +205,44 @@ public partial class World : Node2D
         }
     }
 
-    private async Task ShowTimedStatusAsync(CanvasLayer overlay, string message)
+    private async Task QuickSaveSlotOneAsync(Button button, CanvasLayer overlay)
+    {
+        if (button.Disabled)
+            return;
+
+        button.Disabled = true;
+        button.Text = "SAVING...";
+        try
+        {
+            GameSaveData snapshot = GameSaveData.Capture();
+            await SaveLoadService.SaveAsync(this, 1, snapshot);
+            GameProgress.SetActiveSlot(1);
+            GameProgress.MarkSaved(snapshot.CompletedLevels);
+            if (GodotObject.IsInstanceValid(overlay))
+                _ = ShowTimedStatusAsync(overlay, "Saved to Slot 1 ✓", new Vector2(175, 100));
+        }
+        catch (Exception ex)
+        {
+            GD.PushWarning("Quick Save to Slot 1 failed: " + ex.Message);
+            if (GodotObject.IsInstanceValid(overlay))
+                _ = ShowTimedStatusAsync(overlay, "Quick save failed — check Output", new Vector2(175, 100));
+        }
+        finally
+        {
+            if (GodotObject.IsInstanceValid(button))
+            {
+                button.Disabled = false;
+                button.Text = "QUICK SAVE";
+            }
+        }
+    }
+
+    private async Task ShowTimedStatusAsync(CanvasLayer overlay, string message,
+        Vector2? position = null)
     {
         var toast = new Label
         {
-            Position = new Vector2(91, 176),
+            Position = position ?? new Vector2(91, 176),
             Text = message,
             MouseFilter = Control.MouseFilterEnum.Ignore
         };

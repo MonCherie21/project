@@ -15,7 +15,7 @@ public static class TutorialOverlay
         var shade = new ColorRect
         {
             Size = screen,
-            Color = new Color(0.03f, 0.07f, 0.10f, 0.82f),
+            Color = new Color(0.025f, 0.03f, 0.055f, 0.90f),
             MouseFilter = Control.MouseFilterEnum.Stop
         };
         layer.AddChild(shade);
@@ -28,12 +28,12 @@ public static class TutorialOverlay
         };
         var style = new StyleBoxFlat
         {
-            BgColor = new Color("294c55"),
-            BorderColor = new Color("ebd49a"),
-            BorderWidthLeft = 5,
-            BorderWidthRight = 5,
-            BorderWidthTop = 5,
-            BorderWidthBottom = 5
+            BgColor = new Color("151c2b"),
+            BorderColor = new Color("68788d"),
+            BorderWidthLeft = 4,
+            BorderWidthRight = 4,
+            BorderWidthTop = 4,
+            BorderWidthBottom = 4
         };
         panel.AddThemeStyleboxOverride("panel", style);
         shade.AddChild(panel);
@@ -50,7 +50,7 @@ public static class TutorialOverlay
 
         var heading = new Label { Text = title, HorizontalAlignment = HorizontalAlignment.Center };
         heading.AddThemeFontSizeOverride("font_size", 25);
-        heading.AddThemeColorOverride("font_color", new Color("ffdf76"));
+        heading.AddThemeColorOverride("font_color", new Color("ead49a"));
         column.AddChild(heading);
 
         var body = new Label
@@ -61,7 +61,7 @@ public static class TutorialOverlay
             HorizontalAlignment = HorizontalAlignment.Center
         };
         body.AddThemeFontSizeOverride("font_size", 17);
-        body.AddThemeColorOverride("font_color", new Color("f7f0db"));
+        body.AddThemeColorOverride("font_color", new Color("d6dbe5"));
         column.AddChild(body);
 
         var button = new Button
@@ -70,6 +70,22 @@ public static class TutorialOverlay
             CustomMinimumSize = new Vector2(210, 42),
             SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter
         };
+        var buttonNormal = new StyleBoxFlat
+        {
+            BgColor = new Color("293345"),
+            BorderColor = new Color("8292a6"),
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2,
+            BorderWidthTop = 2,
+            BorderWidthBottom = 2
+        };
+        var buttonHover = (StyleBoxFlat)buttonNormal.Duplicate();
+        buttonHover.BgColor = new Color("3b4c62");
+        button.AddThemeStyleboxOverride("normal", buttonNormal);
+        button.AddThemeStyleboxOverride("hover", buttonHover);
+        button.AddThemeStyleboxOverride("focus", buttonHover);
+        button.AddThemeColorOverride("font_color", new Color("f4f1e8"));
+        button.AddThemeColorOverride("font_hover_color", new Color("ffdfa0"));
         button.Pressed += () =>
         {
             tree.Paused = wasPaused;
