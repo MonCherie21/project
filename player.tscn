@@ -10,6 +10,9 @@ load_path = "res://.godot/imported/P1_Front.png-ea2fd609b5935a1b62c084f8dd6411bd
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_sweqy"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player_footprint"]
+size = Vector2(24, 18)
+
 [node name="Player" type="CharacterBody2D" unique_id=931329393]
 script = ExtResource("1_4flbx")
 FrontTexture = ExtResource("2_onrkg")
@@ -20,6 +23,8 @@ position = Vector2(35, 49)
 texture = SubResource("CompressedTexture2D_4flbx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=40556087]
+position = Vector2(35, 88)
+shape = SubResource("RectangleShape2D_player_footprint")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=209112102]
 position = Vector2(35, 56)

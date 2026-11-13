@@ -32,6 +32,7 @@ public partial class World : Node2D
             : new Vector2(-193, -405);
         PlayerData.WorldPosition = player.Position;
         PlayerData.HasLoadedPosition = false;
+        UpdateStoryFlags();
 
         // Added programmatically, so the existing world.tscn is untouched.
         var overlay = new CanvasLayer();
@@ -50,13 +51,36 @@ public partial class World : Node2D
         saveButton.Pressed += () => SaveSlotPanel.Open(this, SaveSlotPanel.SlotMode.Save);
         overlay.AddChild(saveButton);
 
+        // Keep progression below the return arrow and make the next objective
+        // easy to find without covering the map controls.
+        var progressBackground = new ColorRect
+        {
+            Position = new Vector2(12, 151),
+            Size = new Vector2(600, 49),
+            Color = new Color(0.03f, 0.06f, 0.10f, 0.70f),
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+        overlay.AddChild(progressBackground);
+
+        var objectiveMarker = new Label
+        {
+            Position = new Vector2(13, 4),
+            Text = GameProgress.CompletedLevels == GameProgress.TotalLevels ? "★" : "!",
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+        objectiveMarker.AddThemeColorOverride("font_color", Colors.Gold);
+        objectiveMarker.AddThemeFontSizeOverride("font_size", 28);
+        progressBackground.AddChild(objectiveMarker);
+
         var progressLabel = new Label
         {
-            Position = new Vector2(15, 109),
+            Position = new Vector2(49, 15),
+            Size = new Vector2(535, 30),
+            MouseFilter = Control.MouseFilterEnum.Ignore,
             Text = "CLEARED: " + GameProgress.CompletedLevels + "/" +
                    GameProgress.TotalLevels + "   NEXT: " + GameProgress.NextBuilding
         };
-        overlay.AddChild(progressLabel);
+        progressBackground.AddChild(progressLabel);
 
         if (GameProgress.PendingAutoSave)
             _ = AutoSaveProgressAsync(progressLabel);
@@ -113,6 +137,25 @@ public partial class World : Node2D
             request.QueueFree();
             nameLabel.Text = "Unable to request profile.";
             GD.PrintErr("Profile request could not start: " + error);
+        }
+    }
+
+    private void UpdateStoryFlags()
+    {
+        string[] flagNames =
+        {
+            "House Flag", "Sari-Sari Store Flag", "Gas Station Flag",
+            "Pure Gold Flag", "McDo Flag", "School Flag", "Abandoned House Flag"
+        };
+
+        for (int i = 0; i < flagNames.Length; i++)
+        {
+            var flag = GetParent().GetNodeOrNull<TextureRect>(flagNames[i]);
+            if (flag == null)
+                continue;
+
+            flag.Visible = i >= GameProgress.CompletedLevels;
+            flag.MouseFilter = Control.MouseFilterEnum.Ignore;
         }
     }
 
