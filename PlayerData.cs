@@ -16,6 +16,9 @@ public static class PlayerData
     public static Vector2 WorldPosition = new Vector2(-193, -405);
     public static bool HasLoadedPosition = false;
 
+    // Shown only after a freshly created character, never on Continue/load.
+    public static bool PendingMovementTutorial = false;
+
     public static bool HasLocalSession => FileAccess.FileExists(SessionFile);
 
     public static bool RestoreLocalSession()

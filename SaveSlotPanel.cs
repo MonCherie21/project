@@ -212,6 +212,7 @@ public partial class SaveSlotPanel : CanvasLayer
             GameProgress.MarkSaved(snapshot.CompletedLevels);
             await RefreshAsync();
             _status.Text = "Saved slot " + slot + " successfully!";
+            _ = ClearSuccessMessageAsync(_status.Text);
         }
         catch (Exception e)
         {
@@ -221,5 +222,13 @@ public partial class SaveSlotPanel : CanvasLayer
         {
             SetWorking(false);
         }
+    }
+
+    private async Task ClearSuccessMessageAsync(string successText)
+    {
+        await ToSignal(GetTree().CreateTimer(3.0, processAlways: true),
+            SceneTreeTimer.SignalName.Timeout);
+        if (GodotObject.IsInstanceValid(this) && _status.Text == successText)
+            _status.Text = "Player: " + PlayerData.PlayerName;
     }
 }

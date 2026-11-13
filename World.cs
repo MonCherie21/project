@@ -51,39 +51,62 @@ public partial class World : Node2D
         saveButton.Pressed += () => SaveSlotPanel.Open(this, SaveSlotPanel.SlotMode.Save);
         overlay.AddChild(saveButton);
 
-        // Keep progression below the return arrow and make the next objective
-        // easy to find without covering the map controls.
-        var progressBackground = new ColorRect
+        // The journal replaces the oversized progress banner. The active quest
+        // stays one click away, without covering Wawa's roads and buildings.
+        var journalButton = new Button
         {
-            Position = new Vector2(12, 151),
-            Size = new Vector2(600, 49),
-            Color = new Color(0.03f, 0.06f, 0.10f, 0.70f),
-            MouseFilter = Control.MouseFilterEnum.Ignore
+            Position = new Vector2(14, 157),
+            Size = new Vector2(66, 66),
+            Flat = true,
+            TooltipText = "Open the objective clipboard"
         };
-        overlay.AddChild(progressBackground);
-
-        var objectiveMarker = new Label
+        overlay.AddChild(journalButton);
+        journalButton.AddChild(new ObjectiveClipboardIcon
         {
-            Position = new Vector2(13, 4),
+            Size = new Vector2(60, 64),
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        });
+
+        var notice = new Label
+        {
+            Position = new Vector2(48, -9),
             Text = GameProgress.CompletedLevels == GameProgress.TotalLevels ? "★" : "!",
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
-        objectiveMarker.AddThemeColorOverride("font_color", Colors.Gold);
-        objectiveMarker.AddThemeFontSizeOverride("font_size", 28);
-        progressBackground.AddChild(objectiveMarker);
+        notice.AddThemeColorOverride("font_color", Colors.Gold);
+        notice.AddThemeColorOverride("font_outline_color", Colors.Black);
+        notice.AddThemeConstantOverride("outline_size", 5);
+        notice.AddThemeFontSizeOverride("font_size", 23);
+        journalButton.AddChild(notice);
 
-        var progressLabel = new Label
+        journalButton.Pressed += () =>
         {
-            Position = new Vector2(49, 15),
-            Size = new Vector2(535, 30),
-            MouseFilter = Control.MouseFilterEnum.Ignore,
-            Text = "CLEARED: " + GameProgress.CompletedLevels + "/" +
-                   GameProgress.TotalLevels + "   NEXT: " + GameProgress.NextBuilding
+            var journal = new AcceptDialog
+            {
+                Title = "Wawa Field Notes",
+                DialogText = GameProgress.CompletedLevels == GameProgress.TotalLevels
+                    ? "All seven stages are cleared!\nYou have protected Wawa."
+                    : "STORY PROGRESS  " + GameProgress.CompletedLevels + "/" + GameProgress.TotalLevels +
+                      "\n\nCURRENT OBJECTIVE\nGo to " + GameProgress.NextBuilding +
+                      " and complete the Yo-kai battle.\n\nFollow the yellow flag on the map."
+            };
+            overlay.AddChild(journal);
+            journal.Confirmed += journal.QueueFree;
+            journal.CloseRequested += journal.QueueFree;
+            journal.PopupCentered(new Vector2I(430, 235));
         };
-        progressBackground.AddChild(progressLabel);
 
         if (GameProgress.PendingAutoSave)
-            _ = AutoSaveProgressAsync(progressLabel);
+            _ = AutoSaveProgressAsync(overlay);
+
+        if (PlayerData.PendingMovementTutorial)
+        {
+            PlayerData.PendingMovementTutorial = false;
+            TutorialOverlay.Show(this, "WELCOME TO WAWA!",
+                "Use W, A, S, D or the arrow keys to walk around.\n\n" +
+                "Tap the clipboard with the yellow ! to check your next objective.\n" +
+                "Look for the yellow flag to find your next battle.");
+        }
 
         if (PlayerData.PlayerId <= 0 || PlayerData.AccessToken.Length == 0)
         {
@@ -154,12 +177,13 @@ public partial class World : Node2D
             if (flag == null)
                 continue;
 
-            flag.Visible = i >= GameProgress.CompletedLevels;
+            // Only the currently assigned building should be marked.
+            flag.Visible = i == GameProgress.CompletedLevels;
             flag.MouseFilter = Control.MouseFilterEnum.Ignore;
         }
     }
 
-    private async Task AutoSaveProgressAsync(Label progressLabel)
+    private async Task AutoSaveProgressAsync(CanvasLayer overlay)
     {
         GameSaveData snapshot = GameSaveData.Capture();
         int slot = GameProgress.ActiveSlot;
@@ -167,15 +191,33 @@ public partial class World : Node2D
         {
             await SaveLoadService.SaveAsync(this, slot, snapshot);
             GameProgress.MarkSaved(snapshot.CompletedLevels);
-            if (GodotObject.IsInstanceValid(progressLabel))
-                progressLabel.Text += "  (saved to Slot " + slot + ")";
+            if (GodotObject.IsInstanceValid(overlay))
+                _ = ShowTimedStatusAsync(overlay, "Saved to Slot " + slot + " ✓");
             GD.Print("Level progress automatically saved to Slot " + slot + ".");
         }
         catch (Exception ex)
         {
             GD.PushWarning("Progress autosave failed. Save manually to retry: " + ex.Message);
-            if (GodotObject.IsInstanceValid(progressLabel))
-                progressLabel.Text += "  (save pending)";
+            if (GodotObject.IsInstanceValid(overlay))
+                _ = ShowTimedStatusAsync(overlay, "Save pending — use SAVE GAME to retry");
         }
+    }
+
+    private async Task ShowTimedStatusAsync(CanvasLayer overlay, string message)
+    {
+        var toast = new Label
+        {
+            Position = new Vector2(91, 176),
+            Text = message,
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+        toast.AddThemeFontSizeOverride("font_size", 16);
+        toast.AddThemeColorOverride("font_color", Colors.Gold);
+        toast.AddThemeColorOverride("font_outline_color", new Color("14202b"));
+        toast.AddThemeConstantOverride("outline_size", 5);
+        overlay.AddChild(toast);
+        await ToSignal(GetTree().CreateTimer(3.2, processAlways: true), SceneTreeTimer.SignalName.Timeout);
+        if (GodotObject.IsInstanceValid(toast))
+            toast.QueueFree();
     }
 }

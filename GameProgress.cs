@@ -15,6 +15,7 @@ public static class GameProgress
     public static int CompletedLevels { get; private set; }
     public static int ActiveSlot { get; private set; } = 1;
     public static bool PendingAutoSave { get; private set; }
+    public static bool HasSeenBattleTutorial { get; private set; }
 
     public static string NextBuilding => CompletedLevels >= TotalLevels
         ? "All levels completed"
@@ -25,6 +26,7 @@ public static class GameProgress
         CompletedLevels = 0;
         ActiveSlot = 1;
         PendingAutoSave = false;
+        HasSeenBattleTutorial = false;
     }
 
     public static void LoadProgress(int completed, int slot)
@@ -57,6 +59,8 @@ public static class GameProgress
         PendingAutoSave = true;
         return true;
     }
+
+    public static void MarkBattleTutorialSeen() => HasSeenBattleTutorial = true;
 
     public static int LevelFromBattleScene(string path)
     {

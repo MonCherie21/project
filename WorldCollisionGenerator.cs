@@ -40,13 +40,22 @@ public partial class WorldCollisionGenerator : Node2D
         Vector2 regionSize = building.RegionRect.Size;
         Vector2 scale = AbsScale(building.GlobalScale);
 
-        // The atlas regions include a little transparent padding; trim just
-        // enough to match the visible walls without blocking nearby roads.
+        // Collision belongs to the *solid central walls*, not to the transparent
+        // or decorative edges. Large rectangles previously sealed the narrow
+        // road between the Sari-Sari Store and the Gas Station.
+        string buildingName = building.Name.ToString();
+        bool tightPassage = buildingName == "SariSariStore" ||
+                            buildingName == "GasStation";
+        float widthRatio = tightPassage ? 0.67f : 0.75f;
+        float heightRatio = tightPassage ? 0.48f : 0.60f;
         Vector2 colliderSize = new Vector2(
-            Mathf.Max(20, regionSize.X * scale.X * 0.92f),
-            Mathf.Max(20, regionSize.Y * scale.Y * 0.90f));
+            Mathf.Max(20, regionSize.X * scale.X * widthRatio),
+            Mathf.Max(20, regionSize.Y * scale.Y * heightRatio));
 
-        AddWall(building.Name.ToString() + "_Solid", building.GlobalPosition, colliderSize);
+        // Center the blocker slightly above ground level so the pavement in
+        // front of shops remains walkable and clickable.
+        Vector2 center = building.GlobalPosition - new Vector2(0, regionSize.Y * scale.Y * 0.09f);
+        AddWall(building.Name.ToString() + "_Solid", center, colliderSize);
     }
 
     private static Vector2 AbsScale(Vector2 scale) =>

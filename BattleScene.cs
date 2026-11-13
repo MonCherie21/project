@@ -327,6 +327,18 @@ public partial class BattleScene : Node2D
 		GD.Print("Battle initialized!");
 		GD.Print("Friendship Level: " + FriendshipLevel);
 		GD.Print("Enemy damage: " + EnemyDamage);
+
+		if (GameProgress.LevelFromBattleScene(GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath) == 1
+			&& !GameProgress.HasSeenBattleTutorial)
+		{
+			GameProgress.MarkBattleTutorialSeen();
+			TutorialOverlay.Show(this, "YOUR FIRST YO-KAI BATTLE",
+				"It is your turn first! Choose an attack below.\n\n" +
+				"SLAP is a reliable quick hit. GHOST PUNCH does more damage, " +
+				"but needs time to recharge.\n\n" +
+				"FEED heals your team. RUN leaves the battle. " +
+				"Watch the HP bars and wait for your turn!");
+		}
 	}
 
 
