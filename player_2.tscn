@@ -17,6 +17,7 @@ BackTexture = ExtResource("3_ryqyf")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1045029439]
 position = Vector2(35, 49)
+scale = Vector2(0.78, 0.78)
 texture = ExtResource("2_x3sgo")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=40556087]
