@@ -42,17 +42,6 @@ public partial class World : Node2D
                                     Text = "Loading player profile..." };
         overlay.AddChild(nameLabel);
 
-        // One quick checkpoint for the selected account (not a new player).
-        var saveButton = new Button
-        {
-            Text = "QUICK SAVE",
-            Position = new Vector2(175, 48),
-            Size = new Vector2(145, 42),
-            TooltipText = "Update the current account's saved progress"
-        };
-        saveButton.Pressed += () => _ = QuickSaveSlotOneAsync(saveButton, overlay);
-        overlay.AddChild(saveButton);
-
         // The journal replaces the oversized progress banner. The active quest
         // stays one click away, without covering Wawa's roads and buildings.
         var journalButton = new Button
@@ -228,38 +217,6 @@ public partial class World : Node2D
             GD.PushWarning("Progress autosave failed. Save manually to retry: " + ex.Message);
             if (GodotObject.IsInstanceValid(overlay))
                 _ = ShowTimedStatusAsync(overlay, "Save pending — use SAVE GAME to retry");
-        }
-    }
-
-    private async Task QuickSaveSlotOneAsync(Button button, CanvasLayer overlay)
-    {
-        if (button.Disabled)
-            return;
-
-        button.Disabled = true;
-        button.Text = "SAVING...";
-        try
-        {
-            GameSaveData snapshot = GameSaveData.Capture();
-            await SaveLoadService.SaveAsync(this, 1, snapshot);
-            GameProgress.SetActiveSlot(1);
-            GameProgress.MarkSaved(snapshot.CompletedLevels);
-            if (GodotObject.IsInstanceValid(overlay))
-                _ = ShowTimedStatusAsync(overlay, "Adventure saved ✓", new Vector2(175, 100));
-        }
-        catch (Exception ex)
-        {
-            GD.PushWarning("Quick Save failed: " + ex.Message);
-            if (GodotObject.IsInstanceValid(overlay))
-                _ = ShowTimedStatusAsync(overlay, "Quick save failed — check Output", new Vector2(175, 100));
-        }
-        finally
-        {
-            if (GodotObject.IsInstanceValid(button))
-            {
-                button.Disabled = false;
-                button.Text = "QUICK SAVE";
-            }
         }
     }
 

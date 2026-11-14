@@ -26,8 +26,8 @@ public partial class Continue : Control
 
         _status = new Label
         {
-            Position = new Vector2(317, 561),
-            Size = new Vector2(646, 52),
+            Position = new Vector2(317, 601),
+            Size = new Vector2(646, 45),
             HorizontalAlignment = HorizontalAlignment.Center,
             AutowrapMode = TextServer.AutowrapMode.WordSmart
         };

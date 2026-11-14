@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://bnxonplcdlp4f" path="res://Assets/P2_Front.png" id="2_x3sgo"]
 [ext_resource type="Texture2D" uid="uid://3fysdemiwoae" path="res://Assets/P2_Back.png" id="3_ryqyf"]
 [ext_resource type="Texture2D" uid="uid://chcy5ow0plruu" path="res://Assets/left button.png" id="4_x3sgo"]
+[ext_resource type="Texture2D" path="res://Assets/P2_Side.png" id="5_p2side"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ih478"]
 
@@ -14,6 +15,7 @@ size = Vector2(26, 18)
 script = ExtResource("1_ufh5k")
 FrontTexture = ExtResource("2_x3sgo")
 BackTexture = ExtResource("3_ryqyf")
+SideTexture = ExtResource("5_p2side")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1045029439]
 position = Vector2(35, 49)
