@@ -74,8 +74,8 @@ public static class SupabaseConfig
 
         return new LocalSettings
         {
-            ProjectUrl = (Environment.GetEnvironmentVariable("YOKAI_SUPABASE_URL") ?? "").Trim(),
-            PublishableKey = (Environment.GetEnvironmentVariable("YOKAI_SUPABASE_KEY") ?? "").Trim()
+            ProjectUrl = (System.Environment.GetEnvironmentVariable("YOKAI_SUPABASE_URL") ?? "").Trim(),
+            PublishableKey = (System.Environment.GetEnvironmentVariable("YOKAI_SUPABASE_KEY") ?? "").Trim()
         };
     }
 }
