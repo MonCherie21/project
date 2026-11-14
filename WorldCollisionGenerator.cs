@@ -13,7 +13,15 @@ public partial class WorldCollisionGenerator : Node2D
         foreach (Node child in buildings.GetChildren())
         {
             if (child is Sprite2D sprite && sprite.Texture != null && sprite.RegionEnabled)
+            {
+                // These two buildings have editable StaticBody2D hitboxes in
+                // world.tscn. Do not generate a second obstacle on top.
+                string name = sprite.Name.ToString();
+                if (name == "SariSariStore" || name == "GasStation")
+                    continue;
+
                 BuildBuildingObstacle(sprite);
+            }
         }
     }
 
@@ -40,21 +48,14 @@ public partial class WorldCollisionGenerator : Node2D
         Vector2 regionSize = building.RegionRect.Size;
         Vector2 scale = AbsScale(building.GlobalScale);
 
-        // Keep the original solid hitboxes for every other building. Only the
-        // narrow Sari-Sari/Gas Station passage needs additional walking room.
-        string buildingName = building.Name.ToString();
-        bool tightPassage = buildingName == "SariSariStore" ||
-                            buildingName == "GasStation";
-        float widthRatio = tightPassage ? 0.63f : 0.92f;
-        float heightRatio = tightPassage ? 0.40f : 0.90f;
+        // All remaining buildings retain the original automatically sized wall.
+        const float widthRatio = 0.92f;
+        const float heightRatio = 0.90f;
         Vector2 colliderSize = new Vector2(
             Mathf.Max(20, regionSize.X * scale.X * widthRatio),
             Mathf.Max(20, regionSize.Y * scale.Y * heightRatio));
 
-        // Shorter, slightly raised shop blockers leave the road unobstructed.
         Vector2 center = building.GlobalPosition;
-        if (tightPassage)
-            center -= new Vector2(0, regionSize.Y * scale.Y * 0.09f);
         AddWall(building.Name.ToString() + "_Solid", center, colliderSize);
     }
 

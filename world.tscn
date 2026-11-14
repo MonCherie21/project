@@ -105,6 +105,12 @@ size = Vector2(168.36926, 166.05399)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ixvm2"]
 size = Vector2(152.5927, 145.82855)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sarisari_solid"]
+size = Vector2(188, 162)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gas_solid"]
+size = Vector2(180, 140)
+
 [node name="World" type="Node2D" unique_id=761772831]
 
 [node name="Root" type="Node2D" parent="." unique_id=806218832]
@@ -169,6 +175,14 @@ script = ExtResource("4_dwbse")
 position = Vector2(3.6765747, 13.287109)
 scale = Vector2(1, 0.9999997)
 shape = SubResource("RectangleShape2D_alusk")
+
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/GasStation"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/GasStation/ManualSolid"]
+position = Vector2(0, 26)
+shape = SubResource("RectangleShape2D_gas_solid")
 
 [node name="CarWash" type="Sprite2D" parent="MapBackground/Buildings" unique_id=2098387125]
 position = Vector2(322.00003, 723)
@@ -247,6 +261,14 @@ script = ExtResource("8_ioo17")
 [node name="Sari-Sari Store Click" type="CollisionShape2D" parent="MapBackground/Buildings/SariSariStore/SariSariStoreArea2D" unique_id=1685810897]
 position = Vector2(-3.7037354, -10.895142)
 shape = SubResource("RectangleShape2D_ixvm2")
+
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/SariSariStore"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/SariSariStore/ManualSolid"]
+position = Vector2(-4, -4)
+shape = SubResource("RectangleShape2D_sarisari_solid")
 
 [node name="House3" type="Sprite2D" parent="MapBackground/Buildings" unique_id=305674607]
 position = Vector2(831.0001, 346)
