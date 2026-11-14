@@ -33,6 +33,7 @@ public partial class World : Node2D
         PlayerData.WorldPosition = player.Position;
         PlayerData.HasLoadedPosition = false;
         UpdateStoryFlags();
+        ApplyBuildingDisturbances();
 
         // Added programmatically, so the existing world.tscn is untouched.
         var overlay = new CanvasLayer();
@@ -41,14 +42,13 @@ public partial class World : Node2D
                                     Text = "Loading player profile..." };
         overlay.AddChild(nameLabel);
 
-        // Quick Save always writes directly to Slot 1; the pause menu still
-        // offers all three slots and their overwrite confirmations.
+        // One quick checkpoint for the selected account (not a new player).
         var saveButton = new Button
         {
             Text = "QUICK SAVE",
             Position = new Vector2(175, 48),
             Size = new Vector2(145, 42),
-            TooltipText = "Save immediately to Slot 1 (overwrites Slot 1)"
+            TooltipText = "Update the current account's saved progress"
         };
         saveButton.Pressed += () => _ = QuickSaveSlotOneAsync(saveButton, overlay);
         overlay.AddChild(saveButton);
@@ -185,17 +185,43 @@ public partial class World : Node2D
         }
     }
 
+    private void ApplyBuildingDisturbances()
+    {
+        string[] places =
+        {
+            "House2", "SariSariStore", "GasStation",
+            "Puregold", "MCDO", "School", "HauntedHouse"
+        };
+        for (int level = 0; level < places.Length; level++)
+        {
+            // Completed locations return to their original tidy artwork.
+            if (level < GameProgress.CompletedLevels) continue;
+
+            var sprite = GetParent().GetNodeOrNull<Sprite2D>(
+                "MapBackground/Buildings/" + places[level]);
+            if (sprite == null || sprite.Texture == null) continue;
+            sprite.AddChild(new DisturbedBuildingEffect
+            {
+                Name = "YokaiDisturbance",
+                BuildingSize = sprite.RegionEnabled
+                    ? sprite.RegionRect.Size : sprite.Texture.GetSize(),
+                Variant = level + 1
+            });
+        }
+    }
+
     private async Task AutoSaveProgressAsync(CanvasLayer overlay)
     {
         GameSaveData snapshot = GameSaveData.Capture();
-        int slot = GameProgress.ActiveSlot;
+        const int slot = 1;
         try
         {
             await SaveLoadService.SaveAsync(this, slot, snapshot);
+            GameProgress.SetActiveSlot(slot);
             GameProgress.MarkSaved(snapshot.CompletedLevels);
             if (GodotObject.IsInstanceValid(overlay))
-                _ = ShowTimedStatusAsync(overlay, "Saved to Slot " + slot + " ✓");
-            GD.Print("Level progress automatically saved to Slot " + slot + ".");
+                _ = ShowTimedStatusAsync(overlay, "Adventure saved ✓");
+            GD.Print("Account " + PlayerData.ActiveAccountSlot + " progress saved.");
         }
         catch (Exception ex)
         {
@@ -219,11 +245,11 @@ public partial class World : Node2D
             GameProgress.SetActiveSlot(1);
             GameProgress.MarkSaved(snapshot.CompletedLevels);
             if (GodotObject.IsInstanceValid(overlay))
-                _ = ShowTimedStatusAsync(overlay, "Saved to Slot 1 ✓", new Vector2(175, 100));
+                _ = ShowTimedStatusAsync(overlay, "Adventure saved ✓", new Vector2(175, 100));
         }
         catch (Exception ex)
         {
-            GD.PushWarning("Quick Save to Slot 1 failed: " + ex.Message);
+            GD.PushWarning("Quick Save failed: " + ex.Message);
             if (GodotObject.IsInstanceValid(overlay))
                 _ = ShowTimedStatusAsync(overlay, "Quick save failed — check Output", new Vector2(175, 100));
         }

@@ -95,6 +95,39 @@ public static class SaveLoadService
         }
     }
 
+    // Slot deletion removes ALL checkpoints belonging to the selected account.
+    // If RLS blocks DELETE, the local account is kept so progress isn't lost
+    // just because the client could not reach/update the server.
+    public static async Task DeleteAllSavesAsync(Node caller)
+    {
+        await SaveLock.WaitAsync();
+        try
+        {
+            var existing = await ListAsync(caller);
+            if (existing.Count == 0) return;
+
+            string url = SupabaseConfig.DataUrl + "/player_saves?player_id=eq." +
+                         PlayerData.PlayerId;
+            var response = await SupabaseHttp.SendAsync(caller, url,
+                HttpClient.Method.Delete, accessToken: PlayerData.AccessToken,
+                preference: "return=representation");
+
+            if (!response.IsSuccess)
+                throw new InvalidOperationException("The server could not delete saves (HTTP " +
+                    response.StatusCode + "). Check your Supabase delete policies.");
+
+            using var json = JsonDocument.Parse(response.Body);
+            if (json.RootElement.ValueKind != JsonValueKind.Array ||
+                json.RootElement.GetArrayLength() < existing.Count)
+                throw new InvalidOperationException(
+                    "Supabase did not confirm removal of every save. Check your DELETE policy.");
+        }
+        finally
+        {
+            SaveLock.Release();
+        }
+    }
+
     public static void PrepareLoad(GameSaveSlot slot)
     {
         CheckSlot(slot.Number);

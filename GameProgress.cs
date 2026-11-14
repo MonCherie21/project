@@ -62,6 +62,9 @@ public static class GameProgress
 
     public static void MarkBattleTutorialSeen() => HasSeenBattleTutorial = true;
 
+    // Seed the first checkpoint so Continue works immediately after creation.
+    public static void QueueAutoSave() => PendingAutoSave = true;
+
     public static int LevelFromBattleScene(string path)
     {
         if (string.Equals(path, "res://BattleScene.tscn", StringComparison.OrdinalIgnoreCase))

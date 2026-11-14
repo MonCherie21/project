@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 // One-time instructional cards shared by the world introduction and first battle.
@@ -5,6 +6,16 @@ using Godot;
 public static class TutorialOverlay
 {
     public static void Show(Node caller, string title, string instructions)
+        => ShowCard(caller, title, instructions, null, "GOT IT!");
+
+    // Uses the same dark card as the in-game tutorials, with a deliberate
+    // Yes/No choice for account creation and irreversible slot removal.
+    public static void Confirm(Node caller, string title, string message,
+        Action onConfirmed, string confirmText = "YES, CONTINUE")
+        => ShowCard(caller, title, message, onConfirmed, confirmText);
+
+    private static void ShowCard(Node caller, string title, string instructions,
+        Action onConfirmed, string confirmText)
     {
         SceneTree tree = caller.GetTree();
         bool wasPaused = tree.Paused;
@@ -64,10 +75,17 @@ public static class TutorialOverlay
         body.AddThemeColorOverride("font_color", new Color("d6dbe5"));
         column.AddChild(body);
 
+        var actions = new HBoxContainer
+        {
+            Alignment = BoxContainer.AlignmentMode.Center
+        };
+        actions.AddThemeConstantOverride("separation", 20);
+        column.AddChild(actions);
+
         var button = new Button
         {
-            Text = "GOT IT!",
-            CustomMinimumSize = new Vector2(210, 42),
+            Text = confirmText,
+            CustomMinimumSize = new Vector2(onConfirmed == null ? 210 : 195, 42),
             SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter
         };
         var buttonNormal = new StyleBoxFlat
@@ -90,8 +108,23 @@ public static class TutorialOverlay
         {
             tree.Paused = wasPaused;
             layer.QueueFree();
+            onConfirmed?.Invoke();
         };
-        column.AddChild(button);
+        actions.AddChild(button);
+
+        if (onConfirmed != null)
+        {
+            var cancel = new Button
+            {
+                Text = "CANCEL",
+                CustomMinimumSize = new Vector2(160, 42)
+            };
+            cancel.AddThemeStyleboxOverride("normal", (StyleBoxFlat)buttonNormal.Duplicate());
+            cancel.AddThemeStyleboxOverride("hover", (StyleBoxFlat)buttonHover.Duplicate());
+            cancel.AddThemeColorOverride("font_color", new Color("d6dbe5"));
+            cancel.Pressed += () => { tree.Paused = wasPaused; layer.QueueFree(); };
+            actions.AddChild(cancel);
+        }
         tree.Paused = true;
         button.GrabFocus();
     }

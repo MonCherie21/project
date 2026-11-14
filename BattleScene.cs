@@ -133,6 +133,16 @@ public partial class BattleScene : Node2D
 		playerTurn = true;
 		ghostPunchCooldown = 0;
 
+		// The occupied locations look damaged until the Yokai falls. The
+		// world scene restores the clean building art after that victory.
+		var battleBackground = GetNodeOrNull<TextureRect>("level1_bg");
+		if (battleBackground != null)
+		{
+			var damage = new DisturbedBattleBackdrop { Name = "YokaiDamage" };
+			AddChild(damage);
+			MoveChild(damage, battleBackground.GetIndex() + 1);
+		}
+
 		// Initialize HP.
 		playerHP = PlayerMaxHP;
 		yokaiHP = YokaiMaxHP;

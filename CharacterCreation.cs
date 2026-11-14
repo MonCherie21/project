@@ -26,6 +26,12 @@ public partial class CharacterCreation : Control
 
     private void OnStartPressed()
     {
+        if (PlayerData.PendingNewAccountSlot == 0 ||
+            PlayerData.GetAccounts().Exists(a => a.Slot == PlayerData.PendingNewAccountSlot))
+        {
+            ShowError("There is no free account slot. Return to the main menu.");
+            return;
+        }
         _pendingName = GetNode<LineEdit>("NameInput").Text.Trim();
         _pendingGender = _gender;
 
@@ -41,7 +47,7 @@ public partial class CharacterCreation : Control
         }
         if (!SupabaseConfig.IsConfigured)
         {
-            ShowError("Add your Supabase project URL and publishable key to SupabaseConfig.cs.");
+            ShowError("The game cannot connect right now. Please try again later.");
             return;
         }
 
@@ -54,7 +60,7 @@ public partial class CharacterCreation : Control
             request.QueueFree();
             if (result != (long)HttpRequest.Result.Success || code < 200 || code >= 300)
             {
-                ShowError("Could not connect to Supabase (HTTP " + code + ").");
+                ShowError("Could not start your adventure. Check your connection and try again.");
                 return;
             }
 
@@ -115,8 +121,14 @@ public partial class CharacterCreation : Control
                 PlayerData.HasLoadedPosition = false;
                 GameProgress.StartNewGame();
                 PlayerData.PendingMovementTutorial = true;
-                if (!PlayerData.RememberLocalSession())
-                    GD.PushWarning("Character registered, but this device could not remember the login.");
+                if (!PlayerData.RegisterNewAccount(PlayerData.PendingNewAccountSlot))
+                {
+                    ShowError("Could not secure the new account slot on this device. Please try again.");
+                    return;
+                }
+                // Makes a newly created account continuable even if the
+                // player has not reached the first Yokai yet.
+                GameProgress.QueueAutoSave();
                 GetTree().ChangeSceneToFile("res://world.tscn");
             }
             catch (Exception ex)
