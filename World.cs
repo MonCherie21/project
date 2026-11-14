@@ -5,56 +5,56 @@ using System.Threading.Tasks;
 
 public partial class World : Node2D
 {
-    public override void _Ready()
-    {
-        GD.Print("World loaded!");
-        GD.Print("Selected gender: " + PlayerData.Gender);
+	public override void _Ready()
+	{
+		GD.Print("World loaded!");
+		GD.Print("Selected gender: " + PlayerData.Gender);
 
-        string scenePath = PlayerData.Gender == "Male" ? "res://player_2.tscn"
-                         : PlayerData.Gender == "Female" ? "res://player.tscn" : "";
-        if (scenePath.Length == 0)
-        {
-            GD.PrintErr("No valid gender selected!");
-            return;
-        }
+		string scenePath = PlayerData.Gender == "Male" ? "res://player_2.tscn"
+						 : PlayerData.Gender == "Female" ? "res://player.tscn" : "";
+		if (scenePath.Length == 0)
+		{
+			GD.PrintErr("No valid gender selected!");
+			return;
+		}
 
-        PackedScene playerScene = GD.Load<PackedScene>(scenePath);
-        if (playerScene == null)
-        {
-            GD.PrintErr("Could not load: " + scenePath);
-            return;
-        }
+		PackedScene playerScene = GD.Load<PackedScene>(scenePath);
+		if (playerScene == null)
+		{
+			GD.PrintErr("Could not load: " + scenePath);
+			return;
+		}
 
-        Node2D player = playerScene.Instantiate<Node2D>();
-        GetNode<Node2D>("../MapBackground").AddChild(player);
-        player.Position = PlayerData.HasLoadedPosition
-            ? PlayerData.WorldPosition
-            : new Vector2(-193, -405);
-        PlayerData.WorldPosition = player.Position;
-        PlayerData.HasLoadedPosition = false;
-        UpdateStoryFlags();
+		Node2D player = playerScene.Instantiate<Node2D>();
+		GetNode<Node2D>("../MapBackground").AddChild(player);
+		player.Position = PlayerData.HasLoadedPosition
+			? PlayerData.WorldPosition
+			: new Vector2(-193, -405);
+		PlayerData.WorldPosition = player.Position;
+		PlayerData.HasLoadedPosition = false;
+		UpdateStoryFlags();
 
-        // Added programmatically, so the existing world.tscn is untouched.
-        var overlay = new CanvasLayer();
-        AddChild(overlay);
-        var nameLabel = new Label { Position = new Vector2(15, 15),
-                                    Text = "Loading player profile..." };
-        overlay.AddChild(nameLabel);
+		// Added programmatically, so the existing world.tscn is untouched.
+		var overlay = new CanvasLayer();
+		AddChild(overlay);
+		var nameLabel = new Label { Position = new Vector2(15, 15),
+									Text = "Loading player profile..." };
+		overlay.AddChild(nameLabel);
 
-        // Quick Save always writes directly to Slot 1; the pause menu still
-        // offers all three slots and their overwrite confirmations.
-        var saveButton = new Button
-        {
-            Text = "QUICK SAVE",
-            Position = new Vector2(175, 48),
-            Size = new Vector2(145, 42),
-            TooltipText = "Save immediately to Slot 1 (overwrites Slot 1)"
-        };
-        saveButton.Pressed += () => _ = QuickSaveSlotOneAsync(saveButton, overlay);
-        overlay.AddChild(saveButton);
+		// Quick Save always writes directly to Slot 1; the pause menu still
+		// offers all three slots and their overwrite confirmations.
+		var saveButton = new Button
+		{
+			Text = "QUICK SAVE",
+			Position = new Vector2(175, 48),
+			Size = new Vector2(145, 42),
+			TooltipText = "Save immediately to Slot 1 (overwrites Slot 1)"
+		};
+		saveButton.Pressed += () => _ = QuickSaveSlotOneAsync(saveButton, overlay);
+		overlay.AddChild(saveButton);
 
-        // The journal replaces the oversized progress banner. The active quest
-        // stays one click away, without covering Wawa's roads and buildings.
+		// The journal replaces the oversized progress banner. The active quest
+		// stays one click away, without covering Wawa's roads and buildings.
         var journalButton = new Button
         {
             Position = new Vector2(14, 157),

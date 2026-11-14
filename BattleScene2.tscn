@@ -11,6 +11,24 @@
 [ext_resource type="Texture2D" uid="uid://cxde4vdi0gvna" path="res://Assets/escape button.png" id="9_13ht1"]
 [ext_resource type="Script" uid="uid://bv3tt6av0tccb" path="res://PauseButton.cs" id="10_jeb0n"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b1rxu"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xj46k"]
+bg_color = Color(0, 0.52156866, 0.9098039, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1aj51"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qysdf"]
+bg_color = Color(0, 0.52156866, 0.9098039, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p6i7c"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u76d"]
+bg_color = Color(0.8745098, 0, 0.13725491, 1)
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0y00s"]
 
 [node name="Node2D" type="Node2D" unique_id=1462485367]
@@ -38,18 +56,22 @@ scale = Vector2(2.3348196, 1.9771765)
 texture = ExtResource("3_25jo8")
 
 [node name="TextureButton" type="TextureButton" parent="." unique_id=664962030]
-offset_left = 360.0
-offset_top = 384.0
-offset_right = 642.0
-offset_bottom = 695.0
+offset_left = 455.0
+offset_top = 493.0
+offset_right = 652.0
+offset_bottom = 692.0
 texture_normal = ExtResource("5_jeb0n")
+ignore_texture_size = true
+stretch_mode = 5
 
 [node name="TextureButton2" type="TextureButton" parent="." unique_id=1675303203]
-offset_left = 632.0
-offset_top = 384.0
-offset_right = 929.0
-offset_bottom = 710.0
+offset_left = 670.0
+offset_top = 493.0
+offset_right = 867.0
+offset_bottom = 692.0
 texture_normal = ExtResource("6_0y00s")
+ignore_texture_size = true
+stretch_mode = 5
 
 [node name="btn-attack" type="TextureRect" parent="." unique_id=1464852214]
 offset_left = 72.0
@@ -61,43 +83,49 @@ texture = ExtResource("7_d7knv")
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=874227602]
 
 [node name="hp_p" type="ProgressBar" parent="CanvasLayer" unique_id=1535025064]
-offset_left = 152.0
+offset_left = 146.0
 offset_top = 160.0
 offset_right = 464.0
 offset_bottom = 192.0
+theme_override_styles/background = SubResource("StyleBoxFlat_b1rxu")
+theme_override_styles/fill = SubResource("StyleBoxFlat_xj46k")
 
 [node name="hptext_p" type="TextEdit" parent="CanvasLayer" unique_id=1867132208]
 offset_left = 376.0
 offset_top = 192.0
 offset_right = 464.0
 offset_bottom = 232.0
-text = "100/100"
+text = "Yokai HP"
 
 [node name="hp_py" type="ProgressBar" parent="CanvasLayer" unique_id=2050685450]
 offset_left = 144.0
 offset_top = 224.0
-offset_right = 456.0
+offset_right = 467.0
 offset_bottom = 256.0
+theme_override_styles/background = SubResource("StyleBoxFlat_1aj51")
+theme_override_styles/fill = SubResource("StyleBoxFlat_qysdf")
 
 [node name="hptext_py" type="TextEdit" parent="CanvasLayer" unique_id=816001728]
 offset_left = 376.0
 offset_top = 256.0
 offset_right = 464.0
 offset_bottom = 296.0
-text = "100/100"
+text = "Player HP"
 
 [node name="hp_m" type="ProgressBar" parent="CanvasLayer" unique_id=877872172]
 offset_left = 832.0
 offset_top = 208.0
 offset_right = 1144.0
 offset_bottom = 240.0
+theme_override_styles/background = SubResource("StyleBoxFlat_p6i7c")
+theme_override_styles/fill = SubResource("StyleBoxFlat_1u76d")
 
 [node name="hptext_m" type="TextEdit" parent="CanvasLayer" unique_id=631508804]
 offset_left = 1064.0
 offset_top = 240.0
 offset_right = 1152.0
 offset_bottom = 280.0
-text = "100/100"
+text = "Enemy HP"
 
 [node name="Escape Picture" type="TextureRect" parent="." unique_id=1574546682]
 offset_left = 1118.0

@@ -7,71 +7,71 @@ using System.Collections.Generic;
 // Supabase save-slot JSON used by Continue, so no second progress table is needed.
 public partial class CollectionManager : Control
 {
-    private TextureRect[] _characters;
-    private Texture2D[] _originalPortraits;
-    private int _currentIndex;
-    private int _unlockedCount;
-    private Label _counterLabel;
-    private Label _nameLabel;
-    private Label _hpLabel;
-    private Label _attackLabel;
-    private Label _levelLabel;
-    private Label _rsLevelLabel;
-    private Label _hint;
+	private TextureRect[] _characters;
+	private Texture2D[] _originalPortraits;
+	private int _currentIndex;
+	private int _unlockedCount;
+	private Label _counterLabel;
+	private Label _nameLabel;
+	private Label _hpLabel;
+	private Label _attackLabel;
+	private Label _levelLabel;
+	private Label _rsLevelLabel;
+	private Label _hint;
 
-    [Export] private string[] _characterNames =
-    {
-        "Yo-kai 1", "Yo-kai 2", "Yo-kai 3", "Yo-kai 4",
-        "Yo-kai 5", "Yo-kai 6", "Yo-kai 7"
-    };
-    [Export] private int[] _hpValues = { 100, 120, 90, 150, 110, 130, 200 };
-    [Export] private int[] _attackValues = { 20, 25, 30, 15, 22, 28, 35 };
-    [Export] private int[] _levelValues = { 1, 1, 1, 1, 1, 1, 1 };
-    [Export] private int[] _rsLevelValues = { 1, 2, 1, 3, 2, 1, 4 };
+	[Export] private string[] _characterNames =
+	{
+		"Yo-kai 1", "Yo-kai 2", "Yo-kai 3", "Yo-kai 4",
+		"Yo-kai 5", "Yo-kai 6", "Yo-kai 7"
+	};
+	[Export] private int[] _hpValues = { 100, 120, 90, 150, 110, 130, 200 };
+	[Export] private int[] _attackValues = { 20, 25, 30, 15, 22, 28, 35 };
+	[Export] private int[] _levelValues = { 1, 1, 1, 1, 1, 1, 1 };
+	[Export] private int[] _rsLevelValues = { 1, 2, 1, 3, 2, 1, 4 };
 
-    public override async void _Ready()
-    {
-        _characters = new TextureRect[]
-        {
-            GetNode<TextureRect>("Character 1"), GetNode<TextureRect>("Character 2"),
-            GetNode<TextureRect>("Character 3"), GetNode<TextureRect>("Character 4"),
-            GetNode<TextureRect>("Character 5"), GetNode<TextureRect>("Character 6"),
-            GetNode<TextureRect>("Character 7")
-        };
-        _originalPortraits = new Texture2D[_characters.Length];
-        for (int i = 0; i < _characters.Length; i++)
-            _originalPortraits[i] = _characters[i].Texture;
+	public override async void _Ready()
+	{
+		_characters = new TextureRect[]
+		{
+			GetNode<TextureRect>("Character 1"), GetNode<TextureRect>("Character 2"),
+			GetNode<TextureRect>("Character 3"), GetNode<TextureRect>("Character 4"),
+			GetNode<TextureRect>("Character 5"), GetNode<TextureRect>("Character 6"),
+			GetNode<TextureRect>("Character 7")
+		};
+		_originalPortraits = new Texture2D[_characters.Length];
+		for (int i = 0; i < _characters.Length; i++)
+			_originalPortraits[i] = _characters[i].Texture;
 
-        _counterLabel = GetNodeOrNull<Label>("CounterLabel");
-        _nameLabel = GetNodeOrNull<Label>("NameLabel");
-        _hpLabel = GetNodeOrNull<Label>("HpLabel");
-        _attackLabel = GetNodeOrNull<Label>("AttackLabel");
-        _levelLabel = GetNodeOrNull<Label>("LevelLabel");
-        _rsLevelLabel = GetNodeOrNull<Label>("RsLevelLabel");
+		_counterLabel = GetNodeOrNull<Label>("CounterLabel");
+		_nameLabel = GetNodeOrNull<Label>("NameLabel");
+		_hpLabel = GetNodeOrNull<Label>("HpLabel");
+		_attackLabel = GetNodeOrNull<Label>("AttackLabel");
+		_levelLabel = GetNodeOrNull<Label>("LevelLabel");
+		_rsLevelLabel = GetNodeOrNull<Label>("RsLevelLabel");
 
-        GetNode<Button>("Button2").Pressed += Previous;
-        GetNode<Button>("Button").Pressed += Next;
-        GetNode<Button>("Button3").Pressed += () =>
-            GetTree().ChangeSceneToFile("res://main_menu.tscn");
+		GetNode<Button>("Button2").Pressed += Previous;
+		GetNode<Button>("Button").Pressed += Next;
+		GetNode<Button>("Button3").Pressed += () =>
+			GetTree().ChangeSceneToFile("res://main_menu.tscn");
 
-        _hint = new Label
-        {
-            Position = new Vector2(868, 367),
-            Size = new Vector2(322, 84),
-            AutowrapMode = TextServer.AutowrapMode.WordSmart
-        };
-        _hint.AddThemeFontSizeOverride("font_size", 17);
-        AddChild(_hint);
+		_hint = new Label
+		{
+			Position = new Vector2(868, 367),
+			Size = new Vector2(322, 84),
+			AutowrapMode = TextServer.AutowrapMode.WordSmart
+		};
+		_hint.AddThemeFontSizeOverride("font_size", 17);
+		AddChild(_hint);
 
-        _unlockedCount = Math.Clamp(GameProgress.CompletedLevels, 0, _characters.Length);
-        _hint.Text = "Defeat a Yo-kai in a story battle to reveal it.";
-        UpdateDisplay();
+		_unlockedCount = Math.Clamp(GameProgress.CompletedLevels, 0, _characters.Length);
+		_hint.Text = "Defeat a Yo-kai in a story battle to reveal it.";
+		UpdateDisplay();
 
-        if (!PlayerData.HasLocalSession)
-            return;
+		if (!PlayerData.HasLocalSession)
+			return;
 
-        // Main-menu Collection can be opened before choosing Continue. Look
-        // up the saved slot's progress instead of showing a fresh empty list.
+		// Main-menu Collection can be opened before choosing Continue. Look
+		// up the saved slot's progress instead of showing a fresh empty list.
         try
         {
             List<GameSaveSlot> slots = await SaveLoadService.ListAsync(this);

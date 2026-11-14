@@ -4,19 +4,19 @@ using System.Text.Json;
 
 public partial class CharacterCreation : Control
 {
-    private string _gender = "";
-    private string _pendingName = "";
-    private string _pendingGender = "";
-    private string _accessToken = "";
-    private string _refreshToken = "";
-    private Button _startButton;
-    private AcceptDialog _message;
+	private string _gender = "";
+	private string _pendingName = "";
+	private string _pendingGender = "";
+	private string _accessToken = "";
+	private string _refreshToken = "";
+	private Button _startButton;
+	private AcceptDialog _message;
 
-    public override void _Ready()
-    {
-        GetNode<Button>("Male").Pressed += () => _gender = "Male";
-        GetNode<Button>("Female").Pressed += () => _gender = "Female";
-        GetNode<Button>("Button").Pressed += OnBackPressed; // Ronan's Back button
+	public override void _Ready()
+	{
+		GetNode<Button>("Male").Pressed += () => _gender = "Male";
+		GetNode<Button>("Female").Pressed += () => _gender = "Female";
+		GetNode<Button>("Button").Pressed += OnBackPressed; // Ronan's Back button
 
         _startButton = GetNode<Button>("Start");
         _startButton.Pressed += OnStartPressed;
@@ -95,7 +95,7 @@ public partial class CharacterCreation : Control
             if (result != (long)HttpRequest.Result.Success || code < 200 || code >= 300)
             {
                 GD.PrintErr("Supabase player registration failed (HTTP " + code + ").");
-                ShowError("Couldn't save your character (HTTP " + code + ").");
+				ShowError("Couldn't save your character (HTTP " + code + ").");
                 return;
             }
 
@@ -103,12 +103,12 @@ public partial class CharacterCreation : Control
             {
                 using var json = JsonDocument.Parse(body);
                 if (json.RootElement.GetArrayLength() < 1)
-                    throw new Exception("No player returned");
+					throw new Exception("No player returned");
 
                 var row = json.RootElement[0];
-                PlayerData.PlayerId = row.GetProperty("player_id").GetInt32();
-                PlayerData.PlayerName = row.GetProperty("player_name").GetString() ?? "";
-                PlayerData.Gender = row.GetProperty("gender").GetString() ?? "";
+				PlayerData.PlayerId = row.GetProperty("player_id").GetInt32();
+				PlayerData.PlayerName = row.GetProperty("player_name").GetString() ?? "";
+				PlayerData.Gender = row.GetProperty("gender").GetString() ?? "";
                 PlayerData.AccessToken = _accessToken;
                 PlayerData.RefreshToken = _refreshToken;
                 PlayerData.WorldPosition = new Vector2(-193, -405);
@@ -116,13 +116,13 @@ public partial class CharacterCreation : Control
                 GameProgress.StartNewGame();
                 PlayerData.PendingMovementTutorial = true;
                 if (!PlayerData.RememberLocalSession())
-                    GD.PushWarning("Character registered, but this device could not remember the login.");
-                GetTree().ChangeSceneToFile("res://world.tscn");
+					GD.PushWarning("Character registered, but this device could not remember the login.");
+				GetTree().ChangeSceneToFile("res://world.tscn");
             }
             catch (Exception ex)
             {
-                GD.PrintErr("Player response error: " + ex.Message);
-                ShowError("The server returned invalid player information.");
+				GD.PrintErr("Player response error: " + ex.Message);
+				ShowError("The server returned invalid player information.");
             }
         };
 
@@ -132,16 +132,16 @@ public partial class CharacterCreation : Control
             gender = _pendingGender
         });
         var error = request.Request(
-            SupabaseConfig.DataUrl + "/players?select=player_id,player_name,gender",
-            new[] { "apikey: " + SupabaseConfig.PublishableKey,
-                    "Authorization: Bearer " + _accessToken,
-                    "Content-Type: application/json",
-                    "Prefer: return=representation" },
+			SupabaseConfig.DataUrl + "/players?select=player_id,player_name,gender",
+			new[] { "apikey: " + SupabaseConfig.PublishableKey,
+					"Authorization: Bearer " + _accessToken,
+					"Content-Type: application/json",
+					"Prefer: return=representation" },
             HttpClient.Method.Post, payload);
         if (error != Error.Ok)
         {
             request.QueueFree();
-            ShowError("Could not send player data: " + error);
+			ShowError("Could not send player data: " + error);
         }
     }
 
@@ -155,6 +155,6 @@ public partial class CharacterCreation : Control
     private void OnBackPressed()
     {
         if (!_startButton.Disabled)
-            GetTree().ChangeSceneToFile("res://main_menu.tscn");
+			GetTree().ChangeSceneToFile("res://main_menu.tscn");
     }
 }
