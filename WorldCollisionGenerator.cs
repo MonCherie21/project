@@ -1,28 +1,13 @@
 using Godot;
 
-// Builds physics walls from the existing world.tscn sprite positions.
-// If the team moves a building in Godot, its collision follows automatically.
+// Keeps the player within the map boundaries only.
+// Building collisions are editable StaticBody2D nodes in world.tscn.
 public partial class WorldCollisionGenerator : Node2D
 {
     public override void _Ready()
     {
         var map = GetParent().GetNode<Sprite2D>("MapBackground");
         BuildMapEdges(map);
-
-        var buildings = GetParent().GetNode<Node2D>("MapBackground/Buildings");
-        foreach (Node child in buildings.GetChildren())
-        {
-            if (child is Sprite2D sprite && sprite.Texture != null && sprite.RegionEnabled)
-            {
-                // These two buildings have editable StaticBody2D hitboxes in
-                // world.tscn. Do not generate a second obstacle on top.
-                string name = sprite.Name.ToString();
-                if (name == "SariSariStore" || name == "GasStation")
-                    continue;
-
-                BuildBuildingObstacle(sprite);
-            }
-        }
     }
 
     private void BuildMapEdges(Sprite2D map)
@@ -41,22 +26,6 @@ public partial class WorldCollisionGenerator : Node2D
             new Vector2(extent.X + wall * 2, wall));
         AddWall("MapEdgeBottom", origin + new Vector2(0, extent.Y / 2 + wall / 2),
             new Vector2(extent.X + wall * 2, wall));
-    }
-
-    private void BuildBuildingObstacle(Sprite2D building)
-    {
-        Vector2 regionSize = building.RegionRect.Size;
-        Vector2 scale = AbsScale(building.GlobalScale);
-
-        // All remaining buildings retain the original automatically sized wall.
-        const float widthRatio = 0.92f;
-        const float heightRatio = 0.90f;
-        Vector2 colliderSize = new Vector2(
-            Mathf.Max(20, regionSize.X * scale.X * widthRatio),
-            Mathf.Max(20, regionSize.Y * scale.Y * heightRatio));
-
-        Vector2 center = building.GlobalPosition;
-        AddWall(building.Name.ToString() + "_Solid", center, colliderSize);
     }
 
     private static Vector2 AbsScale(Vector2 scale) =>
