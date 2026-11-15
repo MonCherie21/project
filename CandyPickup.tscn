@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://CandyPickup.cs" id="1_script"]
-[ext_resource type="Texture2D" path="res://Sprites/feedCandy.png" id="2_candy"]
+[ext_resource type="Texture2D" path="res://Assets/CandyWrapperPixel.png" id="2_candy"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_pickup"]
 radius = 21.0
@@ -12,12 +12,10 @@ collision_mask = 1
 script = ExtResource("1_script")
 
 [node name="Icon" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 1, 0.62)
-scale = Vector2(0.85, 0.85)
+modulate = Color(1, 1, 1, 0.65)
+scale = Vector2(0.9, 0.9)
 texture_filter = 1
 texture = ExtResource("2_candy")
-region_enabled = true
-region_rect = Rect2(17, 11, 47, 46)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_pickup")

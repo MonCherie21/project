@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://PartyInventory.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://Assets/CandyWrapperPixel.png" id="2_candy"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.078, 0.102, 0.152, 0.98)
@@ -41,10 +42,21 @@ theme_override_colors/font_color = Color(1, 0.86, 0.59, 1)
 theme_override_font_sizes/font_size = 32
 text = "YOKAI PARTY"
 
+[node name="CandyIcon" type="TextureRect" parent="Panel"]
+offset_left = 680.0
+offset_top = 23.0
+offset_right = 751.0
+offset_bottom = 65.0
+mouse_filter = 2
+texture_filter = 1
+texture = ExtResource("2_candy")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="CandyCount" type="Label" parent="Panel"]
-offset_left = 700.0
+offset_left = 759.0
 offset_top = 25.0
-offset_right = 915.0
+offset_right = 946.0
 offset_bottom = 63.0
 theme_override_colors/font_color = Color(0.97, 0.88, 0.68, 1)
 theme_override_font_sizes/font_size = 22

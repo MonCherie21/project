@@ -146,9 +146,21 @@ public partial class World : Node2D
         partyMarker.AddThemeConstantOverride("outline_size", 4);
         partyButton.AddChild(partyMarker);
 
+        var candyIcon = new TextureRect
+        {
+            Position = new Vector2(198, 242),
+            Size = new Vector2(50, 33),
+            Texture = GD.Load<Texture2D>("res://Assets/CandyWrapperPixel.png"),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+        overlay.AddChild(candyIcon);
+
         var candyCount = new Label
         {
-            Position = new Vector2(200, 248),
+            Position = new Vector2(251, 248),
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
         candyCount.AddThemeFontSizeOverride("font_size", 17);
@@ -175,7 +187,7 @@ public partial class World : Node2D
                 "Welcome to Wawa! Move with W, A, S, D or the arrow keys.\n\n" +
                 "You have 5 starter candies. Press I (or PARTY / FEED), " +
                 "and feed your first Yo-kai TWO candies to reach Friendship Level 1.\n\n" +
-                "Higher Friendship lowers enemy damage in battle. " +
+                "Higher Friendship strengthens your Yo-kai's HP and attacks in battle. " +
                 "Explore roads to find faint, collectible candies!\n\n" +
                 "Tap the clipboard to see both your story and friendship objectives.");
         }

@@ -165,7 +165,10 @@ public partial class PartyInventory : CanvasLayer
         var feed = new Button
         {
             Text = level >= CandyInventory.MaxFriendshipLevel ? "MAX FRIENDSHIP" : "FEED 1 CANDY",
-            CustomMinimumSize = new Vector2(220, 35),
+            Icon = GD.Load<Texture2D>("res://Assets/CandyWrapperPixel.png"),
+            ExpandIcon = true,
+            TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+            CustomMinimumSize = new Vector2(250, 41),
             Disabled = CandyInventory.Candies == 0 ||
                 level >= CandyInventory.MaxFriendshipLevel
         };

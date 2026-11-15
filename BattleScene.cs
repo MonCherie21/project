@@ -8,28 +8,25 @@ public partial class BattleScene : Node2D
 	// 1. HP SETTINGS
 	// =========================================
 
-	[Export] public int PlayerMaxHP = 100;
 	[Export] public int YokaiMaxHP = 100;
 	[Export] public int EnemyMaxHP = 70;
 
-	private int playerHP;
 	private int yokaiHP;
 	private int enemyHP;
 
 
 	// =========================================
-	// 2. DAMAGE AND HEALING
+	// 2. DAMAGE
 	// =========================================
 
 	[Export] public int SlapDamage = 8;
 	[Export] public int GhostPunchDamage = 16;
 
 	[Export] public int EnemyDamage = 6;
-	[Export] public int FeedHealing = 20;
 
 
 	// =========================================
-	// 3. FRIENDSHIP DIFFICULTY
+	// 3. FRIENDSHIP POWER
 	// =========================================
 
 	[Export] public int FriendshipLevel = 0;
@@ -41,6 +38,8 @@ public partial class BattleScene : Node2D
 
 	private bool battleFinished = false;
 	private bool playerTurn = true;
+	private const int UltimateChargeRequired = 2;
+	private int ultimateCharge = 0;
 	private int ghostPunchCooldown = 0;
 
 	private readonly Random random = new Random();
@@ -50,11 +49,9 @@ public partial class BattleScene : Node2D
 	// 5. SPRITES
 	// =========================================
 
-	private Sprite2D playerSprite;
 	private Sprite2D friendlyYokaiSprite;
 	private Sprite2D enemySprite;
 
-	private Color playerOriginalModulate = Colors.White;
 	private Color friendlyOriginalModulate = Colors.White;
 	private Color enemyOriginalModulate = Colors.White;
 	private Tween _friendlyIdleTween;
@@ -70,15 +67,15 @@ public partial class BattleScene : Node2D
 
 	private BaseButton attackButton;
 
-	private Button feedButton;
 	private Button runButton;
+	private ProgressBar ultimateMeter;
+	private Label ultimateText;
 
 
 	// =========================================
 	// 7. HP BARS
 	// =========================================
 
-	private Godot.Range playerHPBar;
 	private Godot.Range yokaiHPBar;
 	private Godot.Range enemyHPBar;
 
@@ -87,7 +84,6 @@ public partial class BattleScene : Node2D
 	// 8. HP LABELS
 	// =========================================
 
-	private Label playerHPText;
 	private Label yokaiHPText;
 	private Label enemyHPText;
 
@@ -132,6 +128,7 @@ public partial class BattleScene : Node2D
 		battleFinished = false;
 		playerTurn = true;
 		ghostPunchCooldown = 0;
+		ultimateCharge = 0;
 
 		// The occupied locations look damaged until the Yokai falls. The
 		// world scene restores the clean building art after that victory.
@@ -144,22 +141,17 @@ public partial class BattleScene : Node2D
 		}
 
 		// Initialize HP.
-		playerHP = PlayerMaxHP;
+		// EFeed and the party screen save each companion's friendship.
+		// The first companion currently fights in all story battles.
+		FriendshipLevel = CandyInventory.FriendshipLevel(0);
+		ApplyFriendshipPower();
 		yokaiHP = YokaiMaxHP;
 		enemyHP = EnemyMaxHP;
-
-		// EFeed and party inventory now share a saved friendship level.
-		// The first companion participates in all existing story battles.
-		FriendshipLevel = CandyInventory.FriendshipLevel(0);
-		ApplyFriendshipDifficulty();
 
 
 		// -------------------------------------
 		// FIND SPRITES
 		// -------------------------------------
-
-		playerSprite =
-			FindNodeRecursive(this, "P1Whole") as Sprite2D;
 
 		friendlyYokaiSprite =
 			FindNodeRecursive(this, "m1_py2") as Sprite2D;
@@ -169,17 +161,6 @@ public partial class BattleScene : Node2D
 
 
 		// Save original sprite colors.
-		if (playerSprite != null)
-		{
-			playerOriginalModulate = playerSprite.Modulate;
-		}
-		else
-		{
-			GD.PushWarning(
-				"Player Sprite2D not found. Check the name and node type of P1Whole."
-			);
-		}
-
 		if (friendlyYokaiSprite != null)
 		{
 			friendlyOriginalModulate = friendlyYokaiSprite.Modulate;
@@ -234,9 +215,6 @@ public partial class BattleScene : Node2D
 		// FIND HP BARS
 		// -------------------------------------
 
-		playerHPBar =
-			FindNodeRecursive(this, "hp_p") as Godot.Range;
-
 		yokaiHPBar =
 			FindNodeRecursive(this, "hp_py") as Godot.Range;
 
@@ -247,9 +225,6 @@ public partial class BattleScene : Node2D
 		// -------------------------------------
 		// FIND HP LABELS
 		// -------------------------------------
-
-		playerHPText =
-			FindNodeRecursive(this, "hptext_p") as Label;
 
 		yokaiHPText =
 			FindNodeRecursive(this, "hptext_py") as Label;
@@ -320,10 +295,11 @@ public partial class BattleScene : Node2D
 
 
 		// -------------------------------------
-		// CREATE FEED AND RUN BUTTONS
+		// CREATE RUN BUTTON AND ULTIMATE METER
 		// -------------------------------------
 
 		CreateActionButtons();
+		UseSingleYokaiHpBar();
 
 
 		// -------------------------------------
@@ -342,7 +318,8 @@ public partial class BattleScene : Node2D
 
 		GD.Print("Battle initialized!");
 		GD.Print("Friendship Level: " + FriendshipLevel);
-		GD.Print("Enemy damage: " + EnemyDamage);
+		GD.Print("Enemy damage (fixed by battle): " + EnemyDamage);
+		GD.Print("Yokai HP: " + YokaiMaxHP + ", normal damage: " + NormalAttackDamage());
 
 		if (GameProgress.LevelFromBattleScene(GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath) == 1
 			&& !GameProgress.HasSeenBattleTutorial)
@@ -350,43 +327,36 @@ public partial class BattleScene : Node2D
 			GameProgress.MarkBattleTutorialSeen();
 			TutorialOverlay.Show(this, "YOUR FIRST YO-KAI BATTLE",
 				"It is your turn first! Choose an attack below.\n\n" +
-				"SLAP is a reliable quick hit. GHOST PUNCH does more damage, " +
-				"but needs time to recharge.\n\n" +
-				"HEAL restores your friendly Yo-kai's HP. RUN leaves the battle.\n\n" +
-				"Feed candy to your partner in the overworld INVENTORY " +
-				"to raise Friendship and lower enemy damage. " +
-				"Watch the HP bars and wait for your turn!");
+				"Normal attacks fill the ULT meter. After TWO normal attacks, " +
+				"use your second skill for a powerful ultimate! It must recharge afterward.\n\n" +
+				"RUN attempts to escape. Only your Yo-kai takes damage.\n\n" +
+				"Feed candy to your partner using PARTY / FEED [I] in the world. " +
+				"Friendship boosts your Yo-kai's maximum HP and attack damage; " +
+				"enemies do NOT get weaker. Explore for candy before challenging them!");
 		}
 	}
 
 
 	// =========================================
-	// 12. FRIENDSHIP DIFFICULTY
+	// 12. FRIENDSHIP POWER — ENEMY STATS NEVER SCALE DOWN
 	// =========================================
 
-	private void ApplyFriendshipDifficulty()
+	private void ApplyFriendshipPower()
 	{
-		if (FriendshipLevel <= 0)
-		{
-			EnemyDamage = 6;
-		}
-		else if (FriendshipLevel == 1)
-		{
-			EnemyDamage = 5;
-		}
-		else if (FriendshipLevel == 2)
-		{
-			EnemyDamage = 4;
-		}
-		else
-		{
-			EnemyDamage = 3;
-		}
+		FriendshipLevel = Math.Clamp(FriendshipLevel, 0, CandyInventory.MaxFriendshipLevel);
+		// The opponent retains at least 10 damage at every friendship level.
+		EnemyDamage = Math.Max(10, EnemyDamage);
+		// Friends start with more maximum HP than their opponent and grow
+		// stronger with each level, without lowering the enemy's stats.
+		YokaiMaxHP = Math.Max(YokaiMaxHP + FriendshipLevel * 15, EnemyMaxHP + 20);
 	}
+
+	private int NormalAttackDamage() => SlapDamage + FriendshipLevel * 5;
+	private int UltimateAttackDamage() => GhostPunchDamage + FriendshipLevel * 10;
 
 
 	// =========================================
-	// 13. CREATE FEED AND RUN BUTTONS
+	// 13. MATCHING RUN BUTTON AND ULTIMATE METER
 	// =========================================
 
 	private void CreateActionButtons()
@@ -394,39 +364,120 @@ public partial class BattleScene : Node2D
 		if (canvasLayer == null)
 		{
 			GD.PushWarning(
-				"CanvasLayer not found. Feed and Run buttons were not created."
+				"CanvasLayer not found. Battle controls were not created."
 			);
 
 			return;
 		}
 
 
-		// FEED BUTTON
-
-		feedButton = new Button();
-
-		feedButton.Name = "RuntimeFeedButton";
-		feedButton.Text = "HEAL";
-		feedButton.Position = new Vector2(20, 460);
-		feedButton.Size = new Vector2(110, 42);
-
-		canvasLayer.AddChild(feedButton);
-
-		feedButton.Pressed += OnFeedPressed;
-
-
-		// RUN BUTTON
-
-		runButton = new Button();
-
-		runButton.Name = "RuntimeRunButton";
-		runButton.Text = "RUN";
-		runButton.Position = new Vector2(145, 460);
-		runButton.Size = new Vector2(110, 42);
-
+		runButton = new Button
+		{
+			Name = "RuntimeRunButton",
+			Text = "RUN",
+			Position = new Vector2(72, 585),
+			Size = new Vector2(190, 53),
+			FocusMode = Control.FocusModeEnum.None
+		};
+		runButton.AddThemeStyleboxOverride("normal", BattleBox("202e41", "b7c4bc"));
+		runButton.AddThemeStyleboxOverride("hover", BattleBox("36536b", "f2d28d"));
+		runButton.AddThemeStyleboxOverride("pressed", BattleBox("4c5663", "d5b678"));
+		runButton.AddThemeStyleboxOverride("disabled", BattleBox("2a2c36", "5f636a"));
+		runButton.AddThemeFontOverride("font", GD.Load<Font>("res://Assets/PressStart2P-Regular.ttf"));
+		runButton.AddThemeFontSizeOverride("font_size", 18);
+		runButton.AddThemeColorOverride("font_color", new Color("f6eaca"));
+		runButton.AddThemeColorOverride("font_hover_color", Colors.White);
 		canvasLayer.AddChild(runButton);
-
 		runButton.Pressed += OnRunPressed;
+
+		// The same shared scene script draws this under the second skill
+		// in every story battle. When a skill sits at the screen's bottom
+		// edge, put the meter ABOVE it so no text gets cut off.
+		Vector2 skillPosition = ghostPunchButton?.Position ?? new Vector2(667, 457);
+		Vector2 skillSize = ghostPunchButton?.Size ?? new Vector2(197, 199);
+		float meterX = skillPosition.X + (skillSize.X - 197) / 2;
+		bool roomBelow = skillPosition.Y + skillSize.Y <= 660;
+		float meterY = roomBelow ? skillPosition.Y + skillSize.Y + 6 : skillPosition.Y - 24;
+		float labelY = roomBelow ? meterY + 20 : skillPosition.Y - 51;
+		ultimateMeter = new ProgressBar
+		{
+			Name = "UltimateChargeMeter",
+			Position = new Vector2(meterX, meterY),
+			Size = new Vector2(197, 15),
+			MinValue = 0,
+			MaxValue = UltimateChargeRequired,
+			ShowPercentage = false,
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		ultimateMeter.AddThemeStyleboxOverride("background", BattleBox("182438", "657080"));
+		ultimateMeter.AddThemeStyleboxOverride("fill", BattleBox("d9a24b", "f9df91"));
+		canvasLayer.AddChild(ultimateMeter);
+
+		ultimateText = new Label
+		{
+			Name = "UltimateChargeText",
+			Position = new Vector2(meterX, labelY),
+			Size = new Vector2(215, 27),
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		ultimateText.AddThemeFontOverride("font", GD.Load<Font>("res://Assets/PressStart2P-Regular.ttf"));
+		ultimateText.AddThemeFontSizeOverride("font_size", 12);
+		ultimateText.AddThemeColorOverride("font_color", new Color("ffe3a1"));
+		ultimateText.AddThemeColorOverride("font_outline_color", Colors.Black);
+		ultimateText.AddThemeConstantOverride("outline_size", 3);
+		canvasLayer.AddChild(ultimateText);
+		UpdateUltimateUI();
+	}
+
+	private static StyleBoxFlat BattleBox(string background, string border) => new()
+	{
+		BgColor = new Color(background),
+		BorderColor = new Color(border),
+		BorderWidthLeft = 3,
+		BorderWidthTop = 3,
+		BorderWidthRight = 3,
+		BorderWidthBottom = 3,
+		CornerRadiusTopLeft = 3,
+		CornerRadiusTopRight = 3,
+		CornerRadiusBottomLeft = 3,
+		CornerRadiusBottomRight = 3
+	};
+
+	private void UseSingleYokaiHpBar()
+	{
+		// Legacy battle scenes still contain trainer HP nodes. Hide these
+		// at runtime and use their former top-left slot for the Yokai HP.
+		Control trainerBar = FindNodeRecursive(this, "hp_p") as Control;
+		Control trainerText = FindNodeRecursive(this, "hptext_p") as Control;
+		Label trainerRole = FindNodeRecursive(this, "PlayerRole") as Label;
+		Label yokaiRole = FindNodeRecursive(this, "YokaiRole") as Label;
+		if (trainerBar != null && yokaiHPBar is Control yokaiBar)
+			yokaiBar.Position = trainerBar.Position;
+		if (trainerText != null && yokaiHPText != null)
+			yokaiHPText.Position = trainerText.Position;
+		if (trainerRole != null && yokaiRole != null)
+			yokaiRole.Position = trainerRole.Position;
+		trainerBar?.Hide();
+		trainerText?.Hide();
+		trainerRole?.Hide();
+	}
+
+	private void UpdateUltimateUI()
+	{
+		bool available = ultimateCharge >= UltimateChargeRequired && ghostPunchCooldown == 0;
+		if (ghostPunchButton != null)
+		{
+			ghostPunchButton.Disabled = battleFinished || !playerTurn || !available;
+			ghostPunchButton.Modulate = available ? Colors.White : new Color(0.48f, 0.48f, 0.48f);
+		}
+		if (ultimateMeter != null)
+			ultimateMeter.Value = ultimateCharge;
+		if (ultimateText != null)
+		{
+			ultimateText.Text = available ? "ULT READY!" : $"ULT {ultimateCharge}/{UltimateChargeRequired}";
+			ultimateText.AddThemeColorOverride("font_color",
+				available ? new Color("c9ffad") : new Color("ffe3a1"));
+		}
 	}
 
 
@@ -487,18 +538,10 @@ public partial class BattleScene : Node2D
 			ghostPunchButton.ZIndex = 100;
 			ghostPunchButton.MoveToFront();
 
-			// Grey out and disable the skill while it is on cooldown.
-			ghostPunchButton.Disabled = ghostPunchCooldown > 0;
-			if (ghostPunchCooldown > 0)
-			{
-				ghostPunchButton.Modulate = new Color(0.5f, 0.5f, 0.5f, 1.0f);
-				GD.Print($"Ghost Punch is on cooldown. Turns remaining: {ghostPunchCooldown}");
-			}
-			else
-			{
-				ghostPunchButton.Modulate = Colors.White;
-			}
+			UpdateUltimateUI();
 		}
+		if (runButton != null)
+			runButton.Disabled = false;
 	}
 
 
@@ -517,6 +560,8 @@ public partial class BattleScene : Node2D
 		{
 			ghostPunchButton.Hide();
 		}
+		if (runButton != null)
+			runButton.Disabled = true;
 
 		GD.Print("Attack skills hidden.");
 	}
@@ -535,16 +580,16 @@ public partial class BattleScene : Node2D
 
 		HideAttackChoices();
 
-		// Reduce Ghost Punch cooldown when using regular attack
+		// Normal attacks charge the ultimate and tick its post-use cooldown.
+		ultimateCharge = Math.Min(UltimateChargeRequired, ultimateCharge + 1);
 		if (ghostPunchCooldown > 0)
-		{
 			ghostPunchCooldown--;
-		}
+		UpdateUltimateUI();
 
 		GD.Print("Used Slap!");
 
 		await PlayFriendlyAttack(new Color(0.65f, 0.90f, 1.0f),
-			43.0f, SlapDamage, 4.0f);
+			43.0f, NormalAttackDamage(), 4.0f);
 
 		if (battleFinished)
 			return;
@@ -567,10 +612,10 @@ public partial class BattleScene : Node2D
 		if (battleFinished || !playerTurn)
 			return;
 
-		// Prevent using Ghost Punch if it's still cooling down
-		if (ghostPunchCooldown > 0)
+		// Ultimates cannot be used until normal attacks fill the meter.
+		if (ghostPunchCooldown > 0 || ultimateCharge < UltimateChargeRequired)
 		{
-			GD.Print($"Ghost Punch is on cooldown! ({ghostPunchCooldown} turns left)");
+			GD.Print($"Ultimate not ready: charge {ultimateCharge}/{UltimateChargeRequired}");
 			return;
 		}
 
@@ -578,13 +623,14 @@ public partial class BattleScene : Node2D
 
 		HideAttackChoices();
 
-		// Set cooldown to 2 turns (can adjust this number as needed)
-		ghostPunchCooldown = 2;
+		ultimateCharge = 0;
+		ghostPunchCooldown = 1;
+		UpdateUltimateUI();
 
 		GD.Print("Used Ghost Punch!");
 
 		await PlayFriendlyAttack(new Color(0.15f, 0.65f, 1.0f),
-			72.0f, GhostPunchDamage, 12.0f);
+			72.0f, UltimateAttackDamage(), 12.0f);
 
 		if (battleFinished)
 			return;
@@ -800,34 +846,18 @@ public partial class BattleScene : Node2D
 		if (battleFinished)
 			return;
 
-		// One enemy action hits ONE target. Previously it damaged both characters
-		// every round, making the opening fights disproportionately punishing.
-		bool hitPlayer = playerHP > 0 &&
-			(yokaiHP <= 0 || random.NextDouble() < 0.4);
-		Sprite2D target = hitPlayer ? playerSprite : friendlyYokaiSprite;
+		// Only the companion has HP, like a classic monster battle.
 		Task hitReaction = Task.CompletedTask;
 		await PlayEnemyLunge(() =>
 		{
-			if (hitPlayer)
-			{
-				playerHP = Math.Max(0, playerHP - EnemyDamage);
-				GD.Print("Enemy hit the player for " + EnemyDamage + ".");
-			}
-			else
-			{
-				yokaiHP = Math.Max(0, yokaiHP - EnemyDamage);
-				GD.Print("Enemy hit the friendly Yo-kai for " + EnemyDamage + ".");
-			}
+			yokaiHP = Math.Max(0, yokaiHP - EnemyDamage);
+			GD.Print("Enemy hit the friendly Yo-kai for " + EnemyDamage + ".");
 			UpdateAllHP();
-			hitReaction = FlashRed(target);
+			hitReaction = FlashRed(friendlyYokaiSprite);
 		});
 		await hitReaction;
 		if (battleFinished)
 			return;
-
-		GD.Print(
-			$"Player HP: {playerHP}/{PlayerMaxHP}"
-		);
 
 		GD.Print(
 			$"Friendly Yo-kai HP: {yokaiHP}/{YokaiMaxHP}"
@@ -836,7 +866,7 @@ public partial class BattleScene : Node2D
 
 		// DEFEAT CHECK
 
-		if (playerHP <= 0 && yokaiHP <= 0)
+		if (yokaiHP <= 0)
 		{
 			await WaitSeconds(0.2);
 
@@ -856,12 +886,6 @@ public partial class BattleScene : Node2D
 		// PLAYER'S TURN STARTS AGAIN
 		// -------------------------------------
 
-		// Reduce Ghost Punch cooldown at the end of the full round
-		if (ghostPunchCooldown > 0)
-		{
-			ghostPunchCooldown--;
-		}
-
 		playerTurn = true;
 
 		// Skills become available again.
@@ -872,54 +896,7 @@ public partial class BattleScene : Node2D
 
 
 	// =========================================
-	// 24. FEED
-	// =========================================
-
-	private async void OnFeedPressed()
-	{
-		if (battleFinished || !playerTurn)
-			return;
-
-		if (yokaiHP >= YokaiMaxHP)
-		{
-			GD.Print("Your Yo-kai already has full HP!");
-			return;
-		}
-
-		playerTurn = false;
-
-		HideAttackChoices();
-
-		// Reduce cooldown if feeding counts as an action turn
-		if (ghostPunchCooldown > 0)
-		{
-			ghostPunchCooldown--;
-		}
-
-		yokaiHP = Math.Min(
-			YokaiMaxHP,
-			yokaiHP + FeedHealing
-		);
-
-		UpdateAllHP();
-
-		GD.Print("You fed your Yo-kai!");
-
-		GD.Print(
-			$"Friendly Yo-kai HP: {yokaiHP}/{YokaiMaxHP}"
-		);
-
-		await WaitSeconds(0.7);
-
-		if (!battleFinished)
-		{
-			await EnemyTurn();
-		}
-	}
-
-
-	// =========================================
-	// 25. RUN
+	// 24. RUN
 	// =========================================
 
 	private async void OnRunPressed()
@@ -957,18 +934,11 @@ public partial class BattleScene : Node2D
 
 
 	// =========================================
-	// 26. UPDATE ALL HP
+	// 25. UPDATE YOKAI HP
 	// =========================================
 
 	private void UpdateAllHP()
 	{
-		UpdateHPDisplay(
-			playerHPBar,
-			playerHPText,
-			playerHP,
-			PlayerMaxHP
-		);
-
 		UpdateHPDisplay(
 			yokaiHPBar,
 			yokaiHPText,
@@ -1019,11 +989,9 @@ public partial class BattleScene : Node2D
 		if (attackButton != null)
 			attackButton.Disabled = true;
 
-		if (feedButton != null)
-			feedButton.Disabled = true;
-
 		if (runButton != null)
 			runButton.Disabled = true;
+		UpdateUltimateUI();
 
 		GD.Print("VICTORY!");
 		GD.Print("You defeated the enemy Yo-kai!");
@@ -1054,11 +1022,9 @@ public partial class BattleScene : Node2D
 		if (attackButton != null)
 			attackButton.Disabled = true;
 
-		if (feedButton != null)
-			feedButton.Disabled = true;
-
 		if (runButton != null)
 			runButton.Disabled = true;
+		UpdateUltimateUI();
 
 		GD.Print("DEFEAT!");
 		GD.Print("Your team can no longer fight.");

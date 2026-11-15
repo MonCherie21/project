@@ -125,10 +125,10 @@ Move with W, A, S, D or the arrow keys. Click on marked buildings to interact wi
 [b]YOKAI PARTY AND FRIENDSHIP[/b]
 Press I or PARTY / FEED in the world to open your inventory. You begin with 5 candies. Each Yokai has its own friendship bar and FEED button. Every candy adds 50 friendship points; feeding 2 candies raises that Yokai by 1 Friendship Level, up to Level 3. You can collect more hidden candies on the map. Candy counts, collected pickups, and friendship are included in your saved adventure.
 
-Your first friendship objective is to feed your partner twice to reach Level 1. Higher partner Friendship reduces the enemy damage in battles. More Yo-kai join your party as you clear story stages.
+Your first friendship objective is to feed your partner twice to reach Level 1. Higher Friendship increases your Yokai's maximum HP and attack damage. Enemies do not become weaker when you feed your companion. More Yo-kai join your party as you clear story stages.
 
 [b]BATTLES[/b]
-Use SLAP or GHOST PUNCH to fight. HEAL restores your companion's HP during battle, while RUN leaves the fight. HEAL in battle is different from feeding candy in the party inventory. Watch your HP bars.
+Use a normal attack to build your ultimate meter. The second attack is your powerful ultimate: it needs 2 normal attacks to charge, then cools down before another use. An unavailable ultimate appears grayed out. RUN offers a chance to escape, but a failed attempt costs a turn. Only your Yokai has HP in battle; the trainer is not a target. There is no free healing during combat. Feed candy from PARTY / FEED before fighting to become stronger. Watch your Yokai HP and the enemy HP.
 
 [b]PAUSE AND SAVES[/b]
 Use the pause button to Continue, Save, Load, or Exit. Save before leaving the world; leaving shows a confirmation warning because progress since your last save will be lost. Saving during battle is unavailable. Each account keeps its own progress.
