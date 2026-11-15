@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://mu6kv7uol8tb"]
 
-[ext_resource type="Texture2D" uid="uid://ls0mk656gwy6" path="res://Assets/D6.png" id="1_u2opj"]
 [ext_resource type="Script" uid="uid://bgmeo8h37lel3" path="res://Dialogue6.cs" id="1_y0g6i"]
+[ext_resource type="Texture2D" uid="uid://dy1duq7hvskdh" path="res://DialoguesNew/level6.png" id="2_cbvw4"]
 [ext_resource type="Texture2D" uid="uid://cxde4vdi0gvna" path="res://Assets/escape button.png" id="3_cbvw4"]
 [ext_resource type="Script" uid="uid://bv3tt6av0tccb" path="res://PauseButton.cs" id="4_d761g"]
 
@@ -13,7 +13,7 @@ script = ExtResource("1_y0g6i")
 [node name="BackD6" type="TextureRect" parent="." unique_id=227296128]
 offset_right = 1282.0
 offset_bottom = 720.0
-texture = ExtResource("1_u2opj")
+texture = ExtResource("2_cbvw4")
 expand_mode = 2
 stretch_mode = 6
 

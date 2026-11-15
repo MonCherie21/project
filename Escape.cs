@@ -17,6 +17,8 @@ public partial class Escape : CanvasLayer
 
 		var saveButton = GetNode<Button>("Button Save");
 		saveButton.Pressed += OnSaveButtonPressed;
+		GetNode<Button>("Button Settings").Pressed += () =>
+			GetNode<SceneManager>("/root/SceneManager").ShowSettings();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

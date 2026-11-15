@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://batnydab1eujt" path="res://Characters/four.png" id="7_fd27m"]
 [ext_resource type="Texture2D" uid="uid://ijhbrrm7d83v" path="res://Assets/right button.png" id="10_tnsjy"]
 [ext_resource type="Texture2D" uid="uid://chcy5ow0plruu" path="res://Assets/left button.png" id="11_fd27m"]
+[ext_resource type="Texture2D" uid="uid://dbxif2rygxk8k" path="res://Assets/Blank Space.png" id="12_tnsjy"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ktf04"]
 
@@ -93,6 +94,15 @@ offset_top = 194.0
 offset_right = 640.0
 offset_bottom = 530.0
 texture = ExtResource("4_03kgx")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="." unique_id=86989829]
+layout_mode = 0
+offset_left = 818.0
+offset_top = 176.0
+offset_right = 1175.0
+offset_bottom = 455.0
+texture = ExtResource("12_tnsjy")
 expand_mode = 1
 
 [node name="Right Picture" type="TextureRect" parent="." unique_id=294349619]

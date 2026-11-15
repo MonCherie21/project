@@ -9,6 +9,8 @@ public partial class MainMenu : Control
 		GetNode<Button>("Exit").Pressed += OnExitPressed;
 		GetNode<Button>("Collections").Pressed += OnCollectionsPressed;
 		GetNode<Button>("Continue").Pressed += OnContinuePressed;
+		GetNode<Button>("SettingsButton").Pressed += () =>
+			GetNode<SceneManager>("/root/SceneManager").ShowSettings();
 		var continueButton = GetNode<Button>("Continue");
 		bool hasAccounts = PlayerData.HasLocalSession;
 		continueButton.Disabled = !hasAccounts;

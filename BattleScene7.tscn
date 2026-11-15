@@ -11,6 +11,24 @@
 [ext_resource type="Texture2D" uid="uid://cxde4vdi0gvna" path="res://Assets/escape button.png" id="9_88eip"]
 [ext_resource type="Script" uid="uid://bv3tt6av0tccb" path="res://PauseButton.cs" id="10_84tf1"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4vvt8"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_akchn"]
+bg_color = Color(0, 0.52156866, 0.9098039, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x7lav"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xj0el"]
+bg_color = Color(0, 0.52156866, 0.9098039, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r84l2"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mobn2"]
+bg_color = Color(0.8745098, 0, 0.13725491, 1)
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_he1co"]
 
 [node name="Node2D" type="Node2D" unique_id=1462485367]
@@ -38,18 +56,22 @@ scale = Vector2(1.6986301, 2.055255)
 texture = ExtResource("5_88eip")
 
 [node name="TextureButton" type="TextureButton" parent="." unique_id=664962030]
-offset_left = 464.0
-offset_top = 320.0
-offset_right = 806.0
-offset_bottom = 446.0
+offset_left = 503.0
+offset_top = 403.0
+offset_right = 800.0
+offset_bottom = 507.0
 texture_normal = ExtResource("6_84tf1")
+ignore_texture_size = true
+stretch_mode = 5
 
 [node name="TextureButton2" type="TextureButton" parent="." unique_id=1675303203]
-offset_left = 464.0
-offset_top = 448.0
-offset_right = 806.0
-offset_bottom = 774.0
+offset_left = 492.0
+offset_top = 509.0
+offset_right = 805.0
+offset_bottom = 617.0
 texture_normal = ExtResource("7_he1co")
+ignore_texture_size = true
+stretch_mode = 5
 
 [node name="btn-attack" type="TextureRect" parent="." unique_id=1464852214]
 offset_left = 72.0
@@ -60,13 +82,39 @@ texture = ExtResource("7_t60qp")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=874227602]
 
+[node name="PlayerRole" type="Label" parent="CanvasLayer"]
+offset_left = 144.0
+offset_top = 136.0
+offset_right = 274.0
+offset_bottom = 160.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "PLAYER"
+
+[node name="YokaiRole" type="Label" parent="CanvasLayer"]
+offset_left = 144.0
+offset_top = 200.0
+offset_right = 274.0
+offset_bottom = 224.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "YOKAI"
+
+[node name="EnemyRole" type="Label" parent="CanvasLayer"]
+offset_left = 832.0
+offset_top = 184.0
+offset_right = 962.0
+offset_bottom = 208.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "ENEMY"
+
 [node name="hp_p" type="ProgressBar" parent="CanvasLayer" unique_id=1535025064]
-offset_left = 152.0
+offset_left = 145.0
 offset_top = 160.0
 offset_right = 464.0
 offset_bottom = 192.0
+theme_override_styles/background = SubResource("StyleBoxFlat_4vvt8")
+theme_override_styles/fill = SubResource("StyleBoxFlat_akchn")
 
-[node name="hptext_p" type="TextEdit" parent="CanvasLayer" unique_id=1867132208]
+[node name="hptext_p" type="Label" parent="CanvasLayer" unique_id=1867132208]
 offset_left = 376.0
 offset_top = 192.0
 offset_right = 464.0
@@ -76,10 +124,12 @@ text = "100/100"
 [node name="hp_py" type="ProgressBar" parent="CanvasLayer" unique_id=2050685450]
 offset_left = 144.0
 offset_top = 224.0
-offset_right = 456.0
+offset_right = 459.0
 offset_bottom = 256.0
+theme_override_styles/background = SubResource("StyleBoxFlat_x7lav")
+theme_override_styles/fill = SubResource("StyleBoxFlat_xj0el")
 
-[node name="hptext_py" type="TextEdit" parent="CanvasLayer" unique_id=816001728]
+[node name="hptext_py" type="Label" parent="CanvasLayer" unique_id=816001728]
 offset_left = 376.0
 offset_top = 256.0
 offset_right = 464.0
@@ -91,8 +141,10 @@ offset_left = 832.0
 offset_top = 208.0
 offset_right = 1144.0
 offset_bottom = 240.0
+theme_override_styles/background = SubResource("StyleBoxFlat_r84l2")
+theme_override_styles/fill = SubResource("StyleBoxFlat_mobn2")
 
-[node name="hptext_m" type="TextEdit" parent="CanvasLayer" unique_id=631508804]
+[node name="hptext_m" type="Label" parent="CanvasLayer" unique_id=631508804]
 offset_left = 1064.0
 offset_top = 240.0
 offset_right = 1152.0
