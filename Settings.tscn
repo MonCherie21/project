@@ -1,0 +1,130 @@
+[gd_scene format=3 uid="uid://c8gwej4j2725w"]
+
+[ext_resource type="Texture2D" uid="uid://nsy7o473dirc" path="res://Assets/Settings.jpg" id="1_2fv1l"]
+[ext_resource type="Script" uid="uid://co8amtbidxwbs" path="res://Settings.cs" id="1_mx4kw"]
+[ext_resource type="Texture2D" uid="uid://chcy5ow0plruu" path="res://Assets/left button.png" id="3_mx4kw"]
+
+[node name="Settings" type="Node2D" unique_id=484729269]
+script = ExtResource("1_mx4kw")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1565197092]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_right = 1288.0
+offset_bottom = 760.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_2fv1l")
+
+[node name="Back Picture" type="TextureRect" parent="." unique_id=364220069]
+offset_left = 72.0
+offset_top = 32.0
+offset_right = 162.0
+offset_bottom = 125.0
+texture = ExtResource("3_mx4kw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ManualButton" type="Button" parent="." unique_id=1105965224]
+offset_left = 480.0
+offset_top = 352.0
+offset_right = 832.0
+offset_bottom = 424.0
+mouse_default_cursor_shape = 2
+
+[node name="CloseSettingsButton" type="Button" parent="." unique_id=897378343]
+offset_left = 72.0
+offset_top = 32.0
+offset_right = 160.0
+offset_bottom = 128.0
+
+[node name="ManualPopup" type="Panel" parent="." unique_id=220775841]
+visible = false
+offset_left = 136.0
+offset_top = 128.0
+offset_right = 1152.0
+offset_bottom = 712.0
+
+[node name="ScrollContainer" type="RichTextLabel" parent="ManualPopup" unique_id=1448073701]
+layout_mode = 0
+offset_left = 80.0
+offset_right = 968.0
+offset_bottom = 592.0
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 30
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ManualPopup/ScrollContainer" unique_id=1475173946]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 48.0
+offset_right = 904.0
+offset_bottom = 576.0
+theme_override_font_sizes/normal_font_size = 25
+text = "𝐆𝐀𝐌𝐄 𝐌𝐀𝐍𝐔𝐀𝐋
+𝗬𝗼-𝗸𝗮𝗶 𝗔𝗱𝘃𝗲𝗻𝘁𝘂𝗿𝗲
+
+1. 𝐌𝐚𝐢𝐧 𝐌𝐞𝐧𝐮
+New Game – Start a new adventure.
+Continue – Resume your saved progress.
+Collections – View your discovered Yo-kai.
+Settings – Adjust game preferences.
+- **Exit** – Close the game.
+
+2.  𝐂𝐡𝐚𝐫𝐚𝐜𝐭𝐞𝐫 𝐂𝐫𝐞𝐚𝐭𝐢𝐨n
+Enter Name – Input your character's username.
+Choose Gender
+Select Male or Female.
+
+3. 𝐌𝐚𝐩 𝐄𝐱𝐩𝐥𝐨𝐫𝐚𝐭𝐢𝐨𝐧
+Explore different locations, interact with your surroundings, and discover Yo-kai.
+
+**Movement Controls:**
+
+- W – Up
+- A – Left
+- S – Down
+- D – Right
+
+**Clipboard** – View story progress, current objectives, and instructions.
+
+**Entering Places** – Click an available location (e.g., House) to enter.
+
+4. 𝐁𝐚𝐭𝐭𝐥𝐞𝐟𝐢𝐞𝐥𝐝
+Battle enemies alongside your Yo-kai companion.
+
+𝐇𝐞𝐚𝐥𝐭𝐡 𝐁𝐚𝐫𝐬:
+- **Player HP** – Your character's health.
+- **Friend HP** – Your companion's health.
+- **Enemy HP** – Your opponent's health.
+
+**Battle Actions:**
+
+- **Basic Skill** – Unlimited regular attacks.
+- **Ultimate Skill** – Powerful attack with limited uses.
+
+𝟓. 𝐏𝐚𝐮𝐬𝐞 𝐌𝐞𝐧𝐮
+- **Save** – Save your current progress.
+- **Load** – Load previously saved progress.
+
+
+𝟔. 𝐒𝐞𝐭𝐭𝐢𝐧𝐠𝐬
+- **Manual** – View the game's instructions and controls.
+- **Music** – Turn background music ON or OFF.
+
+𝟕. 𝐆𝐚𝐦𝐞 𝐎𝐛𝐣𝐞𝐜𝐭𝐢𝐯𝐞
+Explore locations, complete story objectives, collect Yo-kai, and strengthen your friendships. Defeat enemies and uncover the mysteries of the Yo-kai world!
+
+🅶🅾🅾🅳 🅻🆄🅲🅺, 🅰🅳🆅🅴🅽🆃🆄🆁🅴🆁!
+"
+
+[node name="CloseButton" type="Button" parent="ManualPopup" unique_id=1574266516]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 40.0
+offset_right = 96.0
+offset_bottom = 104.0
+theme_override_colors/font_disabled_color = Color(0.87058824, 0.03529412, 0.03529412, 1)
+theme_override_colors/icon_disabled_color = Color(1, 0.101960786, 0.101960786, 0.89411765)
+text = "X"

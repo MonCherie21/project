@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 SceneManager="*uid://cfw0cu4kxwppc"
+GameManager="*uid://dxt2g8hacq51q"
+MusicPlayer="*uid://bi84y3b5o70vh"
 
 [display]
 

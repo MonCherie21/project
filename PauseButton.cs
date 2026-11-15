@@ -1,15 +1,33 @@
 using Godot;
 
-public partial class PauseButton : Button
+public partial class Settings : Node2D
 {
+	private TextureButton _manualButton;
+	private Control _manualPopup;
+	private TextureButton _closeButton;
+
 	public override void _Ready()
 	{
-		Pressed += OnPauseButtonPressed;
+		_manualPopup = GetNode<Control>("ManualPopup");
+		_closeButton = GetNode<TextureButton>("CloseButton");
+		_manualButton = GetNode<TextureButton>("ManualButton");
+
+		_manualPopup.Hide();
+		_closeButton.Hide();
+
+		_manualButton.Pressed += OnManualButtonPressed;
+		_closeButton.Pressed += OnCloseButtonPressed;
 	}
 
-	private void OnPauseButtonPressed()
+	private void OnManualButtonPressed()
 	{
-		SceneManager sceneManager = GetNode<SceneManager>("/root/SceneManager");
-		sceneManager.ShowPause();
+		_manualPopup.Show();
+		_closeButton.Show();
+	}
+
+	private void OnCloseButtonPressed()
+	{
+		_manualPopup.Hide();
+		_closeButton.Hide();
 	}
 }

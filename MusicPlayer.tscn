@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://bi84y3b5o70vh"]
+
+[ext_resource type="AudioStream" uid="uid://bwv8y86pwgqpw" path="res://Music/CORTIS (코르티스) REDRED Instrumental.ogg" id="1_1a72i"]
+
+[node name="MusicPlayer" type="AudioStreamPlayer" unique_id=1380001048]
+stream = ExtResource("1_1a72i")
+autoplay = true
