@@ -63,7 +63,9 @@ public partial class CollectionManager : Control
         _hint.AddThemeFontSizeOverride("font_size", 17);
         AddChild(_hint);
 
-        _unlockedCount = Math.Clamp(GameProgress.CompletedLevels, 0, _characters.Length);
+        // A profile switch must never display the previous account's Yokai.
+        _unlockedCount = PlayerData.ActiveAccountSlot == 0
+            ? 0 : Math.Clamp(GameProgress.CompletedLevels, 0, _characters.Length);
         _hint.Text = "Defeat a Yo-kai in a story battle to reveal it.";
         UpdateDisplay();
 
@@ -92,10 +94,14 @@ public partial class CollectionManager : Control
 
             if (chosen != null)
             {
-                _unlockedCount = Math.Clamp(
-                    Math.Max(_unlockedCount, chosen.Data.CompletedLevels), 0, _characters.Length);
-                _hint.Text = "Collection from save slot " + chosen.Number +
+                _unlockedCount = Math.Clamp(chosen.Data.CompletedLevels, 0, _characters.Length);
+                _hint.Text = "Collection for Account Slot " + PlayerData.ActiveAccountSlot +
                              " (" + _unlockedCount + "/7 discovered).";
+                UpdateDisplay();
+            }
+            else
+            {
+                _unlockedCount = 0;
                 UpdateDisplay();
             }
         }

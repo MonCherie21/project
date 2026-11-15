@@ -1,0 +1,171 @@
+[gd_scene format=3 uid="uid://c8gwej4j2725w"]
+
+[ext_resource type="Texture2D" uid="uid://nsy7o473dirc" path="res://Assets/Settings.jpg" id="1_bg"]
+[ext_resource type="Script" path="res://Settings.cs" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://chcy5ow0plruu" path="res://Assets/left button.png" id="3_back"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_invisible"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_manual"]
+bg_color = Color(0.075, 0.105, 0.16, 0.97)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.75, 0.78, 0.76, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Settings" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("2_script")
+
+[node name="Background" type="TextureRect" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+texture = ExtResource("1_bg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BackPicture" type="TextureRect" parent="."]
+offset_left = 72.0
+offset_top = 32.0
+offset_right = 162.0
+offset_bottom = 125.0
+mouse_filter = 2
+texture = ExtResource("3_back")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CloseSettingsButton" type="Button" parent="."]
+offset_left = 72.0
+offset_top = 32.0
+offset_right = 162.0
+offset_bottom = 125.0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_invisible")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_invisible")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_invisible")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_invisible")
+tooltip_text = "Back"
+
+[node name="ManualButton" type="Button" parent="."]
+offset_left = 480.0
+offset_top = 330.0
+offset_right = 823.0
+offset_bottom = 408.0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_invisible")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_invisible")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_invisible")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_invisible")
+tooltip_text = "Open game manual"
+
+[node name="MusicOnButton" type="Button" parent="."]
+offset_left = 528.0
+offset_top = 510.0
+offset_right = 647.0
+offset_bottom = 565.0
+theme_override_font_sizes/font_size = 22
+text = "ON"
+mouse_default_cursor_shape = 2
+
+[node name="MusicOffButton" type="Button" parent="."]
+offset_left = 665.0
+offset_top = 510.0
+offset_right = 784.0
+offset_bottom = 565.0
+theme_override_font_sizes/font_size = 22
+text = "OFF"
+mouse_default_cursor_shape = 2
+
+[node name="MusicVolumeLabel" type="Label" parent="."]
+offset_left = 502.0
+offset_top = 583.0
+offset_right = 810.0
+offset_bottom = 608.0
+theme_override_colors/font_color = Color(0.99, 0.92, 0.72, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.07, 0.12, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 19
+text = "MUSIC VOLUME"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="."]
+offset_left = 502.0
+offset_top = 616.0
+offset_right = 781.0
+offset_bottom = 641.0
+mouse_default_cursor_shape = 2
+max_value = 100.0
+step = 5.0
+value = 20.0
+
+[node name="MusicVolumePercent" type="Label" parent="."]
+offset_left = 801.0
+offset_top = 612.0
+offset_right = 868.0
+offset_bottom = 644.0
+theme_override_colors/font_color = Color(0.99, 0.92, 0.72, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.07, 0.12, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "20%"
+
+[node name="ManualPopup" type="Panel" parent="."]
+visible = false
+offset_left = 136.0
+offset_top = 78.0
+offset_right = 1152.0
+offset_bottom = 676.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_manual")
+
+[node name="ManualTitle" type="Label" parent="ManualPopup"]
+offset_left = 64.0
+offset_top = 18.0
+offset_right = 706.0
+offset_bottom = 74.0
+theme_override_colors/font_color = Color(1, 0.87, 0.64, 1)
+theme_override_font_sizes/font_size = 32
+text = "YOKAI WAVE - GAME MANUAL"
+
+[node name="CloseButton" type="Button" parent="ManualPopup"]
+offset_left = 917.0
+offset_top = 18.0
+offset_right = 977.0
+offset_bottom = 70.0
+theme_override_font_sizes/font_size = 25
+text = "X"
+mouse_default_cursor_shape = 2
+
+[node name="ManualText" type="RichTextLabel" parent="ManualPopup"]
+offset_left = 64.0
+offset_top = 89.0
+offset_right = 960.0
+offset_bottom = 560.0
+theme_override_colors/default_color = Color(0.96, 0.97, 0.98, 1)
+theme_override_font_sizes/normal_font_size = 24
+scroll_active = true
+bbcode_enabled = true
+text = "[b]STARTING AN ADVENTURE[/b]
+Choose NEW GAME to create a character and use an empty account slot. CONTINUE opens your saved accounts. You can keep up to three separate adventures.
+
+[b]EXPLORING[/b]
+Move with W, A, S, D or the arrow keys. Click on marked buildings to interact with them. The clipboard (!) shows your story and friendship objectives. Explore roads and bushes to discover translucent candy pickups.
+
+[b]YOKAI PARTY AND FRIENDSHIP[/b]
+Press I or PARTY / FEED in the world to open your inventory. You begin with 5 candies. Each Yokai has its own friendship bar and FEED button. Every candy adds 50 friendship points; feeding 2 candies raises that Yokai by 1 Friendship Level, up to Level 3. You can collect more hidden candies on the map. Candy counts, collected pickups, and friendship are included in your saved adventure.
+
+Your first friendship objective is to feed your partner twice to reach Level 1. Higher Friendship increases that Yokai's maximum HP and attack damage. Opponents also grow slightly to keep later fights challenging, but feeding still gives your partner a clear advantage. Each story battle uses its matching Yokai's friendship. More Yo-kai join your party as you clear story stages.
+
+[b]BATTLES[/b]
+Use a normal attack to build your ultimate meter. Your second attack is the ultimate: it needs 2 normal attacks to charge and then cools down. An unavailable ultimate appears gray. RUN offers a chance to escape, but a failed attempt costs a turn. Only your Yokai has HP in battle; the trainer is not a target. There is no free healing during combat. Animated attacks and effects indicate impacts; the battle music changes automatically. Feed your Yokai before fighting. Your HP is blue and the enemy HP is red; the numbers below them have separate colors for readability.
+
+[b]PAUSE AND SAVES[/b]
+Use the pause button to Continue, Save, Load, or Exit. Save before leaving the world; leaving shows a confirmation warning because progress since your last save will be lost. Saving during battle is unavailable. Each account keeps its own progress.
+
+[b]SETTINGS[/b]
+Choose ON or OFF to control background music. When ON, adjust the MUSIC VOLUME slider to your preferred level. Your volume and on/off choices persist across launches. Battle music switches back to the overworld track after combat. Open this manual again any time from Settings.
+
+Good luck on your adventure!"

@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://cnqkp6nej0p7p" path="res://SariSariStoreArea2d.cs" id="8_ioo17"]
 [ext_resource type="Texture2D" uid="uid://b42udyntoskbr" path="res://Assets/Flag.png" id="12_k3n1d"]
 [ext_resource type="Script" path="res://WorldCollisionGenerator.cs" id="13_world_collision"]
+[ext_resource type="PackedScene" path="res://CandyPickup.tscn" id="14_candy_pickup"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fj7yv"]
 texture = ExtResource("1_f3sb7")
@@ -105,6 +106,42 @@ size = Vector2(168.36926, 166.05399)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ixvm2"]
 size = Vector2(152.5927, 145.82855)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sarisari_solid"]
+size = Vector2(188, 162)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gas_solid"]
+size = Vector2(180, 140)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_school_solid"]
+size = Vector2(213.44, 129.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_puregold_solid"]
+size = Vector2(184, 151.2)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_carwash_solid"]
+size = Vector2(154.56, 129.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mcdo_solid"]
+size = Vector2(206.08, 158.4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_haunted_solid"]
+size = Vector2(213.44, 201.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_711_solid"]
+size = Vector2(198.72, 208.8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house_solid"]
+size = Vector2(176.64, 201.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house2_solid"]
+size = Vector2(176.64, 172.8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house3_solid"]
+size = Vector2(161.92, 136.8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house4_solid"]
+size = Vector2(161.92, 136.8)
+
 [node name="World" type="Node2D" unique_id=761772831]
 
 [node name="Root" type="Node2D" parent="." unique_id=806218832]
@@ -119,6 +156,24 @@ tile_set = SubResource("TileSet_g6pdq")
 position = Vector2(580, 515)
 scale = Vector2(1.1230469, 1.0039063)
 texture = ExtResource("2_tlwt5")
+
+[node name="HiddenCandy_01" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(-142, -292)
+
+[node name="HiddenCandy_02" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(-140, -152)
+
+[node name="HiddenCandy_03" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(-238, -108)
+
+[node name="HiddenCandy_04" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(-280, 17)
+
+[node name="HiddenCandy_05" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(103, 205)
+
+[node name="HiddenCandy_06" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(260, 26)
 
 [node name="Buildings" type="Sprite2D" parent="MapBackground" unique_id=1668857549]
 position = Vector2(-516.45215, -512.9961)
@@ -139,6 +194,13 @@ position = Vector2(-1.2960205, 2.5263062)
 scale = Vector2(0.9999998, 1)
 shape = SubResource("RectangleShape2D_vhjg5")
 
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/School"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/School/ManualSolid"]
+shape = SubResource("RectangleShape2D_school_solid")
+
 [node name="Puregold" type="Sprite2D" parent="MapBackground/Buildings" unique_id=665617271]
 position = Vector2(559.0001, 653)
 scale = Vector2(0.73, 0.6785714)
@@ -153,6 +215,13 @@ script = ExtResource("4_pkg7o")
 position = Vector2(2.739624, -1.4736938)
 scale = Vector2(0.9999999, 0.9999999)
 shape = SubResource("RectangleShape2D_ywtwn")
+
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/Puregold"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/Puregold/ManualSolid"]
+shape = SubResource("RectangleShape2D_puregold_solid")
 
 [node name="GasStation" type="Sprite2D" parent="MapBackground/Buildings" unique_id=16223720]
 position = Vector2(585.00006, 445)
@@ -170,12 +239,27 @@ position = Vector2(3.6765747, 13.287109)
 scale = Vector2(1, 0.9999997)
 shape = SubResource("RectangleShape2D_alusk")
 
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/GasStation"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/GasStation/ManualSolid"]
+position = Vector2(0, 26)
+shape = SubResource("RectangleShape2D_gas_solid")
+
 [node name="CarWash" type="Sprite2D" parent="MapBackground/Buildings" unique_id=2098387125]
 position = Vector2(322.00003, 723)
 scale = Vector2(0.7708331, 0.74305534)
 texture = ExtResource("3_aqk2v")
 region_enabled = true
 region_rect = Rect2(304, 576, 168, 144)
+
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/CarWash"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/CarWash/ManualSolid"]
+shape = SubResource("RectangleShape2D_carwash_solid")
 
 [node name="MCDO" type="Sprite2D" parent="MapBackground/Buildings" unique_id=2066647174]
 position = Vector2(126.000015, 828)
@@ -191,6 +275,13 @@ script = ExtResource("7_wse8f")
 position = Vector2(19.047607, 12.109985)
 shape = SubResource("RectangleShape2D_ginqg")
 
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/MCDO"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/MCDO/ManualSolid"]
+shape = SubResource("RectangleShape2D_mcdo_solid")
+
 [node name="HauntedHouse" type="Sprite2D" parent="MapBackground/Buildings" unique_id=617956706]
 position = Vector2(960.7501, 859.00006)
 scale = Vector2(0.81249994, 0.75446486)
@@ -205,6 +296,13 @@ script = ExtResource("8_ic0uy")
 position = Vector2(3.9997559, 1.3254395)
 shape = SubResource("RectangleShape2D_201q2")
 
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/HauntedHouse"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/HauntedHouse/ManualSolid"]
+shape = SubResource("RectangleShape2D_haunted_solid")
+
 [node name="711" type="Sprite2D" parent="MapBackground/Buildings" unique_id=426547624]
 position = Vector2(333.00003, 464)
 scale = Vector2(0.6342593, 0.59051716)
@@ -212,12 +310,26 @@ texture = ExtResource("3_aqk2v")
 region_enabled = true
 region_rect = Rect2(784, 32, 216, 232)
 
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/711"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/711/ManualSolid"]
+shape = SubResource("RectangleShape2D_711_solid")
+
 [node name="House" type="Sprite2D" parent="MapBackground/Buildings" unique_id=1511584674]
 position = Vector2(167, 446.00003)
 scale = Vector2(0.63281256, 0.5937502)
 texture = ExtResource("3_aqk2v")
 region_enabled = true
 region_rect = Rect2(544, 8, 192, 224)
+
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/House"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/House/ManualSolid"]
+shape = SubResource("RectangleShape2D_house_solid")
 
 [node name="House2" type="Sprite2D" parent="MapBackground/Buildings" unique_id=230090518]
 position = Vector2(330.00003, 322)
@@ -234,6 +346,13 @@ position = Vector2(2.953827, -3.4594727)
 scale = Vector2(1, 0.9999999)
 shape = SubResource("RectangleShape2D_ih478")
 
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/House2"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/House2/ManualSolid"]
+shape = SubResource("RectangleShape2D_house2_solid")
+
 [node name="SariSariStore" type="Sprite2D" parent="MapBackground/Buildings" unique_id=608511060]
 position = Vector2(602.00006, 328)
 scale = Vector2(0.675, 0.59659094)
@@ -248,6 +367,14 @@ script = ExtResource("8_ioo17")
 position = Vector2(-3.7037354, -10.895142)
 shape = SubResource("RectangleShape2D_ixvm2")
 
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/SariSariStore"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/SariSariStore/ManualSolid"]
+position = Vector2(-4, -4)
+shape = SubResource("RectangleShape2D_sarisari_solid")
+
 [node name="House3" type="Sprite2D" parent="MapBackground/Buildings" unique_id=305674607]
 position = Vector2(831.0001, 346)
 scale = Vector2(0.68892026, 0.6249998)
@@ -255,12 +382,26 @@ texture = ExtResource("3_aqk2v")
 region_enabled = true
 region_rect = Rect2(560, 312, 176, 152)
 
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/House3"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/House3/ManualSolid"]
+shape = SubResource("RectangleShape2D_house3_solid")
+
 [node name="House4" type="Sprite2D" parent="MapBackground/Buildings" unique_id=733161636]
 position = Vector2(323.00003, 614.00006)
 scale = Vector2(0.68892026, 0.6249998)
 texture = ExtResource("3_aqk2v")
 region_enabled = true
 region_rect = Rect2(560, 312, 176, 152)
+
+[node name="ManualSolid" type="StaticBody2D" parent="MapBackground/Buildings/House4"]
+collision_mask = 0
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MapBackground/Buildings/House4/ManualSolid"]
+shape = SubResource("RectangleShape2D_house4_solid")
 
 [node name="House Flag" type="TextureRect" parent="." unique_id=627743395]
 offset_left = 313.0

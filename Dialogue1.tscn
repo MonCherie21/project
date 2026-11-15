@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b4v40o101ae7w"]
 
-[ext_resource type="Texture2D" uid="uid://c66w7dn74wfqo" path="res://Assets/D1.png" id="1_hrj87"]
 [ext_resource type="Script" uid="uid://drs6qbxi013n3" path="res://Dialogue1.cs" id="1_pbnws"]
+[ext_resource type="Texture2D" uid="uid://clfdxrvmg520t" path="res://DialoguesNew/level1.png" id="2_sot3u"]
 [ext_resource type="Texture2D" uid="uid://cxde4vdi0gvna" path="res://Assets/escape button.png" id="3_marj7"]
 [ext_resource type="Script" uid="uid://bv3tt6av0tccb" path="res://PauseButton.cs" id="4_sot3u"]
 
@@ -14,7 +14,7 @@ script = ExtResource("1_pbnws")
 offset_right = 1282.0
 offset_bottom = 716.0
 focus_mode = 2
-texture = ExtResource("1_hrj87")
+texture = ExtResource("2_sot3u")
 expand_mode = 2
 stretch_mode = 6
 

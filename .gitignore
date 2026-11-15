@@ -1,3 +1,6 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Local per-device Supabase settings; NEVER commit real keys.
+/supabase.local.json

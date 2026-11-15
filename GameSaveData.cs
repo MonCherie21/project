@@ -1,11 +1,11 @@
 using System;
 using System.Text.Json.Serialization;
 
-// Versioned JSON snapshot. Battle turns, candy, and inventory can be added later.
+// Versioned JSON snapshot. Version 3 adds candy, friendship, and collected pickups.
 public sealed class GameSaveData
 {
     [JsonPropertyName("version")]
-    public int Version { get; set; } = 2;
+    public int Version { get; set; } = 3;
 
     [JsonPropertyName("scene")]
     public string Scene { get; set; } = "res://world.tscn";
@@ -20,11 +20,23 @@ public sealed class GameSaveData
     [JsonPropertyName("completed_levels")]
     public int CompletedLevels { get; set; }
 
+    [JsonPropertyName("candy_count")]
+    public int CandyCount { get; set; } = CandyInventory.StarterCandies;
+
+    [JsonPropertyName("friendship_feeds")]
+    public int[] FriendshipFeeds { get; set; } = new int[CandyInventory.PartnerCount];
+
+    [JsonPropertyName("collected_candy_ids")]
+    public string[] CollectedCandyIds { get; set; } = System.Array.Empty<string>();
+
     public static GameSaveData Capture() => new GameSaveData
     {
         PositionX = PlayerData.WorldPosition.X,
         PositionY = PlayerData.WorldPosition.Y,
-        CompletedLevels = GameProgress.CompletedLevels
+        CompletedLevels = GameProgress.CompletedLevels,
+        CandyCount = CandyInventory.Candies,
+        FriendshipFeeds = CandyInventory.SnapshotFeeds(),
+        CollectedCandyIds = CandyInventory.SnapshotPickups()
     };
 }
 

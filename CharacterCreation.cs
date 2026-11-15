@@ -10,12 +10,16 @@ public partial class CharacterCreation : Control
     private string _accessToken = "";
     private string _refreshToken = "";
     private Button _startButton;
+    private Button _maleButton;
+    private Button _femaleButton;
     private AcceptDialog _message;
 
     public override void _Ready()
     {
-        GetNode<Button>("Male").Pressed += () => _gender = "Male";
-        GetNode<Button>("Female").Pressed += () => _gender = "Female";
+        _maleButton = GetNode<Button>("Male");
+        _femaleButton = GetNode<Button>("Female");
+        _maleButton.Pressed += () => SelectGender("Male");
+        _femaleButton.Pressed += () => SelectGender("Female");
         GetNode<Button>("Button").Pressed += OnBackPressed; // Ronan's Back button
 
         _startButton = GetNode<Button>("Start");
@@ -24,8 +28,53 @@ public partial class CharacterCreation : Control
         AddChild(_message);
     }
 
+    private void SelectGender(string gender)
+    {
+        _gender = gender;
+        UpdateGenderButton(_maleButton, gender == "Male", "Male");
+        UpdateGenderButton(_femaleButton, gender == "Female", "Female");
+    }
+
+    private static void UpdateGenderButton(Button button, bool selected, string caption)
+    {
+        // The unselected artwork/text is baked into MainMenu.png. Only draw
+        // a new button label when covering that artwork with the gray state.
+        button.Text = selected ? caption : "";
+        StyleBox style = selected
+            ? new StyleBoxFlat
+            {
+                BgColor = new Color(0.47f, 0.51f, 0.53f, 0.96f),
+                BorderColor = Colors.Black,
+                BorderWidthLeft = 3,
+                BorderWidthTop = 3,
+                BorderWidthRight = 3,
+                BorderWidthBottom = 3,
+                CornerRadiusTopLeft = 10,
+                CornerRadiusTopRight = 10,
+                CornerRadiusBottomLeft = 10,
+                CornerRadiusBottomRight = 10
+            }
+            : new StyleBoxEmpty();
+        foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
+            button.AddThemeStyleboxOverride(state, style);
+        if (selected)
+        {
+            button.AddThemeFontOverride("font", GD.Load<Font>("res://Assets/PressStart2P-Regular.ttf"));
+            button.AddThemeFontSizeOverride("font_size", 21);
+            button.AddThemeColorOverride("font_color", new Color("191d25"));
+            button.AddThemeColorOverride("font_hover_color", new Color("191d25"));
+            button.AddThemeColorOverride("font_pressed_color", new Color("191d25"));
+        }
+    }
+
     private void OnStartPressed()
     {
+        if (PlayerData.PendingNewAccountSlot == 0 ||
+            PlayerData.GetAccounts().Exists(a => a.Slot == PlayerData.PendingNewAccountSlot))
+        {
+            ShowError("There is no free account slot. Return to the main menu.");
+            return;
+        }
         _pendingName = GetNode<LineEdit>("NameInput").Text.Trim();
         _pendingGender = _gender;
 
@@ -41,7 +90,7 @@ public partial class CharacterCreation : Control
         }
         if (!SupabaseConfig.IsConfigured)
         {
-            ShowError("Add your Supabase project URL and publishable key to SupabaseConfig.cs.");
+            ShowError("The game cannot connect right now. Please try again later.");
             return;
         }
 
@@ -54,7 +103,7 @@ public partial class CharacterCreation : Control
             request.QueueFree();
             if (result != (long)HttpRequest.Result.Success || code < 200 || code >= 300)
             {
-                ShowError("Could not connect to Supabase (HTTP " + code + ").");
+                ShowError("Could not start your adventure. Check your connection and try again.");
                 return;
             }
 
@@ -115,8 +164,14 @@ public partial class CharacterCreation : Control
                 PlayerData.HasLoadedPosition = false;
                 GameProgress.StartNewGame();
                 PlayerData.PendingMovementTutorial = true;
-                if (!PlayerData.RememberLocalSession())
-                    GD.PushWarning("Character registered, but this device could not remember the login.");
+                if (!PlayerData.RegisterNewAccount(PlayerData.PendingNewAccountSlot))
+                {
+                    ShowError("Could not secure the new account slot on this device. Please try again.");
+                    return;
+                }
+                // Makes a newly created account continuable even if the
+                // player has not reached the first Yokai yet.
+                GameProgress.QueueAutoSave();
                 GetTree().ChangeSceneToFile("res://world.tscn");
             }
             catch (Exception ex)

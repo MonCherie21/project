@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 // A small reusable overlay. It doesn't replace the current scene or reset gameplay.
@@ -41,7 +42,8 @@ public partial class SaveSlotPanel : CanvasLayer
     {
         var backdrop = new ColorRect
         {
-            Color = new Color(0.03f, 0.04f, 0.09f, 0.85f),
+            // Hide the existing PAUSE artwork while the save/load card is open.
+            Color = new Color(0.025f, 0.03f, 0.055f, 0.93f),
             MouseFilter = Control.MouseFilterEnum.Stop,
             AnchorRight = 1,
             AnchorBottom = 1
@@ -54,39 +56,55 @@ public partial class SaveSlotPanel : CanvasLayer
             AnchorRight = 0.5f,
             AnchorTop = 0.5f,
             AnchorBottom = 0.5f,
-            OffsetLeft = -290,
-            OffsetRight = 290,
-            OffsetTop = -210,
-            OffsetBottom = 210
+            OffsetLeft = -310,
+            OffsetRight = 310,
+            OffsetTop = -165,
+            OffsetBottom = 165
         };
+        panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
+        {
+            BgColor = new Color("151c2b"),
+            BorderColor = new Color("68788d"),
+            BorderWidthLeft = 4,
+            BorderWidthRight = 4,
+            BorderWidthTop = 4,
+            BorderWidthBottom = 4
+        });
         backdrop.AddChild(panel);
 
         var margin = new MarginContainer();
-        margin.AddThemeConstantOverride("margin_left", 22);
-        margin.AddThemeConstantOverride("margin_right", 22);
-        margin.AddThemeConstantOverride("margin_top", 22);
-        margin.AddThemeConstantOverride("margin_bottom", 22);
+        margin.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+        margin.AddThemeConstantOverride("margin_left", 24);
+        margin.AddThemeConstantOverride("margin_right", 24);
+        margin.AddThemeConstantOverride("margin_top", 24);
+        margin.AddThemeConstantOverride("margin_bottom", 24);
         panel.AddChild(margin);
 
         var content = new VBoxContainer();
-        content.AddThemeConstantOverride("separation", 12);
+        content.AddThemeConstantOverride("separation", 22);
         margin.AddChild(content);
 
-        content.AddChild(new Label
+        var title = new Label
         {
             Text = _mode == SlotMode.Save ? "SAVE YOUR GAME" : "LOAD YOUR GAME",
             HorizontalAlignment = HorizontalAlignment.Center
-        });
+        };
+        title.AddThemeFontSizeOverride("font_size", 25);
+        title.AddThemeColorOverride("font_color", new Color("ead49a"));
+        content.AddChild(title);
 
-        for (int i = 1; i <= 3; i++)
+        // One checkpoint per player account. The three accounts themselves
+        // are chosen on Continue, not in the pause menu.
+        for (int i = 1; i <= 1; i++)
         {
             int slot = i;
             var button = new Button
             {
-                Text = "Slot " + slot + " — Checking...",
-                CustomMinimumSize = new Vector2(480, 54),
+                Text = "Checking adventure...",
+                CustomMinimumSize = new Vector2(530, 56),
                 Disabled = true
             };
+            StyleButton(button);
             button.Pressed += () => _ = OnSlotPressedAsync(slot);
             _buttons[slot] = button;
             content.AddChild(button);
@@ -95,13 +113,44 @@ public partial class SaveSlotPanel : CanvasLayer
         _status = new Label
         {
             Text = "Checking your saved games...",
-            AutowrapMode = TextServer.AutowrapMode.WordSmart
+            AutowrapMode = TextServer.AutowrapMode.WordSmart,
+            HorizontalAlignment = HorizontalAlignment.Center
         };
+        _status.AddThemeColorOverride("font_color", new Color("d6dbe5"));
+        _status.AddThemeFontSizeOverride("font_size", 16);
         content.AddChild(_status);
 
-        _close = new Button { Text = "BACK", CustomMinimumSize = new Vector2(120, 42) };
+        _close = new Button
+        {
+            Text = "BACK",
+            CustomMinimumSize = new Vector2(190, 44),
+            SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter
+        };
+        StyleButton(_close);
         _close.Pressed += () => { if (!_working) QueueFree(); };
         content.AddChild(_close);
+        _close.GrabFocus();
+    }
+
+    private static void StyleButton(Button button)
+    {
+        var normal = new StyleBoxFlat
+        {
+            BgColor = new Color("293345"),
+            BorderColor = new Color("8292a6"),
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2,
+            BorderWidthTop = 2,
+            BorderWidthBottom = 2
+        };
+        var hover = (StyleBoxFlat)normal.Duplicate();
+        hover.BgColor = new Color("3b4c62");
+        button.AddThemeStyleboxOverride("normal", normal);
+        button.AddThemeStyleboxOverride("hover", hover);
+        button.AddThemeStyleboxOverride("focus", hover);
+        button.AddThemeColorOverride("font_color", new Color("f4f1e8"));
+        button.AddThemeColorOverride("font_hover_color", new Color("ffdfa0"));
+        button.AddThemeFontSizeOverride("font_size", 17);
     }
 
     private void SetWorking(bool busy)
@@ -118,8 +167,11 @@ public partial class SaveSlotPanel : CanvasLayer
         try
         {
             _existing.Clear();
-            foreach (var save in await SaveLoadService.ListAsync(this))
-                _existing[save.Number] = save;
+            var savedGames = await SaveLoadService.ListAsync(this);
+            // Preserve old player saves from slots 2/3 by offering the most
+            // recent one until the next normal save writes checkpoint 1.
+            var latest = savedGames.OrderByDescending(s => s.SavedAt).FirstOrDefault();
+            if (latest != null) _existing[1] = latest;
 
             foreach (var entry in _buttons)
             {
@@ -127,18 +179,19 @@ public partial class SaveSlotPanel : CanvasLayer
                 Button button = entry.Value;
                 if (_existing.TryGetValue(slot, out GameSaveSlot existing))
                 {
-                    button.Text = "SLOT " + slot + "  —  " +
-                        existing.Data.CompletedLevels + "/7 cleared — " +
+                    button.Text = (_mode == SlotMode.Save ? "UPDATE SAVE" : "CONTINUE") +
+                        "  —  " + existing.Data.CompletedLevels + "/7 cleared — " +
                         existing.SavedAt.ToLocalTime().ToString("MMM d, yyyy  h:mm tt");
                     button.Disabled = false;
                 }
                 else
                 {
-                    button.Text = "SLOT " + slot + "  —  EMPTY";
+                    button.Text = _mode == SlotMode.Save ? "SAVE THIS ADVENTURE" : "NO SAVE YET";
                     button.Disabled = _mode == SlotMode.Load;
                 }
             }
-            _status.Text = "Player: " + PlayerData.PlayerName;
+            _status.Text = "Account " + PlayerData.ActiveAccountSlot +
+                           ": " + PlayerData.PlayerName;
         }
         catch (Exception e)
         {
@@ -184,16 +237,10 @@ public partial class SaveSlotPanel : CanvasLayer
 
         if (_existing.ContainsKey(slot))
         {
-            var dialog = new ConfirmationDialog
-            {
-                Title = "Overwrite save?",
-                DialogText = "Replace the progress in Slot " + slot + "?"
-            };
-            AddChild(dialog);
-            dialog.Confirmed += () => _ = SaveAsync(slot);
-            dialog.CloseRequested += dialog.QueueFree;
-            dialog.Confirmed += dialog.QueueFree;
-            dialog.PopupCentered();
+            TutorialOverlay.Confirm(this, "UPDATE YOUR SAVE?",
+                "Save your current progress for " + PlayerData.PlayerName + "?\n\n" +
+                "This replaces the previous checkpoint for this adventure.",
+                () => _ = SaveAsync(slot), "SAVE PROGRESS");
             return;
         }
 
@@ -203,15 +250,16 @@ public partial class SaveSlotPanel : CanvasLayer
     private async Task SaveAsync(int slot)
     {
         SetWorking(true);
-        _status.Text = "Saving slot " + slot + "...";
+        _status.Text = "Saving this adventure...";
         try
         {
             GameSaveData snapshot = GameSaveData.Capture();
             await SaveLoadService.SaveAsync(this, slot, snapshot);
             GameProgress.SetActiveSlot(slot);
             GameProgress.MarkSaved(snapshot.CompletedLevels);
+            CandyInventory.MarkSaved(snapshot);
             await RefreshAsync();
-            _status.Text = "Saved slot " + slot + " successfully!";
+            _status.Text = "Adventure saved successfully!";
             _ = ClearSuccessMessageAsync(_status.Text);
         }
         catch (Exception e)
@@ -229,6 +277,7 @@ public partial class SaveSlotPanel : CanvasLayer
         await ToSignal(GetTree().CreateTimer(3.0, processAlways: true),
             SceneTreeTimer.SignalName.Timeout);
         if (GodotObject.IsInstanceValid(this) && _status.Text == successText)
-            _status.Text = "Player: " + PlayerData.PlayerName;
+            _status.Text = "Account " + PlayerData.ActiveAccountSlot +
+                           ": " + PlayerData.PlayerName;
     }
 }

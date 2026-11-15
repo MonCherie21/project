@@ -23,6 +23,7 @@ public static class GameProgress
 
     public static void StartNewGame()
     {
+        CandyInventory.StartNewGame();
         CompletedLevels = 0;
         ActiveSlot = 1;
         PendingAutoSave = false;
@@ -61,6 +62,9 @@ public static class GameProgress
     }
 
     public static void MarkBattleTutorialSeen() => HasSeenBattleTutorial = true;
+
+    // Seed the first checkpoint so Continue works immediately after creation.
+    public static void QueueAutoSave() => PendingAutoSave = true;
 
     public static int LevelFromBattleScene(string path)
     {

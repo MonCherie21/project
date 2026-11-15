@@ -5,6 +5,24 @@ using System.Threading.Tasks;
 
 public partial class World : Node2D
 {
+    private Action _refreshPartyHint;
+
+    public override void _ExitTree()
+    {
+        if (_refreshPartyHint != null)
+            CandyInventory.Changed -= _refreshPartyHint;
+    }
+
+    public override void _UnhandledKeyInput(InputEvent @event)
+    {
+        if (@event is InputEventKey key && key.Pressed && !key.Echo &&
+            key.Keycode == Key.I && !GetTree().Paused)
+        {
+            PartyInventory.Open(this);
+            GetViewport().SetInputAsHandled();
+        }
+    }
+
     public override void _Ready()
     {
         GD.Print("World loaded!");
@@ -33,31 +51,25 @@ public partial class World : Node2D
         PlayerData.WorldPosition = player.Position;
         PlayerData.HasLoadedPosition = false;
         UpdateStoryFlags();
+        ApplyBuildingDisturbances();
 
         // Added programmatically, so the existing world.tscn is untouched.
         var overlay = new CanvasLayer();
         AddChild(overlay);
         var nameLabel = new Label { Position = new Vector2(15, 15),
                                     Text = "Loading player profile..." };
+        nameLabel.AddThemeColorOverride("font_color", new Color("fff1cf"));
+        nameLabel.AddThemeColorOverride("font_outline_color", new Color("182c38"));
+        nameLabel.AddThemeConstantOverride("outline_size", 4);
         overlay.AddChild(nameLabel);
-
-        // Quick Save always writes directly to Slot 1; the pause menu still
-        // offers all three slots and their overwrite confirmations.
-        var saveButton = new Button
-        {
-            Text = "QUICK SAVE",
-            Position = new Vector2(175, 48),
-            Size = new Vector2(145, 42),
-            TooltipText = "Save immediately to Slot 1 (overwrites Slot 1)"
-        };
-        saveButton.Pressed += () => _ = QuickSaveSlotOneAsync(saveButton, overlay);
-        overlay.AddChild(saveButton);
 
         // The journal replaces the oversized progress banner. The active quest
         // stays one click away, without covering Wawa's roads and buildings.
         var journalButton = new Button
         {
-            Position = new Vector2(14, 157),
+            // Keep both shortcuts in the upper-right HUD, away from the
+            // movement controls, player name and save confirmation.
+            Position = new Vector2(1190, 25),
             Size = new Vector2(66, 66),
             Flat = true,
             TooltipText = "Open the objective clipboard"
@@ -83,6 +95,12 @@ public partial class World : Node2D
 
         journalButton.Pressed += () =>
         {
+            string friendshipObjective = CandyInventory.FriendshipLevel(0) < 1
+                ? "\n\nFRIENDSHIP OBJECTIVE  !\nFeed 2 candies to your first Yo-kai " +
+                  "using PARTY / FEED [I] to reach Friendship Level 1. " +
+                  "Explore for translucent candy pickups."
+                : "\n\nFRIENDSHIP OBJECTIVE  ✓\nYour first Yo-kai reached " +
+                  "Friendship Level " + CandyInventory.FriendshipLevel(0) + "!";
             var journal = new AcceptDialog
             {
                 Title = "Wawa Field Notes",
@@ -90,7 +108,8 @@ public partial class World : Node2D
                     ? "All seven stages are cleared!\nYou have protected Wawa."
                     : "STORY PROGRESS  " + GameProgress.CompletedLevels + "/" + GameProgress.TotalLevels +
                       "\n\nCURRENT OBJECTIVE\nGo to " + GameProgress.NextBuilding +
-                      " and complete the Yo-kai battle.\n\nFollow the white flag on the map."
+                      " and complete the Yo-kai battle.\n\nFollow the white flag on the map." +
+                      friendshipObjective
             };
             overlay.AddChild(journal);
             journal.Confirmed += journal.QueueFree;
@@ -98,16 +117,60 @@ public partial class World : Node2D
             journal.PopupCentered(new Vector2I(430, 235));
         };
 
+        // The party screen is an overlay: battle locations, world position,
+        // manual building solids, and the current game scene stay intact.
+        var partyButton = new Button
+        {
+            Position = new Vector2(1035, 36),
+            Size = new Vector2(139, 44),
+            Text = "PARTY [I]",
+            TooltipText = "View your Yokai, friendship levels, and feed candies"
+        };
+        partyButton.AddThemeFontSizeOverride("font_size", 16);
+        var partyStyle = new StyleBoxFlat
+        {
+            BgColor = new Color("243b3e"),
+            BorderColor = new Color("d3bc84"),
+            BorderWidthLeft = 3,
+            BorderWidthTop = 3,
+            BorderWidthRight = 3,
+            BorderWidthBottom = 3
+        };
+        partyButton.AddThemeStyleboxOverride("normal", partyStyle);
+        overlay.AddChild(partyButton);
+        partyButton.Pressed += () => PartyInventory.Open(this);
+
+        var partyMarker = new Label
+        {
+            Position = new Vector2(125, -12),
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+        partyMarker.AddThemeFontSizeOverride("font_size", 26);
+        partyMarker.AddThemeColorOverride("font_color", Colors.Gold);
+        partyMarker.AddThemeColorOverride("font_outline_color", Colors.Black);
+        partyMarker.AddThemeConstantOverride("outline_size", 4);
+        partyButton.AddChild(partyMarker);
+
+        _refreshPartyHint = () =>
+        {
+            partyMarker.Text = CandyInventory.FriendshipLevel(0) < 1 ? "!" : "✓";
+        };
+        CandyInventory.Changed += _refreshPartyHint;
+        _refreshPartyHint();
+
         if (GameProgress.PendingAutoSave)
             _ = AutoSaveProgressAsync(overlay);
 
         if (PlayerData.PendingMovementTutorial)
         {
             PlayerData.PendingMovementTutorial = false;
-            TutorialOverlay.Show(this, "WELCOME TO WAWA!",
-                "Use W, A, S, D or the arrow keys to walk around.\n\n" +
-                "Tap the clipboard with the yellow ! to check your next objective.\n" +
-                "Look for the white flag to find your next battle.");
+            TutorialOverlay.Show(this, "YOUR FIRST FRIENDSHIP QUEST!",
+                "Welcome to Wawa! Move with W, A, S, D or the arrow keys.\n\n" +
+                "You have 5 starter candies. Press I (or PARTY / FEED), " +
+                "and feed your first Yo-kai TWO candies to reach Friendship Level 1.\n\n" +
+                "Higher Friendship strengthens your Yo-kai's HP and attacks in battle. " +
+                "Explore roads to find faint, collectible candies!\n\n" +
+                "Tap the clipboard to see both your story and friendship objectives.");
         }
 
         if (PlayerData.PlayerId <= 0 || PlayerData.AccessToken.Length == 0)
@@ -185,17 +248,44 @@ public partial class World : Node2D
         }
     }
 
+    private void ApplyBuildingDisturbances()
+    {
+        string[] places =
+        {
+            "House2", "SariSariStore", "GasStation",
+            "Puregold", "MCDO", "School", "HauntedHouse"
+        };
+        for (int level = 0; level < places.Length; level++)
+        {
+            // Completed locations return to their original tidy artwork.
+            if (level < GameProgress.CompletedLevels) continue;
+
+            var sprite = GetParent().GetNodeOrNull<Sprite2D>(
+                "MapBackground/Buildings/" + places[level]);
+            if (sprite == null || sprite.Texture == null) continue;
+            sprite.AddChild(new DisturbedBuildingEffect
+            {
+                Name = "YokaiDisturbance",
+                BuildingSize = sprite.RegionEnabled
+                    ? sprite.RegionRect.Size : sprite.Texture.GetSize(),
+                Variant = level + 1
+            });
+        }
+    }
+
     private async Task AutoSaveProgressAsync(CanvasLayer overlay)
     {
         GameSaveData snapshot = GameSaveData.Capture();
-        int slot = GameProgress.ActiveSlot;
+        const int slot = 1;
         try
         {
             await SaveLoadService.SaveAsync(this, slot, snapshot);
+            GameProgress.SetActiveSlot(slot);
             GameProgress.MarkSaved(snapshot.CompletedLevels);
+            CandyInventory.MarkSaved(snapshot);
             if (GodotObject.IsInstanceValid(overlay))
-                _ = ShowTimedStatusAsync(overlay, "Saved to Slot " + slot + " ✓");
-            GD.Print("Level progress automatically saved to Slot " + slot + ".");
+                _ = ShowTimedStatusAsync(overlay, "Adventure saved ✓");
+            GD.Print("Account " + PlayerData.ActiveAccountSlot + " progress saved.");
         }
         catch (Exception ex)
         {
@@ -205,44 +295,13 @@ public partial class World : Node2D
         }
     }
 
-    private async Task QuickSaveSlotOneAsync(Button button, CanvasLayer overlay)
-    {
-        if (button.Disabled)
-            return;
-
-        button.Disabled = true;
-        button.Text = "SAVING...";
-        try
-        {
-            GameSaveData snapshot = GameSaveData.Capture();
-            await SaveLoadService.SaveAsync(this, 1, snapshot);
-            GameProgress.SetActiveSlot(1);
-            GameProgress.MarkSaved(snapshot.CompletedLevels);
-            if (GodotObject.IsInstanceValid(overlay))
-                _ = ShowTimedStatusAsync(overlay, "Saved to Slot 1 ✓", new Vector2(175, 100));
-        }
-        catch (Exception ex)
-        {
-            GD.PushWarning("Quick Save to Slot 1 failed: " + ex.Message);
-            if (GodotObject.IsInstanceValid(overlay))
-                _ = ShowTimedStatusAsync(overlay, "Quick save failed — check Output", new Vector2(175, 100));
-        }
-        finally
-        {
-            if (GodotObject.IsInstanceValid(button))
-            {
-                button.Disabled = false;
-                button.Text = "QUICK SAVE";
-            }
-        }
-    }
-
     private async Task ShowTimedStatusAsync(CanvasLayer overlay, string message,
         Vector2? position = null)
     {
         var toast = new Label
         {
-            Position = position ?? new Vector2(91, 176),
+            // Toast lives beneath the HUD instead of covering PARTY / journal.
+            Position = position ?? new Vector2(995, 106),
             Text = message,
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
