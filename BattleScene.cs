@@ -148,6 +148,9 @@ public partial class BattleScene : Node2D
 		yokaiHP = YokaiMaxHP;
 		enemyHP = EnemyMaxHP;
 
+		// EFeed and party inventory now share a saved friendship level.
+		// The first companion participates in all existing story battles.
+		FriendshipLevel = CandyInventory.FriendshipLevel(0);
 		ApplyFriendshipDifficulty();
 
 
@@ -349,7 +352,9 @@ public partial class BattleScene : Node2D
 				"It is your turn first! Choose an attack below.\n\n" +
 				"SLAP is a reliable quick hit. GHOST PUNCH does more damage, " +
 				"but needs time to recharge.\n\n" +
-				"FEED heals your team. RUN leaves the battle. " +
+				"HEAL restores your friendly Yo-kai's HP. RUN leaves the battle.\n\n" +
+				"Feed candy to your partner in the overworld INVENTORY " +
+				"to raise Friendship and lower enemy damage. " +
 				"Watch the HP bars and wait for your turn!");
 		}
 	}
@@ -401,7 +406,7 @@ public partial class BattleScene : Node2D
 		feedButton = new Button();
 
 		feedButton.Name = "RuntimeFeedButton";
-		feedButton.Text = "FEED";
+		feedButton.Text = "HEAL";
 		feedButton.Position = new Vector2(20, 460);
 		feedButton.Size = new Vector2(110, 42);
 

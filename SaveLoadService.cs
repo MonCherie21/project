@@ -137,5 +137,6 @@ public static class SaveLoadService
         PlayerData.WorldPosition = new Vector2(slot.Data.PositionX, slot.Data.PositionY);
         PlayerData.HasLoadedPosition = true;
         GameProgress.LoadProgress(slot.Data.CompletedLevels, slot.Number);
+        CandyInventory.Load(slot.Data);
     }
 }

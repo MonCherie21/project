@@ -29,7 +29,12 @@ public partial class Escape : CanvasLayer
 	// Ito ang gagana kapag pinindot ang Exit button
 	private void OnExitButtonPressed()
 	{
-		GetNode<SceneManager>("/root/SceneManager").ExitToMainMenu();
+		TutorialOverlay.Confirm(this, "LEAVE YOUR ADVENTURE?",
+			"Return to the main menu?\n\n" +
+			"Any progress since your last successful save will be lost. " +
+			"Choose CANCEL if you need to save first.",
+			() => GetNode<SceneManager>("/root/SceneManager").ExitToMainMenu(),
+			"LEAVE GAME");
 	}
 
 	// Ito ang gagana kapag pinindot ang Load button

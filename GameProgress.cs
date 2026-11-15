@@ -23,6 +23,7 @@ public static class GameProgress
 
     public static void StartNewGame()
     {
+        CandyInventory.StartNewGame();
         CompletedLevels = 0;
         ActiveSlot = 1;
         PendingAutoSave = false;

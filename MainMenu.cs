@@ -68,7 +68,10 @@ public partial class MainMenu : Control
 	
 	private void OnExitPressed()
 	{
-		GetTree().Quit();
+		TutorialOverlay.Confirm(this, "EXIT YOKAI WAVE?",
+			"Are you sure you want to close the game?\n\n" +
+			"Any adventure progress made since your last save will be lost.",
+			() => GetTree().Quit(), "EXIT GAME");
 	}
 	
 	private void OnCollectionsPressed()

@@ -120,13 +120,18 @@ text = "[b]STARTING AN ADVENTURE[/b]
 Choose NEW GAME to create a character and use an empty account slot. CONTINUE opens your saved accounts. You can keep up to three separate adventures.
 
 [b]EXPLORING[/b]
-Move with W, A, S, D or the arrow keys. Click on marked buildings to interact with them. Follow the dialogue and objectives as you explore the world.
+Move with W, A, S, D or the arrow keys. Click on marked buildings to interact with them. The clipboard (!) shows your story and friendship objectives. Explore roads and bushes to discover translucent candy pickups.
+
+[b]YOKAI PARTY AND FRIENDSHIP[/b]
+Press I or PARTY / FEED in the world to open your inventory. You begin with 5 candies. Each Yokai has its own friendship bar and FEED button. Every candy adds 50 friendship points; feeding 2 candies raises that Yokai by 1 Friendship Level, up to Level 3. You can collect more hidden candies on the map. Candy counts, collected pickups, and friendship are included in your saved adventure.
+
+Your first friendship objective is to feed your partner twice to reach Level 1. Higher partner Friendship reduces the enemy damage in battles. More Yo-kai join your party as you clear story stages.
 
 [b]BATTLES[/b]
-Use the available attack buttons to fight. Keep an eye on your player's HP, your companion's HP, and your enemy's HP. More combat improvements are coming later.
+Use SLAP or GHOST PUNCH to fight. HEAL restores your companion's HP during battle, while RUN leaves the fight. HEAL in battle is different from feeding candy in the party inventory. Watch your HP bars.
 
 [b]PAUSE AND SAVES[/b]
-Use the pause button to Continue, Save, Load, or Exit. Save before leaving the world. Saving during a battle is unavailable. Each account keeps its own progress.
+Use the pause button to Continue, Save, Load, or Exit. Save before leaving the world; leaving shows a confirmation warning because progress since your last save will be lost. Saving during battle is unavailable. Each account keeps its own progress.
 
 [b]SETTINGS[/b]
 Choose ON or OFF to control background music. The preference is remembered across game launches. Open this manual again any time from Settings.

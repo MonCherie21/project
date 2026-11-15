@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://cnqkp6nej0p7p" path="res://SariSariStoreArea2d.cs" id="8_ioo17"]
 [ext_resource type="Texture2D" uid="uid://b42udyntoskbr" path="res://Assets/Flag.png" id="12_k3n1d"]
 [ext_resource type="Script" path="res://WorldCollisionGenerator.cs" id="13_world_collision"]
+[ext_resource type="PackedScene" path="res://CandyPickup.tscn" id="14_candy_pickup"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fj7yv"]
 texture = ExtResource("1_f3sb7")
@@ -155,6 +156,24 @@ tile_set = SubResource("TileSet_g6pdq")
 position = Vector2(580, 515)
 scale = Vector2(1.1230469, 1.0039063)
 texture = ExtResource("2_tlwt5")
+
+[node name="HiddenCandy_01" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(-142, -292)
+
+[node name="HiddenCandy_02" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(-140, -152)
+
+[node name="HiddenCandy_03" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(-238, -108)
+
+[node name="HiddenCandy_04" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(-280, 17)
+
+[node name="HiddenCandy_05" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(103, 205)
+
+[node name="HiddenCandy_06" parent="MapBackground" instance=ExtResource("14_candy_pickup")]
+position = Vector2(260, 26)
 
 [node name="Buildings" type="Sprite2D" parent="MapBackground" unique_id=1668857549]
 position = Vector2(-516.45215, -512.9961)

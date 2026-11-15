@@ -257,6 +257,7 @@ public partial class SaveSlotPanel : CanvasLayer
             await SaveLoadService.SaveAsync(this, slot, snapshot);
             GameProgress.SetActiveSlot(slot);
             GameProgress.MarkSaved(snapshot.CompletedLevels);
+            CandyInventory.MarkSaved(snapshot);
             await RefreshAsync();
             _status.Text = "Adventure saved successfully!";
             _ = ClearSuccessMessageAsync(_status.Text);
