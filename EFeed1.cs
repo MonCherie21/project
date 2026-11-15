@@ -11,7 +11,7 @@ public partial class EFeed1 : Node2D
     private TextureButton _feedButton;
     private Control _candyCount;
     private Control _friendshipText;
-    private Range _friendshipBar;
+    private Godot.Range _friendshipBar;
     private CanvasItem _portrait;
     private Tween _flashTween;
     private int _index;
@@ -21,7 +21,7 @@ public partial class EFeed1 : Node2D
         _index = ResolveIndex();
         _feedButton = GetNodeOrNull<TextureButton>("CanvasLayer/CandyFeed");
         _candyCount = GetNodeOrNull<Control>("CanvasLayer/CandyCount");
-        _friendshipBar = GetNodeOrNull<Range>("friendshipLvl_bar");
+        _friendshipBar = GetNodeOrNull<Godot.Range>("friendshipLvl_bar");
         // The old scenes consistently spell this node "frienshipLvl".
         _friendshipText = GetNodeOrNull<Control>("friendshipLvl_bar/frienshipLvl");
         _portrait = GetNodeOrNull<CanvasItem>("M1Front");
