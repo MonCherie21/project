@@ -40,6 +40,8 @@ public partial class BattleScene : Node2D
 	private bool battleFinished = false;
 	private bool playerTurn = true;
 	private const int UltimateChargeRequired = 2;
+	private const double FriendlyCriticalChance = 0.16;
+	private const double EnemyCriticalChance = 0.28;
 	private int ultimateCharge = 0;
 	private int ghostPunchCooldown = 0;
 
@@ -52,6 +54,8 @@ public partial class BattleScene : Node2D
 
 	private Sprite2D friendlyYokaiSprite;
 	private Sprite2D enemySprite;
+	private Sprite2D trainerSprite;
+	private Node2D trainerPointingArm;
 
 	private Color friendlyOriginalModulate = Colors.White;
 	private Color enemyOriginalModulate = Colors.White;
@@ -59,6 +63,7 @@ public partial class BattleScene : Node2D
 	private Tween _enemyIdleTween;
 	private Tween _friendlyBreathTween;
 	private Tween _enemyBreathTween;
+	private Tween _trainerIdleTween;
 	private BattlePixelEffects _pixelEffects;
 
 
@@ -165,6 +170,8 @@ public partial class BattleScene : Node2D
 
 		enemySprite =
 			FindNodeRecursive(this, "m1_m") as Sprite2D;
+		trainerSprite = FindNodeRecursive(this, "P1Whole") as Sprite2D;
+		ConfigureTrainerSprite();
 
 
 		// Save original sprite colors.
@@ -402,20 +409,22 @@ public partial class BattleScene : Node2D
 		canvasLayer.AddChild(runButton);
 		runButton.Pressed += OnRunPressed;
 
-		// The same shared scene script draws this under the second skill
-		// in every story battle. When a skill sits at the screen's bottom
-		// edge, put the meter ABOVE it so no text gets cut off.
-		Vector2 skillPosition = ghostPunchButton?.Position ?? new Vector2(667, 457);
-		Vector2 skillSize = ghostPunchButton?.Size ?? new Vector2(197, 199);
-		float meterX = skillPosition.X + (skillSize.X - 197) / 2;
-		bool roomBelow = skillPosition.Y + skillSize.Y <= 660;
-		float meterY = roomBelow ? skillPosition.Y + skillSize.Y + 6 : skillPosition.Y - 24;
-		float labelY = roomBelow ? meterY + 20 : skillPosition.Y - 51;
+		// Fixed screen-space HUD across all seven battle scenes: it never
+		// depends on a skill button's position or falls below 720p.
+		var ultimatePanel = new Panel
+		{
+			Name = "UltimateStatusPanel",
+			Position = new Vector2(492, 69),
+			Size = new Vector2(285, 64),
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		ultimatePanel.AddThemeStyleboxOverride("panel", BattleBox("172638", "e0b76f"));
+		canvasLayer.AddChild(ultimatePanel);
 		ultimateMeter = new ProgressBar
 		{
 			Name = "UltimateChargeMeter",
-			Position = new Vector2(meterX, meterY),
-			Size = new Vector2(197, 15),
+			Position = new Vector2(14, 38),
+			Size = new Vector2(256, 15),
 			MinValue = 0,
 			MaxValue = UltimateChargeRequired,
 			ShowPercentage = false,
@@ -423,13 +432,13 @@ public partial class BattleScene : Node2D
 		};
 		ultimateMeter.AddThemeStyleboxOverride("background", BattleBox("182438", "657080"));
 		ultimateMeter.AddThemeStyleboxOverride("fill", BattleBox("d9a24b", "f9df91"));
-		canvasLayer.AddChild(ultimateMeter);
+		ultimatePanel.AddChild(ultimateMeter);
 
 		ultimateText = new Label
 		{
 			Name = "UltimateChargeText",
-			Position = new Vector2(meterX, labelY),
-			Size = new Vector2(215, 27),
+			Position = new Vector2(14, 9),
+			Size = new Vector2(256, 27),
 			MouseFilter = Control.MouseFilterEnum.Ignore
 		};
 		ultimateText.AddThemeFontOverride("font", GD.Load<Font>("res://Assets/PressStart2P-Regular.ttf"));
@@ -437,7 +446,7 @@ public partial class BattleScene : Node2D
 		ultimateText.AddThemeColorOverride("font_color", new Color("ffe3a1"));
 		ultimateText.AddThemeColorOverride("font_outline_color", Colors.Black);
 		ultimateText.AddThemeConstantOverride("outline_size", 3);
-		canvasLayer.AddChild(ultimateText);
+		ultimatePanel.AddChild(ultimateText);
 		UpdateUltimateUI();
 	}
 
@@ -645,6 +654,7 @@ public partial class BattleScene : Node2D
 
 		GD.Print("Used Slap!");
 		PlaySound("AttackNormal", -7);
+		await PlayTrainerCommand();
 
 		await PlayFriendlyAttack(new Color(0.65f, 0.90f, 1.0f),
 			43.0f, NormalAttackDamage(), 4.0f);
@@ -688,6 +698,7 @@ public partial class BattleScene : Node2D
 		UpdateUltimateUI();
 
 		GD.Print("Used Ghost Punch!");
+		await PlayTrainerCommand();
 		if (_pixelEffects != null && friendlyYokaiSprite != null)
 			await _pixelEffects.Charge(friendlyYokaiSprite.Position);
 		PlaySound("AttackUltimate", -5);
@@ -767,12 +778,99 @@ public partial class BattleScene : Node2D
 		await impact;
 	}
 
+	// All battle scenes share P1Whole, so a single side-facing sprite and
+	// jointed pixel arm can animate the trainer without editing seven scenes.
+	private void ConfigureTrainerSprite()
+	{
+		if (trainerSprite == null)
+			return;
+
+		Texture2D sideTexture = GD.Load<Texture2D>("res://Assets/P1_Side_v2.png");
+		if (sideTexture != null)
+		{
+			trainerSprite.Texture = sideTexture; // Artwork faces the enemy (right).
+			trainerSprite.Scale = new Vector2(3.7f, 3.6f);
+			trainerSprite.FlipH = false;
+			trainerSprite.TextureFilter = CanvasItem.TextureFilterEnum.Nearest;
+		}
+
+		// Local pixel-space coordinates match the small 69x100 side sprite.
+		// The arm pivots from its shoulder, so the gesture has genuine tweened
+		// in-between poses instead of an instant image swap.
+		trainerPointingArm = new Node2D
+		{
+			Name = "TrainerCommandArm",
+			Position = new Vector2(2.5f, 6),
+			Visible = false
+		};
+		trainerSprite.AddChild(trainerPointingArm);
+		var outline = new Polygon2D
+		{
+			Color = new Color("171923"),
+			Polygon = new Vector2[]
+			{
+				new(0, -3), new(6, -5), new(13, -6), new(20, -6),
+				new(23, -5), new(29, -5), new(30, -3), new(29, -1),
+				new(23, 0), new(19, 0), new(10, 1), new(6, 5), new(1, 6)
+			}
+		};
+		trainerPointingArm.AddChild(outline);
+		trainerPointingArm.AddChild(new Polygon2D
+		{
+			Color = new Color("8e9ba6"),
+			Polygon = new Vector2[]
+			{
+				new(1, -2), new(7, -4), new(17, -5),
+				new(20, -3), new(15, -1), new(7, 3), new(2, 4)
+			}
+		});
+		trainerPointingArm.AddChild(new Polygon2D
+		{
+			Color = new Color("ead1bb"),
+			Polygon = new Vector2[]
+			{
+				new(20, -4), new(23, -4), new(28, -4),
+				new(28, -2), new(23, -1), new(20, -1)
+			}
+		});
+	}
+
+	private async Task PlayTrainerCommand()
+	{
+		if (trainerSprite == null || trainerPointingArm == null)
+			return;
+
+		// A down-to-forward pointing arc (with continuous 60fps in-betweens),
+		// followed by a small natural return to the idle pose.
+		trainerPointingArm.Visible = true;
+		trainerPointingArm.Modulate = new Color(1, 1, 1, 0);
+		trainerPointingArm.Rotation = 1.0f;
+		Tween point = CreateTween().SetTrans(Tween.TransitionType.Sine)
+			.SetEase(Tween.EaseType.Out);
+		point.TweenProperty(trainerPointingArm, "rotation", -0.12f, 0.22);
+		point.Parallel().TweenProperty(trainerPointingArm, "modulate", Colors.White, 0.18);
+		point.Parallel().TweenProperty(trainerSprite, "rotation", -0.035f, 0.22);
+		await ToSignal(point, Tween.SignalName.Finished);
+		await WaitSeconds(0.13);
+
+		Tween release = CreateTween().SetTrans(Tween.TransitionType.Sine)
+			.SetEase(Tween.EaseType.InOut);
+		release.TweenProperty(trainerPointingArm, "rotation", 1.0f, 0.20);
+		release.Parallel().TweenProperty(trainerPointingArm, "modulate",
+			new Color(1, 1, 1, 0), 0.20);
+		release.Parallel().TweenProperty(trainerSprite, "rotation", 0f, 0.20);
+		await ToSignal(release, Tween.SignalName.Finished);
+		if (GodotObject.IsInstanceValid(trainerPointingArm))
+			trainerPointingArm.Visible = false;
+	}
+
 	// Gentle looping movement makes the static Yo-kai sprites feel alive.
 	// Offset is animated separately from Position, so it doesn't fight lunges.
 	private void StartIdleAnimations()
 	{
 		_friendlyIdleTween = CreateIdleBob(friendlyYokaiSprite, 4.0f, 0.76);
 		_enemyIdleTween = CreateIdleBob(enemySprite, 3.0f, 0.95);
+		_trainerIdleTween = CreateIdleBob(trainerSprite, 2.8f, 0.92);
 		_friendlyBreathTween = CreateBreathing(friendlyYokaiSprite, 0.81);
 		_enemyBreathTween = CreateBreathing(enemySprite, 1.05);
 	}
@@ -816,6 +914,8 @@ public partial class BattleScene : Node2D
 			_friendlyBreathTween.Kill();
 		if (GodotObject.IsInstanceValid(_enemyBreathTween))
 			_enemyBreathTween.Kill();
+		if (GodotObject.IsInstanceValid(_trainerIdleTween))
+			_trainerIdleTween.Kill();
 	}
 
 
@@ -831,9 +931,14 @@ public partial class BattleScene : Node2D
 		if (battleFinished)
 			return;
 
+		bool critical = random.NextDouble() < FriendlyCriticalChance;
+		int actualDamage = critical ? (int)Math.Ceiling(damage * 1.5) : damage;
+		if (critical)
+			ShowCriticalHit(enemySprite, actualDamage, true);
+
 		enemyHP = Math.Max(
 			0,
-			enemyHP - damage
+			enemyHP - actualDamage
 		);
 
 		UpdateAllHP();
@@ -939,8 +1044,13 @@ public partial class BattleScene : Node2D
 		Task hitReaction = Task.CompletedTask;
 		await PlayEnemyLunge(() =>
 		{
-			yokaiHP = Math.Max(0, yokaiHP - EnemyDamage);
-			GD.Print("Enemy hit the friendly Yo-kai for " + EnemyDamage + ".");
+			bool critical = random.NextDouble() < EnemyCriticalChance;
+			int actualDamage = critical ? EnemyDamage * 2 : EnemyDamage;
+			if (critical)
+				ShowCriticalHit(friendlyYokaiSprite, actualDamage, false);
+			yokaiHP = Math.Max(0, yokaiHP - actualDamage);
+			GD.Print("Enemy hit the friendly Yo-kai for " + actualDamage +
+				(critical ? " (CRITICAL)." : "."));
 			UpdateAllHP();
 			hitReaction = FlashRed(friendlyYokaiSprite);
 		});
@@ -981,6 +1091,46 @@ public partial class BattleScene : Node2D
 		ShowAttackChoices();
 
 		GD.Print("Your turn! Attack skills are available.");
+	}
+
+	private void ShowCriticalHit(Sprite2D target, int damage, bool friendlyAttack)
+	{
+		if (canvasLayer == null)
+			return;
+
+		Vector2 targetPosition = target?.GlobalPosition ??
+			(friendlyAttack ? new Vector2(1000, 400) : new Vector2(350, 430));
+		var notice = new Label
+		{
+			Name = "CriticalHitPopup",
+			Text = $"CRITICAL! {damage} DMG",
+			Position = new Vector2(Math.Clamp(targetPosition.X - 120, 6, 1030),
+				Math.Clamp(targetPosition.Y - 118, 160, 580)),
+			Size = new Vector2(238, 34),
+			HorizontalAlignment = HorizontalAlignment.Center,
+			MouseFilter = Control.MouseFilterEnum.Ignore,
+			ZIndex = 100
+		};
+		notice.AddThemeFontOverride("font", GD.Load<Font>("res://Assets/PressStart2P-Regular.ttf"));
+		notice.AddThemeFontSizeOverride("font_size", 12);
+		notice.AddThemeColorOverride("font_color",
+			friendlyAttack ? new Color("ffde73") : new Color("ff7777"));
+		notice.AddThemeColorOverride("font_outline_color", new Color("172230"));
+		notice.AddThemeConstantOverride("outline_size", 5);
+		canvasLayer.AddChild(notice);
+
+		Tween floatUp = CreateTween();
+		floatUp.SetTrans(Tween.TransitionType.Cubic);
+		floatUp.SetEase(Tween.EaseType.Out);
+		floatUp.TweenProperty(notice, "position", notice.Position + new Vector2(0, -42), 0.85);
+		floatUp.Parallel().TweenProperty(notice, "modulate", new Color(1, 1, 1, 0), 0.85);
+		floatUp.Finished += () =>
+		{
+			if (GodotObject.IsInstanceValid(notice))
+				notice.QueueFree();
+		};
+		GD.Print((friendlyAttack ? "Your Yokai" : "Enemy Yokai") +
+			" landed a critical hit for " + damage + " damage!");
 	}
 
 
@@ -1097,7 +1247,7 @@ public partial class BattleScene : Node2D
 		bool advanced = GameProgress.CompleteLevel(level);
 		string message = advanced
 			? level == GameProgress.TotalLevels
-				? "You cleared all seven levels! Wawa is safe. Return to the map."
+				? "All seven districts are clear! The town's lights are returning. Wawa is safe."
 				: $"Level {level} cleared! Next: {GameProgress.NextBuilding}. Return to Wawa."
 			: "Enemy defeated! Return to Wawa.";
 		ShowResult("VICTORY!", message);
@@ -1130,11 +1280,30 @@ public partial class BattleScene : Node2D
 
 	private void ShowResult(string title, string message)
 	{
-		var dialog = new AcceptDialog { Title = title, DialogText = message };
-		AddChild(dialog);
-		dialog.Confirmed += ReturnToWorld;
-		dialog.CloseRequested += ReturnToWorld;
-		dialog.PopupCentered();
+		PackedScene resultScene = GD.Load<PackedScene>("res://BattleResultUI.tscn");
+		if (resultScene == null)
+		{
+			GD.PushError("Battle result overlay is missing.");
+			ReturnToWorld();
+			return;
+		}
+
+		var result = resultScene.Instantiate<BattleResultUI>();
+		AddChild(result);
+		bool ending = title == "VICTORY!" && _battleStage == GameProgress.TotalLevels;
+		result.Configure(title, message,
+			ending ? "VIEW EPILOGUE" : "RETURN TO WAWA",
+			_battleStage,
+			ending ? GoToEnding : ReturnToWorld);
+	}
+
+	private void GoToEnding()
+	{
+		PlayerData.HasLoadedPosition = true;
+		GetTree().Paused = false;
+		Error error = GetTree().ChangeSceneToFile("res://Ending.tscn");
+		if (error != Error.Ok)
+			GD.PushError("Could not open the Wawa ending: " + error);
 	}
 
 	private void ReturnToWorld()

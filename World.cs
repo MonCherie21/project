@@ -67,7 +67,9 @@ public partial class World : Node2D
         // stays one click away, without covering Wawa's roads and buildings.
         var journalButton = new Button
         {
-            Position = new Vector2(14, 157),
+            // Keep both shortcuts in the upper-right HUD, away from the
+            // movement controls, player name and save confirmation.
+            Position = new Vector2(1190, 25),
             Size = new Vector2(66, 66),
             Flat = true,
             TooltipText = "Open the objective clipboard"
@@ -119,8 +121,7 @@ public partial class World : Node2D
         // manual building solids, and the current game scene stay intact.
         var partyButton = new Button
         {
-            // Compact companion shortcut beside the objective clipboard.
-            Position = new Vector2(91, 169),
+            Position = new Vector2(1035, 36),
             Size = new Vector2(139, 44),
             Text = "PARTY [I]",
             TooltipText = "View your Yokai, friendship levels, and feed candies"
@@ -299,7 +300,8 @@ public partial class World : Node2D
     {
         var toast = new Label
         {
-            Position = position ?? new Vector2(91, 176),
+            // Toast lives beneath the HUD instead of covering PARTY / journal.
+            Position = position ?? new Vector2(995, 106),
             Text = message,
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
