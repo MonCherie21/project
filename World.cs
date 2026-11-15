@@ -58,6 +58,9 @@ public partial class World : Node2D
         AddChild(overlay);
         var nameLabel = new Label { Position = new Vector2(15, 15),
                                     Text = "Loading player profile..." };
+        nameLabel.AddThemeColorOverride("font_color", new Color("fff1cf"));
+        nameLabel.AddThemeColorOverride("font_outline_color", new Color("182c38"));
+        nameLabel.AddThemeConstantOverride("outline_size", 4);
         overlay.AddChild(nameLabel);
 
         // The journal replaces the oversized progress banner. The active quest
@@ -116,12 +119,13 @@ public partial class World : Node2D
         // manual building solids, and the current game scene stay intact.
         var partyButton = new Button
         {
-            Position = new Vector2(14, 237),
-            Size = new Vector2(172, 47),
-            Text = "PARTY / FEED [I]",
+            // Compact companion shortcut beside the objective clipboard.
+            Position = new Vector2(91, 169),
+            Size = new Vector2(139, 44),
+            Text = "PARTY [I]",
             TooltipText = "View your Yokai, friendship levels, and feed candies"
         };
-        partyButton.AddThemeFontSizeOverride("font_size", 17);
+        partyButton.AddThemeFontSizeOverride("font_size", 16);
         var partyStyle = new StyleBoxFlat
         {
             BgColor = new Color("243b3e"),
@@ -137,7 +141,7 @@ public partial class World : Node2D
 
         var partyMarker = new Label
         {
-            Position = new Vector2(156, -15),
+            Position = new Vector2(125, -12),
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
         partyMarker.AddThemeFontSizeOverride("font_size", 26);
@@ -146,33 +150,9 @@ public partial class World : Node2D
         partyMarker.AddThemeConstantOverride("outline_size", 4);
         partyButton.AddChild(partyMarker);
 
-        var candyIcon = new TextureRect
-        {
-            Position = new Vector2(198, 242),
-            Size = new Vector2(50, 33),
-            Texture = GD.Load<Texture2D>("res://Assets/CandyWrapperPixel.png"),
-            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-            TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-            MouseFilter = Control.MouseFilterEnum.Ignore
-        };
-        overlay.AddChild(candyIcon);
-
-        var candyCount = new Label
-        {
-            Position = new Vector2(251, 248),
-            MouseFilter = Control.MouseFilterEnum.Ignore
-        };
-        candyCount.AddThemeFontSizeOverride("font_size", 17);
-        candyCount.AddThemeColorOverride("font_color", new Color("ffdf9a"));
-        candyCount.AddThemeColorOverride("font_outline_color", Colors.Black);
-        candyCount.AddThemeConstantOverride("outline_size", 4);
-        overlay.AddChild(candyCount);
-
         _refreshPartyHint = () =>
         {
             partyMarker.Text = CandyInventory.FriendshipLevel(0) < 1 ? "!" : "✓";
-            candyCount.Text = $"CANDIES x{CandyInventory.Candies:00}";
         };
         CandyInventory.Changed += _refreshPartyHint;
         _refreshPartyHint();

@@ -30,6 +30,7 @@ public partial class BattleScene : Node2D
 	// =========================================
 
 	[Export] public int FriendshipLevel = 0;
+	private int _battleStage = 1;
 
 
 	// =========================================
@@ -56,6 +57,9 @@ public partial class BattleScene : Node2D
 	private Color enemyOriginalModulate = Colors.White;
 	private Tween _friendlyIdleTween;
 	private Tween _enemyIdleTween;
+	private Tween _friendlyBreathTween;
+	private Tween _enemyBreathTween;
+	private BattlePixelEffects _pixelEffects;
 
 
 	// =========================================
@@ -86,6 +90,8 @@ public partial class BattleScene : Node2D
 
 	private Label yokaiHPText;
 	private Label enemyHPText;
+	private Label _friendlyPercent;
+	private Label _enemyPercent;
 
 
 	// =========================================
@@ -140,10 +146,11 @@ public partial class BattleScene : Node2D
 			MoveChild(damage, battleBackground.GetIndex() + 1);
 		}
 
-		// Initialize HP.
-		// EFeed and the party screen save each companion's friendship.
-		// The first companion currently fights in all story battles.
-		FriendshipLevel = CandyInventory.FriendshipLevel(0);
+		// Each story encounter uses the matching companion's saved friendship.
+		// The seven Yokai battles now scale together as the adventure advances.
+		_battleStage = Math.Clamp(GameProgress.LevelFromBattleScene(
+			GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath), 1, GameProgress.TotalLevels);
+		FriendshipLevel = CandyInventory.FriendshipLevel(_battleStage - 1);
 		ApplyFriendshipPower();
 		yokaiHP = YokaiMaxHP;
 		enemyHP = EnemyMaxHP;
@@ -182,6 +189,9 @@ public partial class BattleScene : Node2D
 				"Enemy Sprite2D not found: m1_m."
 			);
 		}
+		_pixelEffects = new BattlePixelEffects { Name = "PixelBattleFX", ZIndex = 85 };
+		AddChild(_pixelEffects);
+		_pixelEffects.SetStage(_battleStage);
 
 
 		// -------------------------------------
@@ -300,6 +310,7 @@ public partial class BattleScene : Node2D
 
 		CreateActionButtons();
 		UseSingleYokaiHpBar();
+		StyleHPDisplays();
 
 
 		// -------------------------------------
@@ -318,7 +329,7 @@ public partial class BattleScene : Node2D
 
 		GD.Print("Battle initialized!");
 		GD.Print("Friendship Level: " + FriendshipLevel);
-		GD.Print("Enemy damage (fixed by battle): " + EnemyDamage);
+		GD.Print("Enemy damage (stage-scaled): " + EnemyDamage);
 		GD.Print("Yokai HP: " + YokaiMaxHP + ", normal damage: " + NormalAttackDamage());
 
 		if (GameProgress.LevelFromBattleScene(GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath) == 1
@@ -338,21 +349,22 @@ public partial class BattleScene : Node2D
 
 
 	// =========================================
-	// 12. FRIENDSHIP POWER — ENEMY STATS NEVER SCALE DOWN
+	// 12. FRIENDSHIP POWER — BOTH SIDES SCALE WITH STORY PROGRESS
 	// =========================================
 
 	private void ApplyFriendshipPower()
 	{
 		FriendshipLevel = Math.Clamp(FriendshipLevel, 0, CandyInventory.MaxFriendshipLevel);
-		// The opponent retains at least 10 damage at every friendship level.
-		EnemyDamage = Math.Max(10, EnemyDamage);
-		// Friends start with more maximum HP than their opponent and grow
-		// stronger with each level, without lowering the enemy's stats.
-		YokaiMaxHP = Math.Max(YokaiMaxHP + FriendshipLevel * 15, EnemyMaxHP + 20);
+		// Opponents scale up with stage and slightly with friendship, never down.
+		// Feeding always improves the friendly Yokai's advantage in a matchup.
+		EnemyMaxHP = Math.Max(EnemyMaxHP, 70 + 10 * (_battleStage - 1) + 5 * FriendshipLevel);
+		EnemyDamage = Math.Max(EnemyDamage, 10 + (_battleStage - 1) + FriendshipLevel / 2);
+		YokaiMaxHP = Math.Max(YokaiMaxHP + 9 * (_battleStage - 1) + 8 * FriendshipLevel,
+			EnemyMaxHP + 20);
 	}
 
-	private int NormalAttackDamage() => SlapDamage + FriendshipLevel * 5;
-	private int UltimateAttackDamage() => GhostPunchDamage + FriendshipLevel * 10;
+	private int NormalAttackDamage() => SlapDamage + (_battleStage - 1) + FriendshipLevel * 3;
+	private int UltimateAttackDamage() => GhostPunchDamage + 2 * (_battleStage - 1) + FriendshipLevel * 6;
 
 
 	// =========================================
@@ -460,6 +472,50 @@ public partial class BattleScene : Node2D
 		trainerBar?.Hide();
 		trainerText?.Hide();
 		trainerRole?.Hide();
+	}
+
+	private void StyleHPDisplays()
+	{
+		// Native ProgressBar percentage text blends into bright maps.
+		// Draw it explicitly with separate, higher-contrast colors.
+		_friendlyPercent = CreatePercentLabel(yokaiHPBar, "YokaiPercent",
+			new Color("082d43"), new Color("d3f6ff"));
+		_enemyPercent = CreatePercentLabel(enemyHPBar, "EnemyPercent",
+			new Color("fff1cf"), new Color("50121d"));
+		StyleNumberLabel(yokaiHPText, new Color("ffed9b"));
+		StyleNumberLabel(enemyHPText, new Color("ffd2d0"));
+	}
+
+	private Label CreatePercentLabel(Godot.Range bar, string name, Color text, Color outline)
+	{
+		if (bar is not ProgressBar progress || canvasLayer == null)
+			return null;
+		progress.ShowPercentage = false;
+		var label = new Label
+		{
+			Name = name,
+			Position = progress.Position + new Vector2(0, 2),
+			Size = progress.Size,
+			HorizontalAlignment = HorizontalAlignment.Center,
+			VerticalAlignment = VerticalAlignment.Center,
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		label.AddThemeColorOverride("font_color", text);
+		label.AddThemeColorOverride("font_outline_color", outline);
+		label.AddThemeConstantOverride("outline_size", 3);
+		label.AddThemeFontSizeOverride("font_size", 16);
+		canvasLayer.AddChild(label);
+		return label;
+	}
+
+	private static void StyleNumberLabel(Label label, Color color)
+	{
+		if (label == null)
+			return;
+		label.AddThemeColorOverride("font_color", color);
+		label.AddThemeColorOverride("font_outline_color", new Color("14202d"));
+		label.AddThemeConstantOverride("outline_size", 4);
+		label.AddThemeFontSizeOverride("font_size", 19);
 	}
 
 	private void UpdateUltimateUI()
@@ -581,15 +637,19 @@ public partial class BattleScene : Node2D
 		HideAttackChoices();
 
 		// Normal attacks charge the ultimate and tick its post-use cooldown.
+		bool willCharge = ultimateCharge == UltimateChargeRequired - 1;
 		ultimateCharge = Math.Min(UltimateChargeRequired, ultimateCharge + 1);
 		if (ghostPunchCooldown > 0)
 			ghostPunchCooldown--;
 		UpdateUltimateUI();
 
 		GD.Print("Used Slap!");
+		PlaySound("AttackNormal", -7);
 
 		await PlayFriendlyAttack(new Color(0.65f, 0.90f, 1.0f),
 			43.0f, NormalAttackDamage(), 4.0f);
+		if (willCharge && !battleFinished)
+			PlaySound("ChargeReady", -11);
 
 		if (battleFinished)
 			return;
@@ -628,6 +688,9 @@ public partial class BattleScene : Node2D
 		UpdateUltimateUI();
 
 		GD.Print("Used Ghost Punch!");
+		if (_pixelEffects != null && friendlyYokaiSprite != null)
+			await _pixelEffects.Charge(friendlyYokaiSprite.Position);
+		PlaySound("AttackUltimate", -5);
 
 		await PlayFriendlyAttack(new Color(0.15f, 0.65f, 1.0f),
 			72.0f, UltimateAttackDamage(), 12.0f);
@@ -690,6 +753,9 @@ public partial class BattleScene : Node2D
 		await ToSignal(tween, Tween.SignalName.Finished);
 
 		// Damage happens at the forward impact, while the attacker recoils.
+		if (_pixelEffects != null)
+			await _pixelEffects.Projectile(friendlyYokaiSprite.Position,
+				enemySprite?.Position ?? new Vector2(950, 370), distance >= 65f);
 		Task impact = DamageEnemy(damage, shakeAmount);
 		Tween recoil = CreateTween();
 		recoil.SetTrans(Tween.TransitionType.Sine);
@@ -705,8 +771,24 @@ public partial class BattleScene : Node2D
 	// Offset is animated separately from Position, so it doesn't fight lunges.
 	private void StartIdleAnimations()
 	{
-		_friendlyIdleTween = CreateIdleBob(friendlyYokaiSprite, 3.0f, 0.76);
-		_enemyIdleTween = CreateIdleBob(enemySprite, 4.0f, 0.95);
+		_friendlyIdleTween = CreateIdleBob(friendlyYokaiSprite, 4.0f, 0.76);
+		_enemyIdleTween = CreateIdleBob(enemySprite, 3.0f, 0.95);
+		_friendlyBreathTween = CreateBreathing(friendlyYokaiSprite, 0.81);
+		_enemyBreathTween = CreateBreathing(enemySprite, 1.05);
+	}
+
+	private Tween CreateBreathing(Sprite2D sprite, double halfCycle)
+	{
+		if (sprite == null)
+			return null;
+		Vector2 baseScale = sprite.Scale;
+		Tween tween = CreateTween();
+		tween.SetTrans(Tween.TransitionType.Sine);
+		tween.SetEase(Tween.EaseType.InOut);
+		tween.SetLoops();
+		tween.TweenProperty(sprite, "scale", baseScale * new Vector2(1.025f, 0.98f), halfCycle);
+		tween.TweenProperty(sprite, "scale", baseScale, halfCycle);
+		return tween;
 	}
 
 	private Tween CreateIdleBob(Sprite2D sprite, float height, double halfCycle)
@@ -730,6 +812,10 @@ public partial class BattleScene : Node2D
 			_friendlyIdleTween.Kill();
 		if (GodotObject.IsInstanceValid(_enemyIdleTween))
 			_enemyIdleTween.Kill();
+		if (GodotObject.IsInstanceValid(_friendlyBreathTween))
+			_friendlyBreathTween.Kill();
+		if (GodotObject.IsInstanceValid(_enemyBreathTween))
+			_enemyBreathTween.Kill();
 	}
 
 
@@ -751,6 +837,7 @@ public partial class BattleScene : Node2D
 		);
 
 		UpdateAllHP();
+		PlaySound("Hit", -11);
 
 		GD.Print(
 			$"Enemy HP: {enemyHP}/{EnemyMaxHP}"
@@ -811,6 +898,7 @@ public partial class BattleScene : Node2D
 		await ToSignal(tween, Tween.SignalName.Finished);
 
 		// The HP hit and target flash begin when the enemy reaches the apex.
+		_pixelEffects?.Burst(friendlyYokaiSprite?.Position ?? new Vector2(320, 368), hostile: true);
 		onImpact();
 		Tween recoil = CreateTween();
 		recoil.SetTrans(Tween.TransitionType.Sine);
@@ -831,6 +919,7 @@ public partial class BattleScene : Node2D
 		HideAttackChoices();
 
 		GD.Print("Enemy's turn!");
+		PlaySound("EnemyAttack", -9);
 
 
 		// Enemy turns blue before attacking.
@@ -909,6 +998,7 @@ public partial class BattleScene : Node2D
 		HideAttackChoices();
 
 		GD.Print("Attempting to escape...");
+		PlaySound("Escape", -10);
 
 		int escapeRoll = random.Next(1, 101);
 
@@ -917,6 +1007,7 @@ public partial class BattleScene : Node2D
 			GD.Print("Escaped successfully!");
 
 			battleFinished = true;
+			await WaitSeconds(0.32);
 			ReturnToWorld();
 
 			return;
@@ -952,6 +1043,10 @@ public partial class BattleScene : Node2D
 			enemyHP,
 			EnemyMaxHP
 		);
+		if (_friendlyPercent != null)
+			_friendlyPercent.Text = $"{(int)Math.Round(100.0 * yokaiHP / Math.Max(1, YokaiMaxHP))}%";
+		if (_enemyPercent != null)
+			_enemyPercent.Text = $"{(int)Math.Round(100.0 * enemyHP / Math.Max(1, EnemyMaxHP))}%";
 	}
 
 
@@ -994,6 +1089,7 @@ public partial class BattleScene : Node2D
 		UpdateUltimateUI();
 
 		GD.Print("VICTORY!");
+		PlaySound("Victory", -8);
 		GD.Print("You defeated the enemy Yo-kai!");
 
 		string path = GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath;
@@ -1027,6 +1123,7 @@ public partial class BattleScene : Node2D
 		UpdateUltimateUI();
 
 		GD.Print("DEFEAT!");
+		PlaySound("Defeat", -8);
 		GD.Print("Your team can no longer fight.");
 		ShowResult("DEFEAT", "Your team can no longer fight. Return to Wawa and try again.");
 	}
@@ -1048,6 +1145,25 @@ public partial class BattleScene : Node2D
 		Error error = GetTree().ChangeSceneToFile("res://world.tscn");
 		if (error != Error.Ok)
 			GD.PushError("Could not return to Wawa: " + error);
+	}
+
+	// Independent short-lived players let hit/attack sounds overlap naturally.
+	// These intentionally use Master so the music slider only changes BGM.
+	private void PlaySound(string fileName, float volumeDb = -9f)
+	{
+		AudioStream sound = GD.Load<AudioStream>($"res://Music/Sfx/{fileName}.wav");
+		if (sound == null)
+			return;
+		var player = new AudioStreamPlayer
+		{
+			Stream = sound,
+			VolumeDb = volumeDb,
+			PitchScale = fileName == "Hit" ? 1f : 0.91f + 0.035f * (_battleStage - 1),
+			ProcessMode = ProcessModeEnum.Pausable
+		};
+		AddChild(player);
+		player.Finished += player.QueueFree;
+		player.Play();
 	}
 
 

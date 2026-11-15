@@ -7,6 +7,9 @@ public partial class Settings : CanvasLayer
 	private Control _manualPopup;
 	private Button _musicOnButton;
 	private Button _musicOffButton;
+	private HSlider _volumeSlider;
+	private Label _volumeLabel;
+	private Label _volumePercent;
 	private MusicPlayer _music;
 
 	public override void _Ready()
@@ -14,6 +17,9 @@ public partial class Settings : CanvasLayer
 		_manualPopup = GetNode<Control>("ManualPopup");
 		_musicOnButton = GetNode<Button>("MusicOnButton");
 		_musicOffButton = GetNode<Button>("MusicOffButton");
+		_volumeSlider = GetNode<HSlider>("MusicVolumeSlider");
+		_volumeLabel = GetNode<Label>("MusicVolumeLabel");
+		_volumePercent = GetNode<Label>("MusicVolumePercent");
 		_music = GetNodeOrNull<MusicPlayer>("/root/MusicPlayer");
 
 		GetNode<Button>("ManualButton").Pressed += () => _manualPopup.Show();
@@ -21,6 +27,12 @@ public partial class Settings : CanvasLayer
 		GetNode<Button>("CloseSettingsButton").Pressed += Close;
 		_musicOnButton.Pressed += () => ChangeMusic(true);
 		_musicOffButton.Pressed += () => ChangeMusic(false);
+		_volumeSlider.Value = _music?.VolumePercent ?? 20;
+		_volumeSlider.ValueChanged += value =>
+		{
+			_music?.SetVolumePercent(Mathf.RoundToInt((float)value));
+			_volumePercent.Text = Mathf.RoundToInt((float)value) + "%";
+		};
 		_manualPopup.Hide();
 		UpdateMusicButtons();
 	}
@@ -47,6 +59,10 @@ public partial class Settings : CanvasLayer
 		bool enabled = _music?.Enabled ?? false;
 		StyleMusicButton(_musicOnButton, enabled);
 		StyleMusicButton(_musicOffButton, !enabled);
+		_volumeSlider.Visible = enabled;
+		_volumeLabel.Visible = enabled;
+		_volumePercent.Visible = enabled;
+		_volumePercent.Text = (_music?.VolumePercent ?? 20) + "%";
 	}
 
 	private static void StyleMusicButton(Button button, bool selected)
