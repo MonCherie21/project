@@ -55,7 +55,6 @@ public partial class BattleScene : Node2D
 	private Sprite2D friendlyYokaiSprite;
 	private Sprite2D enemySprite;
 	private Sprite2D trainerSprite;
-	private Node2D trainerPointingArm;
 
 	private Color friendlyOriginalModulate = Colors.White;
 	private Color enemyOriginalModulate = Colors.White;
@@ -171,7 +170,6 @@ public partial class BattleScene : Node2D
 		enemySprite =
 			FindNodeRecursive(this, "m1_m") as Sprite2D;
 		trainerSprite = FindNodeRecursive(this, "P1Whole") as Sprite2D;
-		ConfigureTrainerSprite();
 
 
 		// Save original sprite colors.
@@ -654,7 +652,6 @@ public partial class BattleScene : Node2D
 
 		GD.Print("Used Slap!");
 		PlaySound("AttackNormal", -7);
-		await PlayTrainerCommand();
 
 		await PlayFriendlyAttack(new Color(0.65f, 0.90f, 1.0f),
 			43.0f, NormalAttackDamage(), 4.0f);
@@ -698,7 +695,6 @@ public partial class BattleScene : Node2D
 		UpdateUltimateUI();
 
 		GD.Print("Used Ghost Punch!");
-		await PlayTrainerCommand();
 		if (_pixelEffects != null && friendlyYokaiSprite != null)
 			await _pixelEffects.Charge(friendlyYokaiSprite.Position);
 		PlaySound("AttackUltimate", -5);
@@ -778,99 +774,13 @@ public partial class BattleScene : Node2D
 		await impact;
 	}
 
-	// All battle scenes share P1Whole, so a single side-facing sprite and
-	// jointed pixel arm can animate the trainer without editing seven scenes.
-	private void ConfigureTrainerSprite()
-	{
-		if (trainerSprite == null)
-			return;
-
-		Texture2D sideTexture = GD.Load<Texture2D>("res://Assets/P1_Side_v2.png");
-		if (sideTexture != null)
-		{
-			trainerSprite.Texture = sideTexture; // Artwork faces the enemy (right).
-			trainerSprite.Scale = new Vector2(3.7f, 3.6f);
-			trainerSprite.FlipH = false;
-			trainerSprite.TextureFilter = CanvasItem.TextureFilterEnum.Nearest;
-		}
-
-		// Local pixel-space coordinates match the small 69x100 side sprite.
-		// The arm pivots from its shoulder, so the gesture has genuine tweened
-		// in-between poses instead of an instant image swap.
-		trainerPointingArm = new Node2D
-		{
-			Name = "TrainerCommandArm",
-			Position = new Vector2(2.5f, 6),
-			Visible = false
-		};
-		trainerSprite.AddChild(trainerPointingArm);
-		var outline = new Polygon2D
-		{
-			Color = new Color("171923"),
-			Polygon = new Vector2[]
-			{
-				new(0, -3), new(6, -5), new(13, -6), new(20, -6),
-				new(23, -5), new(29, -5), new(30, -3), new(29, -1),
-				new(23, 0), new(19, 0), new(10, 1), new(6, 5), new(1, 6)
-			}
-		};
-		trainerPointingArm.AddChild(outline);
-		trainerPointingArm.AddChild(new Polygon2D
-		{
-			Color = new Color("8e9ba6"),
-			Polygon = new Vector2[]
-			{
-				new(1, -2), new(7, -4), new(17, -5),
-				new(20, -3), new(15, -1), new(7, 3), new(2, 4)
-			}
-		});
-		trainerPointingArm.AddChild(new Polygon2D
-		{
-			Color = new Color("ead1bb"),
-			Polygon = new Vector2[]
-			{
-				new(20, -4), new(23, -4), new(28, -4),
-				new(28, -2), new(23, -1), new(20, -1)
-			}
-		});
-	}
-
-	private async Task PlayTrainerCommand()
-	{
-		if (trainerSprite == null || trainerPointingArm == null)
-			return;
-
-		// A down-to-forward pointing arc (with continuous 60fps in-betweens),
-		// followed by a small natural return to the idle pose.
-		trainerPointingArm.Visible = true;
-		trainerPointingArm.Modulate = new Color(1, 1, 1, 0);
-		trainerPointingArm.Rotation = 1.0f;
-		Tween point = CreateTween().SetTrans(Tween.TransitionType.Sine)
-			.SetEase(Tween.EaseType.Out);
-		point.TweenProperty(trainerPointingArm, "rotation", -0.12f, 0.22);
-		point.Parallel().TweenProperty(trainerPointingArm, "modulate", Colors.White, 0.18);
-		point.Parallel().TweenProperty(trainerSprite, "rotation", -0.035f, 0.22);
-		await ToSignal(point, Tween.SignalName.Finished);
-		await WaitSeconds(0.13);
-
-		Tween release = CreateTween().SetTrans(Tween.TransitionType.Sine)
-			.SetEase(Tween.EaseType.InOut);
-		release.TweenProperty(trainerPointingArm, "rotation", 1.0f, 0.20);
-		release.Parallel().TweenProperty(trainerPointingArm, "modulate",
-			new Color(1, 1, 1, 0), 0.20);
-		release.Parallel().TweenProperty(trainerSprite, "rotation", 0f, 0.20);
-		await ToSignal(release, Tween.SignalName.Finished);
-		if (GodotObject.IsInstanceValid(trainerPointingArm))
-			trainerPointingArm.Visible = false;
-	}
-
-	// Gentle looping movement makes the static Yo-kai sprites feel alive.
+	// Gentle looping movement makes the trainer and Yo-kai sprites feel alive.
 	// Offset is animated separately from Position, so it doesn't fight lunges.
 	private void StartIdleAnimations()
 	{
 		_friendlyIdleTween = CreateIdleBob(friendlyYokaiSprite, 4.0f, 0.76);
 		_enemyIdleTween = CreateIdleBob(enemySprite, 3.0f, 0.95);
-		_trainerIdleTween = CreateIdleBob(trainerSprite, 2.8f, 0.92);
+		_trainerIdleTween = CreateIdleBob(trainerSprite, 2.5f, 0.95);
 		_friendlyBreathTween = CreateBreathing(friendlyYokaiSprite, 0.81);
 		_enemyBreathTween = CreateBreathing(enemySprite, 1.05);
 	}
