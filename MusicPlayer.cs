@@ -39,9 +39,11 @@ public partial class MusicPlayer : AudioStreamPlayer
 		GetTree().SceneChanged -= OnSceneChanged;
 	}
 
-	private void OnSceneChanged(Node scene)
+	private void OnSceneChanged()
 	{
-		string path = scene?.SceneFilePath ?? "";
+		// Godot's C# SceneChanged event is Action (no arguments).
+		// Get the active scene from the tree after it changes.
+		string path = GetTree().CurrentScene?.SceneFilePath ?? "";
 		bool isBattle = path.EndsWith("BattleScene.tscn", StringComparison.OrdinalIgnoreCase);
 		for (int i = 2; i <= 7 && !isBattle; i++)
 			isBattle = path.EndsWith($"BattleScene{i}.tscn", StringComparison.OrdinalIgnoreCase);
