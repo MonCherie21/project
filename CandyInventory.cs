@@ -13,6 +13,7 @@ public static class CandyInventory
 
     private static int _candies = StarterCandies;
     private static int[] _feeds = new int[PartnerCount];
+    private static int _activePartnerIndex;
     private static HashSet<string> _pickedUp = new(StringComparer.Ordinal);
     private static bool _dirty;
 
@@ -20,12 +21,22 @@ public static class CandyInventory
     public static int Candies => _candies;
     public static bool HasUnsavedChanges => _dirty;
 
-    // Starter partner is always available. Each defeated story Yokai adds one
-    // more party entry, without changing the separate Collection archive.
+    // Preserve the existing story unlock sequence: a starter is always
+    // available, and each cleared level expands the party by one slot.
     public static int AvailablePartners => Math.Clamp(GameProgress.CompletedLevels + 1, 1, PartnerCount);
+    public static int ActivePartnerIndex => Math.Clamp(_activePartnerIndex, 0, AvailablePartners - 1);
 
-    public static string Name(int index) => index == 0
-        ? "PARTNER YO-KAI" : "YO-KAI " + (index + 1);
+    public static string Name(int index) => YokaiRoster.Name(index);
+
+    public static bool TrySelectActivePartner(int index)
+    {
+        if (index < 0 || index >= AvailablePartners || index == ActivePartnerIndex)
+            return false;
+
+        _activePartnerIndex = index;
+        NotifyChanged();
+        return true;
+    }
 
     public static int FeedCount(int index) =>
         index >= 0 && index < PartnerCount ? _feeds[index] : 0;
@@ -64,6 +75,7 @@ public static class CandyInventory
     {
         _candies = StarterCandies;
         _feeds = new int[PartnerCount];
+        _activePartnerIndex = 0;
         _pickedUp = new HashSet<string>(StringComparer.Ordinal);
         _dirty = false;
         Changed?.Invoke();
@@ -87,6 +99,8 @@ public static class CandyInventory
         _pickedUp = new HashSet<string>(
             (save.CollectedCandyIds ?? Array.Empty<string>())
                 .Where(id => !string.IsNullOrWhiteSpace(id)), StringComparer.Ordinal);
+        _activePartnerIndex = save.Version >= 4
+            ? Math.Clamp(save.ActiveYokaiIndex, 0, AvailablePartners - 1) : 0;
         _dirty = false;
         Changed?.Invoke();
     }
@@ -99,6 +113,7 @@ public static class CandyInventory
         // An async save could finish after another pickup; don't mark newer
         // progress as safely saved if it wasn't in that snapshot.
         if (snapshot != null && snapshot.CandyCount == _candies &&
+            snapshot.ActiveYokaiIndex == ActivePartnerIndex &&
             (snapshot.FriendshipFeeds ?? Array.Empty<int>()).SequenceEqual(_feeds) &&
             (snapshot.CollectedCandyIds ?? Array.Empty<string>()).SequenceEqual(SnapshotPickups()))
             _dirty = false;

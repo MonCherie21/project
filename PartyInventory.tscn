@@ -77,7 +77,7 @@ offset_right = 1015.0
 offset_bottom = 106.0
 theme_override_colors/font_color = Color(0.77, 0.86, 0.85, 1)
 theme_override_font_sizes/font_size = 18
-text = "Feed 2 candies to gain 1 Friendship Level (max level 3)."
+text = "Select an active Yokai before battle, or feed one to build friendship."
 
 [node name="Scroll" type="ScrollContainer" parent="Panel"]
 offset_left = 35.0
@@ -100,4 +100,4 @@ offset_right = 1025.0
 offset_bottom = 603.0
 theme_override_colors/font_color = Color(0.88, 0.8, 0.63, 1)
 theme_override_font_sizes/font_size = 16
-text = "TIP: Pause and SAVE to keep your collected candies and friendship progress."
+text = "TIP: SAVE from the pause menu to keep your active Yokai and friendship."

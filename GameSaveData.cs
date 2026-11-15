@@ -1,11 +1,11 @@
 using System;
 using System.Text.Json.Serialization;
 
-// Versioned JSON snapshot. Version 3 adds candy, friendship, and collected pickups.
+// Versioned JSON snapshot. V3 adds candy/friendship; V4 adds active Yokai.
 public sealed class GameSaveData
 {
     [JsonPropertyName("version")]
-    public int Version { get; set; } = 3;
+    public int Version { get; set; } = 4;
 
     [JsonPropertyName("scene")]
     public string Scene { get; set; } = "res://world.tscn";
@@ -26,6 +26,9 @@ public sealed class GameSaveData
     [JsonPropertyName("friendship_feeds")]
     public int[] FriendshipFeeds { get; set; } = new int[CandyInventory.PartnerCount];
 
+    [JsonPropertyName("active_yokai_index")]
+    public int ActiveYokaiIndex { get; set; }
+
     [JsonPropertyName("collected_candy_ids")]
     public string[] CollectedCandyIds { get; set; } = System.Array.Empty<string>();
 
@@ -35,6 +38,7 @@ public sealed class GameSaveData
         PositionY = PlayerData.WorldPosition.Y,
         CompletedLevels = GameProgress.CompletedLevels,
         CandyCount = CandyInventory.Candies,
+        ActiveYokaiIndex = CandyInventory.ActivePartnerIndex,
         FriendshipFeeds = CandyInventory.SnapshotFeeds(),
         CollectedCandyIds = CandyInventory.SnapshotPickups()
     };

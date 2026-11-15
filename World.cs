@@ -153,7 +153,10 @@ public partial class World : Node2D
 
         _refreshPartyHint = () =>
         {
-            partyMarker.Text = CandyInventory.FriendshipLevel(0) < 1 ? "!" : "✓";
+            int active = CandyInventory.ActivePartnerIndex;
+            partyMarker.Text = CandyInventory.FriendshipLevel(active) < 1 ? "!" : "✓";
+            partyButton.TooltipText = "ACTIVE: " + CandyInventory.Name(active) +
+                ". Open to change your battle companion or feed candy.";
         };
         CandyInventory.Changed += _refreshPartyHint;
         _refreshPartyHint();

@@ -1,18 +1,11 @@
 using Godot;
 using System;
 
-// Retro-styled, non-destructive party screen. The world stays instantiated
-// underneath it, and feeding affects battles through CandyInventory.
+// Retro party screen for feeding and choosing the Yokai for the next battle.
+// The world stays instantiated underneath the pause overlay.
 public partial class PartyInventory : CanvasLayer
 {
     private static PartyInventory _active;
-    private static readonly string[] Portraits =
-    {
-        "res://Characters/one.png", "res://Characters/two.png",
-        "res://Characters/three.png", "res://Characters/four.png",
-        "res://Characters/five.png", "res://Characters/six.jpg",
-        "res://Characters/seven.jpg"
-    };
 
     private SceneTree _tree;
     private bool _wasPaused;
@@ -78,6 +71,8 @@ public partial class PartyInventory : CanvasLayer
         if (_grid == null)
             return;
         _candyLabel.Text = $"CANDY x{CandyInventory.Candies:00}";
+        GetNode<Label>("Panel/Hint").Text =
+            $"ACTIVE: {CandyInventory.Name(CandyInventory.ActivePartnerIndex)}  |  Select a Yokai before battle.";
         foreach (Node existing in _grid.GetChildren())
         {
             _grid.RemoveChild(existing);
@@ -114,10 +109,12 @@ public partial class PartyInventory : CanvasLayer
     {
         var card = new PanelContainer
         {
-            CustomMinimumSize = new Vector2(482, 145),
+            CustomMinimumSize = new Vector2(482, 174),
             MouseFilter = Control.MouseFilterEnum.Stop
         };
-        card.AddThemeStyleboxOverride("panel", Box(new Color("1c293a"), new Color("8191a0")));
+        bool isActive = index == CandyInventory.ActivePartnerIndex;
+        card.AddThemeStyleboxOverride("panel", Box(new Color("1c293a"),
+            isActive ? new Color("f4d085") : new Color("8191a0")));
 
         var margin = new MarginContainer();
         margin.AddThemeConstantOverride("margin_left", 10);
@@ -132,8 +129,8 @@ public partial class PartyInventory : CanvasLayer
 
         var portrait = new TextureRect
         {
-            Texture = GD.Load<Texture2D>(Portraits[index]),
-            CustomMinimumSize = new Vector2(110, 112),
+            Texture = GD.Load<Texture2D>(YokaiRoster.Portrait(index)),
+            CustomMinimumSize = new Vector2(110, 132),
             ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
             StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
             TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
@@ -142,7 +139,7 @@ public partial class PartyInventory : CanvasLayer
         row.AddChild(portrait);
 
         var column = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        column.AddThemeConstantOverride("separation", 5);
+        column.AddThemeConstantOverride("separation", 4);
         row.AddChild(column);
         column.AddChild(Text(CandyInventory.Name(index), 20, new Color("ffde9e")));
         int level = CandyInventory.FriendshipLevel(index);
@@ -168,7 +165,7 @@ public partial class PartyInventory : CanvasLayer
             Icon = GD.Load<Texture2D>("res://Assets/CandyWrapperPixel.png"),
             ExpandIcon = true,
             TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-            CustomMinimumSize = new Vector2(250, 41),
+            CustomMinimumSize = new Vector2(250, 38),
             Disabled = CandyInventory.Candies == 0 ||
                 level >= CandyInventory.MaxFriendshipLevel
         };
@@ -188,6 +185,29 @@ public partial class PartyInventory : CanvasLayer
                          CandyInventory.FriendshipLevel(index));
         };
         column.AddChild(feed);
+
+        var select = new Button
+        {
+            Text = isActive ? "ACTIVE YOKAI" : "SET ACTIVE",
+            CustomMinimumSize = new Vector2(250, 36),
+            Disabled = isActive,
+            FocusMode = Control.FocusModeEnum.None
+        };
+        select.AddThemeStyleboxOverride("normal",
+            Box(new Color("283e57"), new Color("9bacc4")));
+        select.AddThemeStyleboxOverride("hover",
+            Box(new Color("375d80"), new Color("f7d691")));
+        select.AddThemeStyleboxOverride("disabled",
+            Box(new Color("335b49"), new Color("f7d691")));
+        select.AddThemeColorOverride("font_color", new Color("fff2db"));
+        select.AddThemeColorOverride("font_disabled_color", new Color("ffdf96"));
+        select.AddThemeFontSizeOverride("font_size", 16);
+        select.Pressed += () =>
+        {
+            if (CandyInventory.TrySelectActivePartner(index))
+                GD.Print("Next battle Yokai: " + CandyInventory.Name(index));
+        };
+        column.AddChild(select);
         return card;
     }
 }
