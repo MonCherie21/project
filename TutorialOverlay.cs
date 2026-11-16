@@ -26,7 +26,7 @@ public static class TutorialOverlay
         var shade = new ColorRect
         {
             Size = screen,
-            Color = new Color(0.025f, 0.03f, 0.055f, 0.90f),
+            Color = new Color(0.012f, 0.020f, 0.017f, 0.93f),
             MouseFilter = Control.MouseFilterEnum.Stop
         };
         layer.AddChild(shade);
@@ -37,16 +37,7 @@ public static class TutorialOverlay
                                    Mathf.Max(8, (screen.Y - 300) / 2)),
             Size = new Vector2(Mathf.Min(620, screen.X - 16), 300)
         };
-        var style = new StyleBoxFlat
-        {
-            BgColor = new Color("151c2b"),
-            BorderColor = new Color("68788d"),
-            BorderWidthLeft = 4,
-            BorderWidthRight = 4,
-            BorderWidthTop = 4,
-            BorderWidthBottom = 4
-        };
-        panel.AddThemeStyleboxOverride("panel", style);
+        panel.AddThemeStyleboxOverride("panel", YokaiTheme.Panel());
         shade.AddChild(panel);
 
         var margin = new MarginContainer();
@@ -61,7 +52,7 @@ public static class TutorialOverlay
 
         var heading = new Label { Text = title, HorizontalAlignment = HorizontalAlignment.Center };
         heading.AddThemeFontSizeOverride("font_size", 25);
-        heading.AddThemeColorOverride("font_color", new Color("ead49a"));
+        heading.AddThemeColorOverride("font_color", YokaiTheme.BrassBright);
         column.AddChild(heading);
 
         var body = new Label
@@ -72,7 +63,7 @@ public static class TutorialOverlay
             HorizontalAlignment = HorizontalAlignment.Center
         };
         body.AddThemeFontSizeOverride("font_size", 17);
-        body.AddThemeColorOverride("font_color", new Color("d6dbe5"));
+        body.AddThemeColorOverride("font_color", YokaiTheme.Parchment);
         column.AddChild(body);
 
         var actions = new HBoxContainer
@@ -88,22 +79,7 @@ public static class TutorialOverlay
             CustomMinimumSize = new Vector2(onConfirmed == null ? 210 : 195, 42),
             SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter
         };
-        var buttonNormal = new StyleBoxFlat
-        {
-            BgColor = new Color("293345"),
-            BorderColor = new Color("8292a6"),
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2,
-            BorderWidthTop = 2,
-            BorderWidthBottom = 2
-        };
-        var buttonHover = (StyleBoxFlat)buttonNormal.Duplicate();
-        buttonHover.BgColor = new Color("3b4c62");
-        button.AddThemeStyleboxOverride("normal", buttonNormal);
-        button.AddThemeStyleboxOverride("hover", buttonHover);
-        button.AddThemeStyleboxOverride("focus", buttonHover);
-        button.AddThemeColorOverride("font_color", new Color("f4f1e8"));
-        button.AddThemeColorOverride("font_hover_color", new Color("ffdfa0"));
+        YokaiTheme.StyleButton(button, important: true);
         button.Pressed += () =>
         {
             tree.Paused = wasPaused;
@@ -119,9 +95,7 @@ public static class TutorialOverlay
                 Text = "CANCEL",
                 CustomMinimumSize = new Vector2(160, 42)
             };
-            cancel.AddThemeStyleboxOverride("normal", (StyleBoxFlat)buttonNormal.Duplicate());
-            cancel.AddThemeStyleboxOverride("hover", (StyleBoxFlat)buttonHover.Duplicate());
-            cancel.AddThemeColorOverride("font_color", new Color("d6dbe5"));
+            YokaiTheme.StyleButton(cancel);
             cancel.Pressed += () => { tree.Paused = wasPaused; layer.QueueFree(); };
             actions.AddChild(cancel);
         }

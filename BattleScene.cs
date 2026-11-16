@@ -31,6 +31,7 @@ public partial class BattleScene : Node2D
 
 	[Export] public int FriendshipLevel = 0;
 	private int _battleStage = 1;
+	private int _activePartnerIndex;
 
 
 	// =========================================
@@ -145,16 +146,24 @@ public partial class BattleScene : Node2D
 		var battleBackground = GetNodeOrNull<TextureRect>("level1_bg");
 		if (battleBackground != null)
 		{
-			var damage = new DisturbedBattleBackdrop { Name = "YokaiDamage" };
+			var damage = new DisturbedBattleBackdrop
+			{
+				Name = "YokaiDamage",
+				Stage = Math.Clamp(GameProgress.LevelFromBattleScene(
+					GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath), 1, GameProgress.TotalLevels)
+			};
 			AddChild(damage);
 			MoveChild(damage, battleBackground.GetIndex() + 1);
 		}
 
-		// Each story encounter uses the matching companion's saved friendship.
-		// The seven Yokai battles now scale together as the adventure advances.
+		// The story stage determines the opponent; the Party menu determines
+		// which unlocked companion fights and which friendship stat applies.
 		_battleStage = Math.Clamp(GameProgress.LevelFromBattleScene(
 			GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath), 1, GameProgress.TotalLevels);
-		FriendshipLevel = CandyInventory.FriendshipLevel(_battleStage - 1);
+		_activePartnerIndex = CandyInventory.ActivePartnerIndex;
+		SlapDamage = YokaiRoster.NormalBaseDamage(_activePartnerIndex);
+		GhostPunchDamage = YokaiRoster.UltimateBaseDamage(_activePartnerIndex);
+		FriendshipLevel = CandyInventory.FriendshipLevel(_activePartnerIndex);
 		ApplyFriendshipPower();
 		yokaiHP = YokaiMaxHP;
 		enemyHP = EnemyMaxHP;
@@ -170,6 +179,7 @@ public partial class BattleScene : Node2D
 		enemySprite =
 			FindNodeRecursive(this, "m1_m") as Sprite2D;
 		trainerSprite = FindNodeRecursive(this, "P1Whole") as Sprite2D;
+		ConfigureTrainerAppearance();
 
 
 		// Save original sprite colors.
@@ -208,6 +218,7 @@ public partial class BattleScene : Node2D
 
 		ghostPunchButton =
 			FindNodeRecursive(this, "TextureButton2") as TextureButton;
+		ConfigureActiveYokai();
 
 
 		// -------------------------------------
@@ -346,10 +357,66 @@ public partial class BattleScene : Node2D
 				"Normal attacks fill the ULT meter. After TWO normal attacks, " +
 				"use your second skill for a powerful ultimate! It must recharge afterward.\n\n" +
 				"RUN attempts to escape. Only your Yo-kai takes damage.\n\n" +
-				"Feed candy to your partner using PARTY / FEED [I] in the world. " +
+				"Open PARTY [I] in the world to choose your active Yokai and feed candy. " +
 				"Friendship boosts your Yo-kai's maximum HP and attack damage; " +
 				"enemies do NOT get weaker. Explore for candy before challenging them!");
 		}
+	}
+
+	private void ConfigureTrainerAppearance()
+	{
+		if (trainerSprite == null)
+			return;
+
+		bool male = string.Equals(PlayerData.Gender, "Male", StringComparison.OrdinalIgnoreCase);
+		string spritePath = male ? "res://Sprites/P2_Whole.png" : "res://Sprites/P1_Whole.png";
+		Texture2D texture = GD.Load<Texture2D>(spritePath);
+		if (texture == null)
+		{
+			GD.PushWarning("Trainer sprite missing: " + spritePath);
+			return;
+		}
+
+		trainerSprite.Texture = texture;
+		// Male art is 368x677; normalize it to the original 205x243
+		// trainer's visible size and foot position in every battle scene.
+		if (male)
+			trainerSprite.Scale = new Vector2(0.83f, 0.68f);
+		trainerSprite.TextureFilter = CanvasItem.TextureFilterEnum.Nearest;
+	}
+
+	private void ConfigureActiveYokai()
+	{
+		if (friendlyYokaiSprite != null)
+		{
+			Texture2D yokaiTexture = GD.Load<Texture2D>(YokaiRoster.BattleSprite(_activePartnerIndex));
+			if (yokaiTexture != null)
+			{
+				friendlyYokaiSprite.Texture = yokaiTexture;
+				// Common size / footing prevents large companions from obscuring
+				// the trainer or getting cut off in different stage layouts.
+				float scale = 185f / Math.Max(1, yokaiTexture.GetHeight());
+				friendlyYokaiSprite.Scale = new Vector2(scale, scale);
+				friendlyYokaiSprite.Position = new Vector2(366, 533);
+				friendlyYokaiSprite.TextureFilter = CanvasItem.TextureFilterEnum.Nearest;
+			}
+			else
+				GD.PushWarning("Active Yokai sprite missing for slot " + _activePartnerIndex);
+		}
+
+		if (slapButton != null)
+		{
+			slapButton.TextureNormal = GD.Load<Texture2D>(YokaiRoster.NormalSkill(_activePartnerIndex));
+			slapButton.TooltipText = $"{YokaiRoster.NormalMoveName(_activePartnerIndex)}: " +
+				$"{NormalAttackDamage()} damage with current friendship";
+		}
+		if (ghostPunchButton != null)
+		{
+			ghostPunchButton.TextureNormal = GD.Load<Texture2D>(YokaiRoster.UltimateSkill(_activePartnerIndex));
+			ghostPunchButton.TooltipText = $"{YokaiRoster.UltimateMoveName(_activePartnerIndex)}: " +
+				$"{UltimateAttackDamage()} damage (charges in two normal attacks)";
+		}
+		GD.Print("Active battle companion: " + YokaiRoster.Name(_activePartnerIndex));
 	}
 
 
@@ -396,13 +463,10 @@ public partial class BattleScene : Node2D
 			Size = new Vector2(190, 53),
 			FocusMode = Control.FocusModeEnum.None
 		};
-		runButton.AddThemeStyleboxOverride("normal", BattleBox("202e41", "b7c4bc"));
-		runButton.AddThemeStyleboxOverride("hover", BattleBox("36536b", "f2d28d"));
-		runButton.AddThemeStyleboxOverride("pressed", BattleBox("4c5663", "d5b678"));
-		runButton.AddThemeStyleboxOverride("disabled", BattleBox("2a2c36", "5f636a"));
+		YokaiTheme.StyleButton(runButton);
 		runButton.AddThemeFontOverride("font", GD.Load<Font>("res://Assets/PressStart2P-Regular.ttf"));
 		runButton.AddThemeFontSizeOverride("font_size", 18);
-		runButton.AddThemeColorOverride("font_color", new Color("f6eaca"));
+		runButton.AddThemeColorOverride("font_color", YokaiTheme.Parchment);
 		runButton.AddThemeColorOverride("font_hover_color", Colors.White);
 		canvasLayer.AddChild(runButton);
 		runButton.Pressed += OnRunPressed;
@@ -416,7 +480,7 @@ public partial class BattleScene : Node2D
 			Size = new Vector2(285, 64),
 			MouseFilter = Control.MouseFilterEnum.Ignore
 		};
-		ultimatePanel.AddThemeStyleboxOverride("panel", BattleBox("172638", "e0b76f"));
+		ultimatePanel.AddThemeStyleboxOverride("panel", YokaiTheme.Panel(3));
 		canvasLayer.AddChild(ultimatePanel);
 		ultimateMeter = new ProgressBar
 		{
@@ -428,8 +492,8 @@ public partial class BattleScene : Node2D
 			ShowPercentage = false,
 			MouseFilter = Control.MouseFilterEnum.Ignore
 		};
-		ultimateMeter.AddThemeStyleboxOverride("background", BattleBox("182438", "657080"));
-		ultimateMeter.AddThemeStyleboxOverride("fill", BattleBox("d9a24b", "f9df91"));
+		ultimateMeter.AddThemeStyleboxOverride("background", YokaiTheme.Box(YokaiTheme.Shadow, YokaiTheme.FrameEdge));
+		ultimateMeter.AddThemeStyleboxOverride("fill", YokaiTheme.Box(YokaiTheme.Brass, YokaiTheme.BrassBright));
 		ultimatePanel.AddChild(ultimateMeter);
 
 		ultimateText = new Label
@@ -441,7 +505,7 @@ public partial class BattleScene : Node2D
 		};
 		ultimateText.AddThemeFontOverride("font", GD.Load<Font>("res://Assets/PressStart2P-Regular.ttf"));
 		ultimateText.AddThemeFontSizeOverride("font_size", 12);
-		ultimateText.AddThemeColorOverride("font_color", new Color("ffe3a1"));
+		ultimateText.AddThemeColorOverride("font_color", YokaiTheme.BrassBright);
 		ultimateText.AddThemeColorOverride("font_outline_color", Colors.Black);
 		ultimateText.AddThemeConstantOverride("outline_size", 3);
 		ultimatePanel.AddChild(ultimateText);
@@ -476,6 +540,11 @@ public partial class BattleScene : Node2D
 			yokaiHPText.Position = trainerText.Position;
 		if (trainerRole != null && yokaiRole != null)
 			yokaiRole.Position = trainerRole.Position;
+		if (yokaiRole != null)
+		{
+			yokaiRole.Text = YokaiRoster.Name(_activePartnerIndex);
+			yokaiRole.AddThemeFontSizeOverride("font_size", 14);
+		}
 		trainerBar?.Hide();
 		trainerText?.Hide();
 		trainerRole?.Hide();
@@ -650,7 +719,7 @@ public partial class BattleScene : Node2D
 			ghostPunchCooldown--;
 		UpdateUltimateUI();
 
-		GD.Print("Used Slap!");
+		GD.Print("Used " + YokaiRoster.NormalMoveName(_activePartnerIndex) + "!");
 		PlaySound("AttackNormal", -7);
 
 		await PlayFriendlyAttack(new Color(0.65f, 0.90f, 1.0f),
@@ -694,7 +763,7 @@ public partial class BattleScene : Node2D
 		ghostPunchCooldown = 1;
 		UpdateUltimateUI();
 
-		GD.Print("Used Ghost Punch!");
+		GD.Print("Used " + YokaiRoster.UltimateMoveName(_activePartnerIndex) + "!");
 		if (_pixelEffects != null && friendlyYokaiSprite != null)
 			await _pixelEffects.Charge(friendlyYokaiSprite.Position);
 		PlaySound("AttackUltimate", -5);

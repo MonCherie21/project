@@ -36,7 +36,7 @@ public partial class Ending : Control
         AddChild(map);
         AddChild(new ColorRect
         {
-            Color = new Color(0.07f, 0.14f, 0.21f, 0.62f),
+            Color = new Color(0.035f, 0.10f, 0.085f, 0.72f),
             Size = new Vector2(1280, 720),
             MouseFilter = MouseFilterEnum.Ignore
         });
@@ -51,8 +51,8 @@ public partial class Ending : Control
         };
         _endingTitle.AddThemeFontOverride("font", font);
         _endingTitle.AddThemeFontSizeOverride("font_size", 35);
-        _endingTitle.AddThemeColorOverride("font_color", new Color("ffe0a2"));
-        _endingTitle.AddThemeColorOverride("font_outline_color", new Color("1a2738"));
+        _endingTitle.AddThemeColorOverride("font_color", YokaiTheme.BrassBright);
+        _endingTitle.AddThemeColorOverride("font_outline_color", YokaiTheme.Shadow);
         _endingTitle.AddThemeConstantOverride("outline_size", 9);
         AddChild(_endingTitle);
 
@@ -66,7 +66,7 @@ public partial class Ending : Control
         };
         chapter.AddThemeFontOverride("font", font);
         chapter.AddThemeFontSizeOverride("font_size", 13);
-        chapter.AddThemeColorOverride("font_color", new Color("bde2d3"));
+        chapter.AddThemeColorOverride("font_color", YokaiTheme.MossBright);
         AddChild(chapter);
 
         var storyCard = new Panel
@@ -75,18 +75,14 @@ public partial class Ending : Control
             Position = new Vector2(172, 285),
             Size = new Vector2(936, 300)
         };
-        storyCard.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color("1b2d3d"),
-            BorderColor = new Color("e9c782"),
-            BorderWidthLeft = 5,
-            BorderWidthTop = 5,
-            BorderWidthRight = 5,
-            BorderWidthBottom = 5,
-            ShadowColor = new Color(0, 0, 0, 0.55f),
-            ShadowSize = 8
-        });
+        storyCard.AddThemeStyleboxOverride("panel", YokaiTheme.Panel(5));
         AddChild(storyCard);
+
+        storyCard.AddChild(new YokaiRuneSeal
+        {
+            Position = new Vector2(841, 22),
+            Size = new Vector2(44, 44)
+        });
 
         _speaker = new Label
         {
@@ -96,7 +92,7 @@ public partial class Ending : Control
         };
         _speaker.AddThemeFontOverride("font", font);
         _speaker.AddThemeFontSizeOverride("font_size", 14);
-        _speaker.AddThemeColorOverride("font_color", new Color("f0ca87"));
+        _speaker.AddThemeColorOverride("font_color", YokaiTheme.BrassBright);
         storyCard.AddChild(_speaker);
 
         _dialogueText = new Label
@@ -109,7 +105,7 @@ public partial class Ending : Control
         };
         _dialogueText.AddThemeFontOverride("font", font);
         _dialogueText.AddThemeFontSizeOverride("font_size", 13);
-        _dialogueText.AddThemeColorOverride("font_color", new Color("f6efe0"));
+        _dialogueText.AddThemeColorOverride("font_color", YokaiTheme.Parchment);
         storyCard.AddChild(_dialogueText);
 
         _pageCounter = new Label
@@ -120,7 +116,7 @@ public partial class Ending : Control
         };
         _pageCounter.AddThemeFontOverride("font", font);
         _pageCounter.AddThemeFontSizeOverride("font_size", 11);
-        _pageCounter.AddThemeColorOverride("font_color", new Color("8bb4ae"));
+        _pageCounter.AddThemeColorOverride("font_color", YokaiTheme.MossBright);
         storyCard.AddChild(_pageCounter);
 
         _nextButton = new Button
@@ -131,10 +127,7 @@ public partial class Ending : Control
         };
         _nextButton.AddThemeFontOverride("font", font);
         _nextButton.AddThemeFontSizeOverride("font_size", 12);
-        _nextButton.AddThemeColorOverride("font_color", Colors.White);
-        _nextButton.AddThemeStyleboxOverride("normal", ButtonStyle("335e55", "e9c782"));
-        _nextButton.AddThemeStyleboxOverride("hover", ButtonStyle("4d8376", "f7eba9"));
-        _nextButton.AddThemeStyleboxOverride("pressed", ButtonStyle("253e43", "f7eba9"));
+        YokaiTheme.StyleButton(_nextButton, important: true);
         _nextButton.Pressed += AdvanceDialogue;
         storyCard.AddChild(_nextButton);
 
@@ -170,13 +163,4 @@ public partial class Ending : Control
             _endingTitle.Text = "FOR NOW...";
     }
 
-    private static StyleBoxFlat ButtonStyle(string background, string outline) => new()
-    {
-        BgColor = new Color(background),
-        BorderColor = new Color(outline),
-        BorderWidthLeft = 3,
-        BorderWidthTop = 3,
-        BorderWidthRight = 3,
-        BorderWidthBottom = 3
-    };
 }

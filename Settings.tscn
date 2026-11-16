@@ -29,6 +29,12 @@ texture = ExtResource("1_bg")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="NightShade" type="ColorRect" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0.017, 0.031, 0.025, 0.28)
+
 [node name="BackPicture" type="TextureRect" parent="."]
 offset_left = 72.0
 offset_top = 32.0
@@ -86,7 +92,7 @@ offset_left = 502.0
 offset_top = 583.0
 offset_right = 810.0
 offset_bottom = 608.0
-theme_override_colors/font_color = Color(0.99, 0.92, 0.72, 1)
+theme_override_colors/font_color = Color(0.88, 0.75, 0.48, 1)
 theme_override_colors/font_outline_color = Color(0.03, 0.07, 0.12, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 19
@@ -107,7 +113,7 @@ offset_left = 801.0
 offset_top = 612.0
 offset_right = 868.0
 offset_bottom = 644.0
-theme_override_colors/font_color = Color(0.99, 0.92, 0.72, 1)
+theme_override_colors/font_color = Color(0.88, 0.75, 0.48, 1)
 theme_override_colors/font_outline_color = Color(0.03, 0.07, 0.12, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 18
@@ -136,7 +142,7 @@ offset_top = 18.0
 offset_right = 977.0
 offset_bottom = 70.0
 theme_override_font_sizes/font_size = 25
-text = "X"
+text = ""
 mouse_default_cursor_shape = 2
 
 [node name="ManualText" type="RichTextLabel" parent="ManualPopup"]
@@ -155,9 +161,9 @@ Choose NEW GAME to create a character and use an empty account slot. CONTINUE op
 Move with W, A, S, D or the arrow keys. Click on marked buildings to interact with them. The clipboard (!) shows your story and friendship objectives. Explore roads and bushes to discover translucent candy pickups.
 
 [b]YOKAI PARTY AND FRIENDSHIP[/b]
-Press I or PARTY / FEED in the world to open your inventory. You begin with 5 candies. Each Yokai has its own friendship bar and FEED button. Every candy adds 50 friendship points; feeding 2 candies raises that Yokai by 1 Friendship Level, up to Level 3. You can collect more hidden candies on the map. Candy counts, collected pickups, and friendship are included in your saved adventure.
+Press I or PARTY / FEED in the world to open your inventory. You begin with 5 candies, and give Whisper the first one during the opening cutscene. Each Yokai has its own friendship bar and FEED button. Every candy adds 50 friendship points; feeding 2 candies raises that Yokai by 1 Friendship Level, up to Level 3. You can collect more hidden candies on the map. Candy counts, collected pickups, and friendship are included in your saved adventure.
 
-Your first friendship objective is to feed your partner twice to reach Level 1. Higher Friendship increases that Yokai's maximum HP and attack damage. Opponents also grow slightly to keep later fights challenging, but feeding still gives your partner a clear advantage. Each story battle uses its matching Yokai's friendship. More Yo-kai join your party as you clear story stages.
+After the cutscene, feed Whisper one more candy to reach Friendship Level 1. Higher Friendship increases that Yokai's maximum HP and attack damage. Opponents also grow slightly to keep later fights challenging, but feeding still gives your partner a clear advantage. Your active companion's friendship matters in battle. New Yokai join your party only when you win their battles, not when you RUN.
 
 [b]BATTLES[/b]
 Use a normal attack to build your ultimate meter. Your second attack is the ultimate: it needs 2 normal attacks to charge and then cools down. An unavailable ultimate appears gray. RUN offers a chance to escape, but a failed attempt costs a turn. Only your Yokai has HP in battle; the trainer is not a target. There is no free healing during combat. Animated attacks and effects indicate impacts; the battle music changes automatically. Feed your Yokai before fighting. Your HP is blue and the enemy HP is red; the numbers below them have separate colors for readability.

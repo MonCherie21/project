@@ -93,29 +93,7 @@ public partial class World : Node2D
         notice.AddThemeFontSizeOverride("font_size", 23);
         journalButton.AddChild(notice);
 
-        journalButton.Pressed += () =>
-        {
-            string friendshipObjective = CandyInventory.FriendshipLevel(0) < 1
-                ? "\n\nFRIENDSHIP OBJECTIVE  !\nFeed 2 candies to your first Yo-kai " +
-                  "using PARTY / FEED [I] to reach Friendship Level 1. " +
-                  "Explore for translucent candy pickups."
-                : "\n\nFRIENDSHIP OBJECTIVE  ✓\nYour first Yo-kai reached " +
-                  "Friendship Level " + CandyInventory.FriendshipLevel(0) + "!";
-            var journal = new AcceptDialog
-            {
-                Title = "Wawa Field Notes",
-                DialogText = GameProgress.CompletedLevels == GameProgress.TotalLevels
-                    ? "All seven stages are cleared!\nYou have protected Wawa."
-                    : "STORY PROGRESS  " + GameProgress.CompletedLevels + "/" + GameProgress.TotalLevels +
-                      "\n\nCURRENT OBJECTIVE\nGo to " + GameProgress.NextBuilding +
-                      " and complete the Yo-kai battle.\n\nFollow the white flag on the map." +
-                      friendshipObjective
-            };
-            overlay.AddChild(journal);
-            journal.Confirmed += journal.QueueFree;
-            journal.CloseRequested += journal.QueueFree;
-            journal.PopupCentered(new Vector2I(430, 235));
-        };
+        journalButton.Pressed += () => StoryNoticeUI.ShowJournal(this);
 
         // The party screen is an overlay: battle locations, world position,
         // manual building solids, and the current game scene stay intact.
@@ -127,16 +105,7 @@ public partial class World : Node2D
             TooltipText = "View your Yokai, friendship levels, and feed candies"
         };
         partyButton.AddThemeFontSizeOverride("font_size", 16);
-        var partyStyle = new StyleBoxFlat
-        {
-            BgColor = new Color("243b3e"),
-            BorderColor = new Color("d3bc84"),
-            BorderWidthLeft = 3,
-            BorderWidthTop = 3,
-            BorderWidthRight = 3,
-            BorderWidthBottom = 3
-        };
-        partyButton.AddThemeStyleboxOverride("normal", partyStyle);
+        YokaiTheme.StyleButton(partyButton);
         overlay.AddChild(partyButton);
         partyButton.Pressed += () => PartyInventory.Open(this);
 
@@ -153,7 +122,10 @@ public partial class World : Node2D
 
         _refreshPartyHint = () =>
         {
-            partyMarker.Text = CandyInventory.FriendshipLevel(0) < 1 ? "!" : "✓";
+            int active = CandyInventory.ActivePartnerIndex;
+            partyMarker.Text = CandyInventory.FriendshipLevel(active) < 1 ? "!" : "✓";
+            partyButton.TooltipText = "ACTIVE: " + CandyInventory.Name(active) +
+                ". Open to change your battle companion or feed candy.";
         };
         CandyInventory.Changed += _refreshPartyHint;
         _refreshPartyHint();
@@ -164,13 +136,17 @@ public partial class World : Node2D
         if (PlayerData.PendingMovementTutorial)
         {
             PlayerData.PendingMovementTutorial = false;
-            TutorialOverlay.Show(this, "YOUR FIRST FRIENDSHIP QUEST!",
-                "Welcome to Wawa! Move with W, A, S, D or the arrow keys.\n\n" +
-                "You have 5 starter candies. Press I (or PARTY / FEED), " +
-                "and feed your first Yo-kai TWO candies to reach Friendship Level 1.\n\n" +
-                "Higher Friendship strengthens your Yo-kai's HP and attacks in battle. " +
-                "Explore roads to find faint, collectible candies!\n\n" +
-                "Tap the clipboard to see both your story and friendship objectives.");
+            int feedsRemaining = Math.Max(0,
+                CandyInventory.FeedsPerLevel - CandyInventory.FeedCount(0));
+            TutorialOverlay.Show(this, "YOUR JOURNEY BEGINS!",
+                "Wawa is counting on you and Whisper. Move with W, A, S, D or the arrow keys.\n\n" +
+                "Follow the white flag to House 2 for your first battle. " +
+                $"You have {CandyInventory.Candies} candies left. " +
+                (feedsRemaining > 0
+                    ? $"Press I (PARTY / FEED) and give Whisper {feedsRemaining} more " +
+                      "candy to reach Friendship Level 1."
+                    : "Whisper is already at Friendship Level 1!") + "\n\n" +
+                "Friendship boosts your Yokai's power. Use the clipboard to track your quest.");
         }
 
         if (PlayerData.PlayerId <= 0 || PlayerData.AccessToken.Length == 0)
@@ -257,18 +233,19 @@ public partial class World : Node2D
         };
         for (int level = 0; level < places.Length; level++)
         {
-            // Completed locations return to their original tidy artwork.
-            if (level < GameProgress.CompletedLevels) continue;
-
             var sprite = GetParent().GetNodeOrNull<Sprite2D>(
                 "MapBackground/Buildings/" + places[level]);
             if (sprite == null || sprite.Texture == null) continue;
+            // Cleared locations show only a subtle healing glow; uncleared
+            // places keep their active Yokai stains, seals, smoke and debris.
             sprite.AddChild(new DisturbedBuildingEffect
             {
-                Name = "YokaiDisturbance",
+                Name = level < GameProgress.CompletedLevels
+                    ? "YokaiRestoration" : "YokaiDisturbance",
                 BuildingSize = sprite.RegionEnabled
                     ? sprite.RegionRect.Size : sprite.Texture.GetSize(),
-                Variant = level + 1
+                Variant = level + 1,
+                Restored = level < GameProgress.CompletedLevels
             });
         }
     }

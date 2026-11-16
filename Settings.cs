@@ -21,6 +21,15 @@ public partial class Settings : CanvasLayer
 		_volumeLabel = GetNode<Label>("MusicVolumeLabel");
 		_volumePercent = GetNode<Label>("MusicVolumePercent");
 		_music = GetNodeOrNull<MusicPlayer>("/root/MusicPlayer");
+		_manualPopup.AddThemeStyleboxOverride("panel", YokaiTheme.Panel(5));
+		_manualPopup.AddChild(new YokaiRuneSeal
+		{
+			Position = new Vector2(849, 23),
+			Size = new Vector2(44, 44)
+		});
+		GetNode<Label>("ManualPopup/ManualTitle").AddThemeColorOverride("font_color", YokaiTheme.BrassBright);
+		GetNode<RichTextLabel>("ManualPopup/ManualText").AddThemeColorOverride("default_color", YokaiTheme.Parchment);
+		YokaiTheme.StyleClose(GetNode<Button>("ManualPopup/CloseButton"));
 
 		GetNode<Button>("ManualButton").Pressed += () => _manualPopup.Show();
 		GetNode<Button>("ManualPopup/CloseButton").Pressed += () => _manualPopup.Hide();
@@ -68,15 +77,11 @@ public partial class Settings : CanvasLayer
 	private static void StyleMusicButton(Button button, bool selected)
 	{
 		// Opaque buttons cover the two baked "ON" captions in the artwork.
-		var box = new StyleBoxFlat
-		{
-			BgColor = selected ? new Color("3c5945") : new Color("23272e"),
-			BorderColor = selected ? new Color("f8dc95") : new Color("939ba5")
-		};
-		box.SetBorderWidthAll(selected ? 3 : 2);
-		box.SetCornerRadiusAll(4);
+		var box = YokaiTheme.Box(selected ? new Color("2c493b") : YokaiTheme.Surface,
+			selected ? YokaiTheme.BrassBright : YokaiTheme.FrameEdge, selected ? 3 : 2);
 		button.AddThemeStyleboxOverride("normal", box);
-		button.AddThemeColorOverride("font_color", selected ? new Color("fff3cc") : Colors.White);
+		button.AddThemeStyleboxOverride("hover", YokaiTheme.Box(new Color("385e49"), YokaiTheme.BrassBright));
+		button.AddThemeColorOverride("font_color", selected ? YokaiTheme.BrassBright : YokaiTheme.Parchment);
 	}
 
 	private void Close()

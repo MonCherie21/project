@@ -19,7 +19,7 @@ public partial class BattleResultUI : CanvasLayer
             Name = "ScreenDimmer",
             Position = Vector2.Zero,
             Size = new Vector2(1280, 720),
-            Color = new Color(0.035f, 0.067f, 0.10f, 0.79f),
+            Color = new Color(0.014f, 0.022f, 0.017f, 0.88f),
             MouseFilter = Control.MouseFilterEnum.Stop
         };
         AddChild(dim);
@@ -30,27 +30,23 @@ public partial class BattleResultUI : CanvasLayer
             Position = new Vector2(302, 205),
             Size = new Vector2(676, 320)
         };
-        card.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color("192838"),
-            BorderColor = new Color("f0cf85"),
-            BorderWidthLeft = 5,
-            BorderWidthTop = 5,
-            BorderWidthRight = 5,
-            BorderWidthBottom = 5,
-            ShadowColor = new Color(0, 0, 0, 0.65f),
-            ShadowSize = 9
-        });
+        card.AddThemeStyleboxOverride("panel", YokaiTheme.Panel(5));
         AddChild(card);
 
         var upperAccent = new ColorRect
         {
             Position = new Vector2(20, 20),
             Size = new Vector2(636, 5),
-            Color = new Color("60998d"),
+            Color = YokaiTheme.Moss,
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
         card.AddChild(upperAccent);
+
+        card.AddChild(new YokaiRuneSeal
+        {
+            Position = new Vector2(599, 41),
+            Size = new Vector2(44, 44)
+        });
 
         _heading = new Label
         {
@@ -62,7 +58,7 @@ public partial class BattleResultUI : CanvasLayer
         };
         _heading.AddThemeFontOverride("font", pixelFont);
         _heading.AddThemeFontSizeOverride("font_size", 25);
-        _heading.AddThemeColorOverride("font_color", new Color("ffe1a0"));
+        _heading.AddThemeColorOverride("font_color", YokaiTheme.BrassBright);
         card.AddChild(_heading);
 
         _progress = new Label
@@ -74,7 +70,7 @@ public partial class BattleResultUI : CanvasLayer
         };
         _progress.AddThemeFontOverride("font", pixelFont);
         _progress.AddThemeFontSizeOverride("font_size", 11);
-        _progress.AddThemeColorOverride("font_color", new Color("8cc8bf"));
+        _progress.AddThemeColorOverride("font_color", YokaiTheme.MossBright);
         card.AddChild(_progress);
 
         _message = new Label
@@ -88,7 +84,7 @@ public partial class BattleResultUI : CanvasLayer
         };
         _message.AddThemeFontOverride("font", pixelFont);
         _message.AddThemeFontSizeOverride("font_size", 11);
-        _message.AddThemeColorOverride("font_color", new Color("f3eed9"));
+        _message.AddThemeColorOverride("font_color", YokaiTheme.Parchment);
         card.AddChild(_message);
 
         _continueButton = new Button
@@ -99,12 +95,10 @@ public partial class BattleResultUI : CanvasLayer
             Size = new Vector2(348, 53),
             FocusMode = Control.FocusModeEnum.None
         };
-        _continueButton.AddThemeStyleboxOverride("normal", ButtonStyle("345e55", "e3c47e"));
-        _continueButton.AddThemeStyleboxOverride("hover", ButtonStyle("518379", "fff0af"));
-        _continueButton.AddThemeStyleboxOverride("pressed", ButtonStyle("263b41", "f8dea5"));
+        YokaiTheme.StyleButton(_continueButton, important: true);
         _continueButton.AddThemeFontOverride("font", pixelFont);
         _continueButton.AddThemeFontSizeOverride("font_size", 12);
-        _continueButton.AddThemeColorOverride("font_color", new Color("fff1d7"));
+        _continueButton.AddThemeColorOverride("font_color", YokaiTheme.Parchment);
         _continueButton.Pressed += () => _onContinue?.Invoke();
         card.AddChild(_continueButton);
 
@@ -127,16 +121,6 @@ public partial class BattleResultUI : CanvasLayer
             ? "THE YOKAI ARE STILL WAITING..."
             : $"STAGE {level} / {GameProgress.TotalLevels} CLEARED";
         _heading.AddThemeColorOverride("font_color", title == "DEFEAT"
-            ? new Color("ff9b89") : new Color("ffe1a0"));
+            ? YokaiTheme.Rust : YokaiTheme.BrassBright);
     }
-
-    private static StyleBoxFlat ButtonStyle(string background, string outline) => new()
-    {
-        BgColor = new Color(background),
-        BorderColor = new Color(outline),
-        BorderWidthLeft = 3,
-        BorderWidthTop = 3,
-        BorderWidthRight = 3,
-        BorderWidthBottom = 3
-    };
 }

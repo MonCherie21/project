@@ -19,6 +19,7 @@ public partial class Escape : CanvasLayer
 		saveButton.Pressed += OnSaveButtonPressed;
 		GetNode<Button>("Button Settings").Pressed += () =>
 			GetNode<SceneManager>("/root/SceneManager").ShowSettings();
+		YokaiTheme.StyleButton(GetNode<Button>("Button Settings"));
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -49,15 +50,8 @@ public partial class Escape : CanvasLayer
 		// players can safely resume a half-finished fight from a save slot.
 		if (GetTree().CurrentScene is BattleScene)
 		{
-			var message = new AcceptDialog
-			{
-				Title = "Save game",
-				DialogText = "Finish or leave the battle before saving your progress."
-			};
-			AddChild(message);
-			message.Confirmed += message.QueueFree;
-			message.CloseRequested += message.QueueFree;
-			message.PopupCentered();
+			TutorialOverlay.Show(this, "SAVE UNAVAILABLE",
+				"Finish or leave the battle before saving your progress.");
 			return;
 		}
 

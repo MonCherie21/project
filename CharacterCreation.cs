@@ -12,7 +12,6 @@ public partial class CharacterCreation : Control
     private Button _startButton;
     private Button _maleButton;
     private Button _femaleButton;
-    private AcceptDialog _message;
 
     public override void _Ready()
     {
@@ -24,8 +23,6 @@ public partial class CharacterCreation : Control
 
         _startButton = GetNode<Button>("Start");
         _startButton.Pressed += OnStartPressed;
-        _message = new AcceptDialog { Title = "Character Creation" };
-        AddChild(_message);
     }
 
     private void SelectGender(string gender)
@@ -170,9 +167,9 @@ public partial class CharacterCreation : Control
                     return;
                 }
                 // Makes a newly created account continuable even if the
-                // player has not reached the first Yokai yet.
+                // player hasn't finished the opening cutscene yet.
                 GameProgress.QueueAutoSave();
-                GetTree().ChangeSceneToFile("res://world.tscn");
+                GetTree().ChangeSceneToFile("res://OpeningCutscene.tscn");
             }
             catch (Exception ex)
             {
@@ -203,8 +200,7 @@ public partial class CharacterCreation : Control
     private void ShowError(string message)
     {
         _startButton.Disabled = false;
-        _message.DialogText = message;
-        _message.PopupCentered();
+        TutorialOverlay.Show(this, "CHARACTER CREATION", message);
     }
 
     private void OnBackPressed()
