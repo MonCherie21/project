@@ -43,7 +43,7 @@ public partial class SaveSlotPanel : CanvasLayer
         var backdrop = new ColorRect
         {
             // Hide the existing PAUSE artwork while the save/load card is open.
-            Color = new Color(0.025f, 0.03f, 0.055f, 0.93f),
+            Color = new Color(0.009f, 0.018f, 0.016f, 0.94f),
             MouseFilter = Control.MouseFilterEnum.Stop,
             AnchorRight = 1,
             AnchorBottom = 1
@@ -61,15 +61,7 @@ public partial class SaveSlotPanel : CanvasLayer
             OffsetTop = -165,
             OffsetBottom = 165
         };
-        panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color("151c2b"),
-            BorderColor = new Color("68788d"),
-            BorderWidthLeft = 4,
-            BorderWidthRight = 4,
-            BorderWidthTop = 4,
-            BorderWidthBottom = 4
-        });
+        panel.AddThemeStyleboxOverride("panel", YokaiTheme.Panel());
         backdrop.AddChild(panel);
 
         var margin = new MarginContainer();
@@ -90,7 +82,7 @@ public partial class SaveSlotPanel : CanvasLayer
             HorizontalAlignment = HorizontalAlignment.Center
         };
         title.AddThemeFontSizeOverride("font_size", 25);
-        title.AddThemeColorOverride("font_color", new Color("ead49a"));
+        title.AddThemeColorOverride("font_color", YokaiTheme.BrassBright);
         content.AddChild(title);
 
         // One checkpoint per player account. The three accounts themselves
@@ -116,7 +108,7 @@ public partial class SaveSlotPanel : CanvasLayer
             AutowrapMode = TextServer.AutowrapMode.WordSmart,
             HorizontalAlignment = HorizontalAlignment.Center
         };
-        _status.AddThemeColorOverride("font_color", new Color("d6dbe5"));
+        _status.AddThemeColorOverride("font_color", YokaiTheme.Parchment);
         _status.AddThemeFontSizeOverride("font_size", 16);
         content.AddChild(_status);
 
@@ -134,22 +126,7 @@ public partial class SaveSlotPanel : CanvasLayer
 
     private static void StyleButton(Button button)
     {
-        var normal = new StyleBoxFlat
-        {
-            BgColor = new Color("293345"),
-            BorderColor = new Color("8292a6"),
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2,
-            BorderWidthTop = 2,
-            BorderWidthBottom = 2
-        };
-        var hover = (StyleBoxFlat)normal.Duplicate();
-        hover.BgColor = new Color("3b4c62");
-        button.AddThemeStyleboxOverride("normal", normal);
-        button.AddThemeStyleboxOverride("hover", hover);
-        button.AddThemeStyleboxOverride("focus", hover);
-        button.AddThemeColorOverride("font_color", new Color("f4f1e8"));
-        button.AddThemeColorOverride("font_hover_color", new Color("ffdfa0"));
+        YokaiTheme.StyleButton(button);
         button.AddThemeFontSizeOverride("font_size", 17);
     }
 

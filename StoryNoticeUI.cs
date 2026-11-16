@@ -47,7 +47,7 @@ public partial class StoryNoticeUI : CanvasLayer
         var dimmer = new ColorRect
         {
             Name = "DimmedWorld",
-            Color = new Color(0.015f, 0.025f, 0.045f, 0.83f),
+            Color = new Color(0.012f, 0.020f, 0.017f, 0.91f),
             MouseFilter = Control.MouseFilterEnum.Stop
         };
         surface.AddChild(dimmer);
@@ -63,7 +63,7 @@ public partial class StoryNoticeUI : CanvasLayer
             CustomMinimumSize = new Vector2(Mathf.Min(_journal ? 716 : 654, screen.X - 32), 0),
             MouseFilter = Control.MouseFilterEnum.Stop
         };
-        card.AddThemeStyleboxOverride("panel", Box("192838", "f0cf85", 5));
+        card.AddThemeStyleboxOverride("panel", YokaiTheme.Panel(5));
         center.AddChild(card);
 
         var padding = new MarginContainer();
@@ -78,22 +78,28 @@ public partial class StoryNoticeUI : CanvasLayer
         headingRow.AddThemeConstantOverride("separation", 16);
         stack.AddChild(headingRow);
 
+        headingRow.AddChild(new YokaiRuneSeal
+        {
+            CustomMinimumSize = new Vector2(44, 44),
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        });
+
         var headingColumn = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         headingColumn.AddThemeConstantOverride("separation", 7);
         headingRow.AddChild(headingColumn);
         headingColumn.AddChild(Text(_journal ? "WAWA  /  ADVENTURE JOURNAL" : "WAWA  /  STORY STATUS",
-            10, "86c4ba", pixel));
+            10, "84a88d", pixel));
         headingColumn.AddChild(Text(_journal ? "FIELD NOTES" : "YOKAI WAVE PROGRESS",
-            _journal ? 23 : 18, "ffdf9b", pixel));
+            _journal ? 23 : 18, "e0be7a", pixel));
 
-        var close = Button("X", 38, pixel);
-        close.CustomMinimumSize = new Vector2(40, 38);
+        var close = Button("", 12, pixel);
+        YokaiTheme.StyleClose(close);
         close.Pressed += Close;
         headingRow.AddChild(close);
 
         var separator = new ColorRect
         {
-            Color = new Color("619c91"),
+            Color = YokaiTheme.Moss,
             CustomMinimumSize = new Vector2(0, 4),
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
@@ -122,10 +128,10 @@ public partial class StoryNoticeUI : CanvasLayer
         int done = GameProgress.CompletedLevels;
         var row = new HBoxContainer();
         parent.AddChild(row);
-        var label = Text("STORY PROGRESS", 12, "dfe9e5", pixel);
+        var label = Text("STORY PROGRESS", 12, "d5d9c9", pixel);
         label.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         row.AddChild(label);
-        row.AddChild(Text($"{done} / {GameProgress.TotalLevels} CLEARED", 11, "ffdf9b", pixel));
+        row.AddChild(Text($"{done} / {GameProgress.TotalLevels} CLEARED", 11, "e0be7a", pixel));
 
         var progress = new ProgressBar
         {
@@ -135,8 +141,8 @@ public partial class StoryNoticeUI : CanvasLayer
             CustomMinimumSize = new Vector2(0, 18),
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
-        progress.AddThemeStyleboxOverride("background", Box("0d1726", "536174", 2));
-        progress.AddThemeStyleboxOverride("fill", Box("609e91", "609e91", 0));
+        progress.AddThemeStyleboxOverride("background", YokaiTheme.Box(YokaiTheme.Shadow, YokaiTheme.FrameEdge, 2));
+        progress.AddThemeStyleboxOverride("fill", YokaiTheme.Box(YokaiTheme.Moss, YokaiTheme.Moss, 0));
         parent.AddChild(progress);
     }
 
@@ -193,7 +199,7 @@ public partial class StoryNoticeUI : CanvasLayer
         string paragraph, Font pixel)
     {
         var panel = new PanelContainer();
-        panel.AddThemeStyleboxOverride("panel", Box("243648", "536d74", 2));
+        panel.AddThemeStyleboxOverride("panel", YokaiTheme.Box(YokaiTheme.Inset, YokaiTheme.FrameEdge, 2));
         stack.AddChild(panel);
 
         var margin = new MarginContainer();
@@ -203,10 +209,10 @@ public partial class StoryNoticeUI : CanvasLayer
         column.AddThemeConstantOverride("separation", 8);
         margin.AddChild(column);
 
-        column.AddChild(Text(heading, 12, "f2d18e", pixel));
+        column.AddChild(Text(heading, 12, "cfb17b", pixel));
         if (!string.IsNullOrEmpty(subtitle))
-            column.AddChild(Text(subtitle, 13, "99cfc4", pixel));
-        column.AddChild(Text(paragraph, 17, "e4e9eb", null, wrap: true));
+            column.AddChild(Text(subtitle, 13, "83ae94", pixel));
+        column.AddChild(Text(paragraph, 17, "dedacb", null, wrap: true));
     }
 
     private static Label Text(string value, int size, string color, Font font, bool wrap = false)
@@ -228,25 +234,12 @@ public partial class StoryNoticeUI : CanvasLayer
     private static Button Button(string title, int size, Font pixel)
     {
         var button = new Button { Text = title, FocusMode = Control.FocusModeEnum.None };
-        button.AddThemeStyleboxOverride("normal", Box("2c4b53", "d9c080", 3));
-        button.AddThemeStyleboxOverride("hover", Box("426d6c", "fff0b8", 3));
-        button.AddThemeStyleboxOverride("pressed", Box("1d343c", "ffda8b", 3));
-        button.AddThemeColorOverride("font_color", new Color("fff0d6"));
+        YokaiTheme.StyleButton(button, important: true);
         button.AddThemeFontSizeOverride("font_size", size);
         if (pixel != null)
             button.AddThemeFontOverride("font", pixel);
         return button;
     }
-
-    private static StyleBoxFlat Box(string fill, string border, int thickness) => new()
-    {
-        BgColor = new Color(fill),
-        BorderColor = new Color(border),
-        BorderWidthLeft = thickness,
-        BorderWidthRight = thickness,
-        BorderWidthTop = thickness,
-        BorderWidthBottom = thickness
-    };
 
     private static void SetPadding(MarginContainer container, int horizontal, int vertical)
     {

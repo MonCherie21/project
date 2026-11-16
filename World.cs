@@ -105,16 +105,7 @@ public partial class World : Node2D
             TooltipText = "View your Yokai, friendship levels, and feed candies"
         };
         partyButton.AddThemeFontSizeOverride("font_size", 16);
-        var partyStyle = new StyleBoxFlat
-        {
-            BgColor = new Color("243b3e"),
-            BorderColor = new Color("d3bc84"),
-            BorderWidthLeft = 3,
-            BorderWidthTop = 3,
-            BorderWidthRight = 3,
-            BorderWidthBottom = 3
-        };
-        partyButton.AddThemeStyleboxOverride("normal", partyStyle);
+        YokaiTheme.StyleButton(partyButton);
         overlay.AddChild(partyButton);
         partyButton.Pressed += () => PartyInventory.Open(this);
 
@@ -242,18 +233,19 @@ public partial class World : Node2D
         };
         for (int level = 0; level < places.Length; level++)
         {
-            // Completed locations return to their original tidy artwork.
-            if (level < GameProgress.CompletedLevels) continue;
-
             var sprite = GetParent().GetNodeOrNull<Sprite2D>(
                 "MapBackground/Buildings/" + places[level]);
             if (sprite == null || sprite.Texture == null) continue;
+            // Cleared locations show only a subtle healing glow; uncleared
+            // places keep their active Yokai stains, seals, smoke and debris.
             sprite.AddChild(new DisturbedBuildingEffect
             {
-                Name = "YokaiDisturbance",
+                Name = level < GameProgress.CompletedLevels
+                    ? "YokaiRestoration" : "YokaiDisturbance",
                 BuildingSize = sprite.RegionEnabled
                     ? sprite.RegionRect.Size : sprite.Texture.GetSize(),
-                Variant = level + 1
+                Variant = level + 1,
+                Restored = level < GameProgress.CompletedLevels
             });
         }
     }

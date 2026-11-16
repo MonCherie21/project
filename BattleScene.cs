@@ -146,7 +146,12 @@ public partial class BattleScene : Node2D
 		var battleBackground = GetNodeOrNull<TextureRect>("level1_bg");
 		if (battleBackground != null)
 		{
-			var damage = new DisturbedBattleBackdrop { Name = "YokaiDamage" };
+			var damage = new DisturbedBattleBackdrop
+			{
+				Name = "YokaiDamage",
+				Stage = Math.Clamp(GameProgress.LevelFromBattleScene(
+					GetTree().CurrentScene?.SceneFilePath ?? SceneFilePath), 1, GameProgress.TotalLevels)
+			};
 			AddChild(damage);
 			MoveChild(damage, battleBackground.GetIndex() + 1);
 		}
@@ -458,13 +463,10 @@ public partial class BattleScene : Node2D
 			Size = new Vector2(190, 53),
 			FocusMode = Control.FocusModeEnum.None
 		};
-		runButton.AddThemeStyleboxOverride("normal", BattleBox("202e41", "b7c4bc"));
-		runButton.AddThemeStyleboxOverride("hover", BattleBox("36536b", "f2d28d"));
-		runButton.AddThemeStyleboxOverride("pressed", BattleBox("4c5663", "d5b678"));
-		runButton.AddThemeStyleboxOverride("disabled", BattleBox("2a2c36", "5f636a"));
+		YokaiTheme.StyleButton(runButton);
 		runButton.AddThemeFontOverride("font", GD.Load<Font>("res://Assets/PressStart2P-Regular.ttf"));
 		runButton.AddThemeFontSizeOverride("font_size", 18);
-		runButton.AddThemeColorOverride("font_color", new Color("f6eaca"));
+		runButton.AddThemeColorOverride("font_color", YokaiTheme.Parchment);
 		runButton.AddThemeColorOverride("font_hover_color", Colors.White);
 		canvasLayer.AddChild(runButton);
 		runButton.Pressed += OnRunPressed;
@@ -478,7 +480,7 @@ public partial class BattleScene : Node2D
 			Size = new Vector2(285, 64),
 			MouseFilter = Control.MouseFilterEnum.Ignore
 		};
-		ultimatePanel.AddThemeStyleboxOverride("panel", BattleBox("172638", "e0b76f"));
+		ultimatePanel.AddThemeStyleboxOverride("panel", YokaiTheme.Panel(3));
 		canvasLayer.AddChild(ultimatePanel);
 		ultimateMeter = new ProgressBar
 		{
@@ -490,8 +492,8 @@ public partial class BattleScene : Node2D
 			ShowPercentage = false,
 			MouseFilter = Control.MouseFilterEnum.Ignore
 		};
-		ultimateMeter.AddThemeStyleboxOverride("background", BattleBox("182438", "657080"));
-		ultimateMeter.AddThemeStyleboxOverride("fill", BattleBox("d9a24b", "f9df91"));
+		ultimateMeter.AddThemeStyleboxOverride("background", YokaiTheme.Box(YokaiTheme.Shadow, YokaiTheme.FrameEdge));
+		ultimateMeter.AddThemeStyleboxOverride("fill", YokaiTheme.Box(YokaiTheme.Brass, YokaiTheme.BrassBright));
 		ultimatePanel.AddChild(ultimateMeter);
 
 		ultimateText = new Label
@@ -503,7 +505,7 @@ public partial class BattleScene : Node2D
 		};
 		ultimateText.AddThemeFontOverride("font", GD.Load<Font>("res://Assets/PressStart2P-Regular.ttf"));
 		ultimateText.AddThemeFontSizeOverride("font_size", 12);
-		ultimateText.AddThemeColorOverride("font_color", new Color("ffe3a1"));
+		ultimateText.AddThemeColorOverride("font_color", YokaiTheme.BrassBright);
 		ultimateText.AddThemeColorOverride("font_outline_color", Colors.Black);
 		ultimateText.AddThemeConstantOverride("outline_size", 3);
 		ultimatePanel.AddChild(ultimateText);

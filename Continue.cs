@@ -31,7 +31,7 @@ public partial class Continue : Control
             HorizontalAlignment = HorizontalAlignment.Center,
             AutowrapMode = TextServer.AutowrapMode.WordSmart
         };
-        _status.AddThemeColorOverride("font_color", new Color("f2dbab"));
+        _status.AddThemeColorOverride("font_color", YokaiTheme.BrassBright);
         AddChild(_status);
         RefreshRows();
     }
@@ -43,15 +43,8 @@ public partial class Continue : Control
             Position = new Vector2(300, 286 + (slot - 1) * 81),
             Size = new Vector2(680, 68)
         };
-        row.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color("161f30ee"),
-            BorderColor = new Color("78899e"),
-            BorderWidthTop = 2, BorderWidthBottom = 2,
-            BorderWidthLeft = 2, BorderWidthRight = 2,
-            CornerRadiusTopLeft = 5, CornerRadiusTopRight = 5,
-            CornerRadiusBottomLeft = 5, CornerRadiusBottomRight = 5
-        });
+        row.AddThemeStyleboxOverride("panel",
+            YokaiTheme.Box(new Color("141f1ce8"), YokaiTheme.Brass, 2));
         AddChild(row);
 
         var margin = new MarginContainer();
@@ -72,7 +65,7 @@ public partial class Continue : Control
             SizeFlagsHorizontal = SizeFlags.ExpandFill,
             VerticalAlignment = VerticalAlignment.Center
         };
-        label.AddThemeColorOverride("font_color", new Color("f1e5c9"));
+        label.AddThemeColorOverride("font_color", YokaiTheme.Parchment);
         label.AddThemeFontSizeOverride("font_size", 19);
         _names[slot] = label;
         line.AddChild(label);
@@ -91,19 +84,7 @@ public partial class Continue : Control
     private static Button MakeButton(string text)
     {
         var button = new Button { Text = text, CustomMinimumSize = new Vector2(102, 44) };
-        var style = new StyleBoxFlat
-        {
-            BgColor = new Color("303d51"),
-            BorderColor = new Color("8e9dad"),
-            BorderWidthTop = 2, BorderWidthBottom = 2,
-            BorderWidthLeft = 2, BorderWidthRight = 2
-        };
-        var hover = (StyleBoxFlat)style.Duplicate();
-        hover.BgColor = new Color("53647b");
-        button.AddThemeStyleboxOverride("normal", style);
-        button.AddThemeStyleboxOverride("hover", hover);
-        button.AddThemeColorOverride("font_color", new Color("fff0ca"));
-        button.AddThemeColorOverride("font_hover_color", Colors.White);
+        YokaiTheme.StyleButton(button);
         return button;
     }
 

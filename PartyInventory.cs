@@ -35,7 +35,14 @@ public partial class PartyInventory : CanvasLayer
     {
         _grid = GetNode<GridContainer>("Panel/Scroll/PartyGrid");
         _candyLabel = GetNode<Label>("Panel/CandyCount");
-        GetNode<Button>("Panel/CloseButton").Pressed += Close;
+        var close = GetNode<Button>("Panel/CloseButton");
+        YokaiTheme.StyleButton(close);
+        close.Pressed += Close;
+        GetNode<Control>("Panel").AddChild(new YokaiRuneSeal
+        {
+            Position = new Vector2(572, 20),
+            Size = new Vector2(44, 44)
+        });
         CandyInventory.Changed += Refresh;
         Refresh();
     }
@@ -82,20 +89,8 @@ public partial class PartyInventory : CanvasLayer
             _grid.AddChild(BuildCard(i));
     }
 
-    private static StyleBoxFlat Box(Color fill, Color border)
-    {
-        var style = new StyleBoxFlat
-        {
-            BgColor = fill,
-            BorderColor = border,
-            BorderWidthLeft = 3,
-            BorderWidthTop = 3,
-            BorderWidthRight = 3,
-            BorderWidthBottom = 3
-        };
-        style.SetCornerRadiusAll(3);
-        return style;
-    }
+    private static StyleBoxFlat Box(Color fill, Color border) =>
+        YokaiTheme.Box(fill, border);
 
     private static Label Text(string value, int fontSize, Color color)
     {
@@ -113,8 +108,8 @@ public partial class PartyInventory : CanvasLayer
             MouseFilter = Control.MouseFilterEnum.Stop
         };
         bool isActive = index == CandyInventory.ActivePartnerIndex;
-        card.AddThemeStyleboxOverride("panel", Box(new Color("1c293a"),
-            isActive ? new Color("f4d085") : new Color("8191a0")));
+        card.AddThemeStyleboxOverride("panel", Box(YokaiTheme.Inset,
+            isActive ? YokaiTheme.BrassBright : YokaiTheme.FrameEdge));
 
         var margin = new MarginContainer();
         margin.AddThemeConstantOverride("margin_left", 10);
@@ -141,10 +136,10 @@ public partial class PartyInventory : CanvasLayer
         var column = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         column.AddThemeConstantOverride("separation", 4);
         row.AddChild(column);
-        column.AddChild(Text(CandyInventory.Name(index), 20, new Color("ffde9e")));
+        column.AddChild(Text(CandyInventory.Name(index), 20, YokaiTheme.BrassBright));
         int level = CandyInventory.FriendshipLevel(index);
         column.AddChild(Text($"FRIENDSHIP LVL {level}/{CandyInventory.MaxFriendshipLevel}",
-            16, Colors.White));
+            16, YokaiTheme.Parchment));
 
         var bar = new ProgressBar
         {
@@ -154,9 +149,9 @@ public partial class PartyInventory : CanvasLayer
             ShowPercentage = false
         };
         bar.AddThemeStyleboxOverride("background",
-            Box(new Color("101a28"), new Color("4b566b")));
+            Box(YokaiTheme.Shadow, YokaiTheme.FrameEdge));
         bar.AddThemeStyleboxOverride("fill",
-            Box(new Color("78b78c"), new Color("78b78c")));
+            Box(YokaiTheme.Moss, YokaiTheme.Moss));
         column.AddChild(bar);
 
         var feed = new Button
@@ -169,10 +164,7 @@ public partial class PartyInventory : CanvasLayer
             Disabled = CandyInventory.Candies == 0 ||
                 level >= CandyInventory.MaxFriendshipLevel
         };
-        feed.AddThemeStyleboxOverride("normal",
-            Box(new Color("374c3a"), new Color("b5c49a")));
-        feed.AddThemeStyleboxOverride("hover",
-            Box(new Color("506e50"), new Color("ffdf9a")));
+        YokaiTheme.StyleButton(feed, important: true);
         feed.AddThemeFontSizeOverride("font_size", 17);
         feed.Pressed += () =>
         {
@@ -193,14 +185,10 @@ public partial class PartyInventory : CanvasLayer
             Disabled = isActive,
             FocusMode = Control.FocusModeEnum.None
         };
-        select.AddThemeStyleboxOverride("normal",
-            Box(new Color("283e57"), new Color("9bacc4")));
-        select.AddThemeStyleboxOverride("hover",
-            Box(new Color("375d80"), new Color("f7d691")));
+        YokaiTheme.StyleButton(select);
         select.AddThemeStyleboxOverride("disabled",
-            Box(new Color("335b49"), new Color("f7d691")));
-        select.AddThemeColorOverride("font_color", new Color("fff2db"));
-        select.AddThemeColorOverride("font_disabled_color", new Color("ffdf96"));
+            Box(new Color("26392d"), YokaiTheme.Brass));
+        select.AddThemeColorOverride("font_disabled_color", YokaiTheme.BrassBright);
         select.AddThemeFontSizeOverride("font_size", 16);
         select.Pressed += () =>
         {

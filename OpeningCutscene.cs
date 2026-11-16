@@ -121,7 +121,7 @@ public partial class OpeningCutscene : Control
         {
             Position = Vector2.Zero,
             Size = new Vector2(1280, 720),
-            Color = new Color(0.07f, 0.10f, 0.19f, 0.36f),
+            Color = new Color(0.06f, 0.10f, 0.08f, 0.43f),
             MouseFilter = MouseFilterEnum.Ignore
         };
         AddChild(_sceneTint);
@@ -188,13 +188,13 @@ public partial class OpeningCutscene : Control
         });
 
         _chapterLabel = Label("PROLOGUE  /  A FAMILY PROMISE",
-            new Vector2(76, 57), new Vector2(850, 26), 11, "b8ded2", true);
+            new Vector2(76, 57), new Vector2(850, 26), 11, "8eb39d", true);
         _chapterTitle = Label("THE FIRST BOND",
-            new Vector2(71, 105), new Vector2(1100, 59), 30, "ffe1a0", true);
-        _chapterTitle.AddThemeColorOverride("font_outline_color", new Color("132336"));
+            new Vector2(71, 105), new Vector2(1100, 59), 30, "e0be7a", true);
+        _chapterTitle.AddThemeColorOverride("font_outline_color", YokaiTheme.Shadow);
         _chapterTitle.AddThemeConstantOverride("outline_size", 8);
 
-        var skip = StyledButton("SKIP INTRO  >>", 12, "293a49", "c9a96e");
+        var skip = StyledButton("SKIP INTRO  >>", 12);
         skip.Position = new Vector2(1050, 38);
         skip.Size = new Vector2(184, 44);
         skip.Pressed += SkipIntro;
@@ -207,45 +207,40 @@ public partial class OpeningCutscene : Control
             Size = new Vector2(1024, 204),
             MouseFilter = MouseFilterEnum.Stop
         };
-        card.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color("172738f2"),
-            BorderColor = new Color("edd094"),
-            BorderWidthLeft = 5,
-            BorderWidthTop = 5,
-            BorderWidthRight = 5,
-            BorderWidthBottom = 5,
-            ShadowSize = 12,
-            ShadowColor = new Color(0, 0, 0, 0.6f)
-        });
+        card.AddThemeStyleboxOverride("panel", YokaiTheme.Panel(5));
         AddChild(card);
+        card.AddChild(new YokaiRuneSeal
+        {
+            Position = new Vector2(952, 27),
+            Size = new Vector2(44, 44)
+        });
 
         var accent = new ColorRect
         {
             Position = new Vector2(29, 16), Size = new Vector2(961, 4),
-            Color = new Color("5b9489"), MouseFilter = MouseFilterEnum.Ignore
+            Color = YokaiTheme.Moss, MouseFilter = MouseFilterEnum.Ignore
         };
         card.AddChild(accent);
 
         _speaker = Label("NARRATOR", new Vector2(35, 32), new Vector2(800, 24),
-            13, "ffd897", true, card);
+            13, "e0be7a", true, card);
         _speech = Label("", new Vector2(35, 71), new Vector2(945, 74),
-            17, "f4efe4", false, card);
+            17, "e4ddc9", false, card);
         _speech.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _speech.VerticalAlignment = VerticalAlignment.Center;
 
         _pageLabel = Label("01 / 18", new Vector2(35, 167), new Vector2(180, 20),
-            10, "8fbdb5", true, card);
+            10, "92b7a0", true, card);
         _status = Label("ENTER / SPACE TO CONTINUE", new Vector2(209, 166),
-            new Vector2(430, 24), 10, "aac1b9", true, card);
+            new Vector2(430, 24), 10, "b8bdac", true, card);
 
-        _continue = StyledButton("CONTINUE  >", 12, "315f58", "ead08e");
+        _continue = StyledButton("CONTINUE  >", 12);
         _continue.Position = new Vector2(728, 150);
         _continue.Size = new Vector2(262, 44);
         _continue.Pressed += ContinueStory;
         card.AddChild(_continue);
 
-        _feed = StyledButton("GIVE WHISPER CANDY", 11, "3d654c", "ffda8a");
+        _feed = StyledButton("GIVE WHISPER CANDY", 11);
         _feed.Position = new Vector2(661, 150);
         _feed.Size = new Vector2(329, 44);
         _feed.Icon = GD.Load<Texture2D>("res://Assets/CandyWrapperPixel.png");
@@ -310,25 +305,14 @@ public partial class OpeningCutscene : Control
         return label;
     }
 
-    private Button StyledButton(string title, int size, string fill, string border)
+    private Button StyledButton(string title, int size)
     {
         var button = new Button { Text = title, FocusMode = FocusModeEnum.None };
         button.AddThemeFontOverride("font", _pixelFont);
         button.AddThemeFontSizeOverride("font_size", size);
-        button.AddThemeColorOverride("font_color", new Color("fff4dc"));
-        button.AddThemeColorOverride("font_hover_color", Colors.White);
-        button.AddThemeStyleboxOverride("normal", ButtonStyle(fill, border));
-        button.AddThemeStyleboxOverride("hover", ButtonStyle("4d7c73", "fff0bc"));
-        button.AddThemeStyleboxOverride("pressed", ButtonStyle("203b40", "efd28e"));
+        YokaiTheme.StyleButton(button, important: true);
         return button;
     }
-
-    private static StyleBoxFlat ButtonStyle(string fill, string border) => new()
-    {
-        BgColor = new Color(fill), BorderColor = new Color(border),
-        BorderWidthLeft = 3, BorderWidthTop = 3,
-        BorderWidthRight = 3, BorderWidthBottom = 3
-    };
 
     public override void _Process(double delta)
     {

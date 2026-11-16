@@ -28,6 +28,12 @@ texture = ExtResource("1_hmbvg")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="NightShade" type="ColorRect" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0.011, 0.023, 0.020, 0.22)
+
 [node name="Button Continue" type="Button" parent="." unique_id=491091131]
 offset_left = 475.0
 offset_top = 262.0
