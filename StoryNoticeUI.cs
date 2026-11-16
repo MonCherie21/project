@@ -157,10 +157,11 @@ public partial class StoryNoticeUI : CanvasLayer
                 "Follow the white flag on the map. It marks your next battle location.", pixel);
 
         int level = CandyInventory.FriendshipLevel(0);
+        int remaining = Math.Max(0, CandyInventory.FeedsPerLevel - CandyInventory.FeedCount(0));
         AddSection(stack, level < 1 ? "FRIENDSHIP QUEST  !" : "FRIENDSHIP QUEST  COMPLETE",
             null,
             level < 1
-                ? "Feed Whisper 2 candies to reach Friendship Level 1. Open PARTY [I] to feed a Yokai, and explore Wawa to find more candy."
+                ? $"Feed Whisper {remaining} more candy to reach Friendship Level 1. Open PARTY [I] to feed a Yokai, and explore Wawa to find more candy."
                 : $"Whisper reached Friendship Level {level}. Keep feeding Yokai to strengthen them for battle.",
             pixel);
     }

@@ -142,19 +142,24 @@ public partial class Continue : Control
             if (!GodotObject.IsInstanceValid(this)) return;
             // Old accounts may have used Save 2 or Save 3. Never strand them.
             var latest = saves.OrderByDescending(s => s.SavedAt).FirstOrDefault();
+            string destination = "res://world.tscn";
             if (latest == null)
             {
+                // If a player left before the very first checkpoint, let
+                // them see the opening and meet Whisper on their next visit.
                 GameProgress.StartNewGame();
                 GameProgress.QueueAutoSave();
                 PlayerData.HasLoadedPosition = false;
+                PlayerData.PendingMovementTutorial = true;
+                destination = "res://OpeningCutscene.tscn";
             }
             else
             {
                 SaveLoadService.PrepareLoad(latest);
             }
-            Error changed = GetTree().ChangeSceneToFile("res://world.tscn");
+            Error changed = GetTree().ChangeSceneToFile(destination);
             if (changed != Error.Ok)
-                throw new InvalidOperationException("Could not open the world: " + changed);
+                throw new InvalidOperationException("Could not open the adventure: " + changed);
         }
         catch (Exception e)
         {

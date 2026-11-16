@@ -170,9 +170,9 @@ public partial class CharacterCreation : Control
                     return;
                 }
                 // Makes a newly created account continuable even if the
-                // player has not reached the first Yokai yet.
+                // player hasn't finished the opening cutscene yet.
                 GameProgress.QueueAutoSave();
-                GetTree().ChangeSceneToFile("res://world.tscn");
+                GetTree().ChangeSceneToFile("res://OpeningCutscene.tscn");
             }
             catch (Exception ex)
             {

@@ -145,13 +145,17 @@ public partial class World : Node2D
         if (PlayerData.PendingMovementTutorial)
         {
             PlayerData.PendingMovementTutorial = false;
-            TutorialOverlay.Show(this, "YOUR FIRST FRIENDSHIP QUEST!",
-                "Welcome to Wawa! Move with W, A, S, D or the arrow keys.\n\n" +
-                "You have 5 starter candies. Press I (or PARTY / FEED), " +
-                "and feed your first Yo-kai TWO candies to reach Friendship Level 1.\n\n" +
-                "Higher Friendship strengthens your Yo-kai's HP and attacks in battle. " +
-                "Explore roads to find faint, collectible candies!\n\n" +
-                "Tap the clipboard to see both your story and friendship objectives.");
+            int feedsRemaining = Math.Max(0,
+                CandyInventory.FeedsPerLevel - CandyInventory.FeedCount(0));
+            TutorialOverlay.Show(this, "YOUR JOURNEY BEGINS!",
+                "Wawa is counting on you and Whisper. Move with W, A, S, D or the arrow keys.\n\n" +
+                "Follow the white flag to House 2 for your first battle. " +
+                $"You have {CandyInventory.Candies} candies left. " +
+                (feedsRemaining > 0
+                    ? $"Press I (PARTY / FEED) and give Whisper {feedsRemaining} more " +
+                      "candy to reach Friendship Level 1."
+                    : "Whisper is already at Friendship Level 1!") + "\n\n" +
+                "Friendship boosts your Yokai's power. Use the clipboard to track your quest.");
         }
 
         if (PlayerData.PlayerId <= 0 || PlayerData.AccessToken.Length == 0)
