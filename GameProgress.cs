@@ -90,27 +90,9 @@ public static class GameProgress
             return;
         }
 
-        string message = level <= CompletedLevels
-            ? $"Level {level} is already cleared. You cannot replay this building."
-            : $"Level {level} is locked. Clear Level {CompletedLevels + 1} " +
-              $"at {NextBuilding} first.";
-
-        if (CompletedLevels == TotalLevels)
-            message = "You have already completed every Yokai battle in Wawa!";
-
-        var root = caller.GetTree().Root;
-        if (root.GetNodeOrNull<AcceptDialog>("LevelProgressNotice") != null)
-            return;
-
-        var dialog = new AcceptDialog
-        {
-            Name = "LevelProgressNotice",
-            Title = "Yokai Wave Progress",
-            DialogText = message
-        };
-        root.AddChild(dialog);
-        dialog.Confirmed += dialog.QueueFree;
-        dialog.CloseRequested += dialog.QueueFree;
-        dialog.PopupCentered();
+        StoryNoticeUI.ShowProgress(caller, level);
     }
+
+    public static string BuildingName(int level) =>
+        level >= 1 && level <= TotalLevels ? BuildingNames[level - 1] : "Wawa";
 }

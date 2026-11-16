@@ -93,29 +93,7 @@ public partial class World : Node2D
         notice.AddThemeFontSizeOverride("font_size", 23);
         journalButton.AddChild(notice);
 
-        journalButton.Pressed += () =>
-        {
-            string friendshipObjective = CandyInventory.FriendshipLevel(0) < 1
-                ? "\n\nFRIENDSHIP OBJECTIVE  !\nFeed 2 candies to your first Yo-kai " +
-                  "using PARTY / FEED [I] to reach Friendship Level 1. " +
-                  "Explore for translucent candy pickups."
-                : "\n\nFRIENDSHIP OBJECTIVE  ✓\nYour first Yo-kai reached " +
-                  "Friendship Level " + CandyInventory.FriendshipLevel(0) + "!";
-            var journal = new AcceptDialog
-            {
-                Title = "Wawa Field Notes",
-                DialogText = GameProgress.CompletedLevels == GameProgress.TotalLevels
-                    ? "All seven stages are cleared!\nYou have protected Wawa."
-                    : "STORY PROGRESS  " + GameProgress.CompletedLevels + "/" + GameProgress.TotalLevels +
-                      "\n\nCURRENT OBJECTIVE\nGo to " + GameProgress.NextBuilding +
-                      " and complete the Yo-kai battle.\n\nFollow the white flag on the map." +
-                      friendshipObjective
-            };
-            overlay.AddChild(journal);
-            journal.Confirmed += journal.QueueFree;
-            journal.CloseRequested += journal.QueueFree;
-            journal.PopupCentered(new Vector2I(430, 235));
-        };
+        journalButton.Pressed += () => StoryNoticeUI.ShowJournal(this);
 
         // The party screen is an overlay: battle locations, world position,
         // manual building solids, and the current game scene stay intact.

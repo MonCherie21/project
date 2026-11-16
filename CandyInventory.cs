@@ -21,9 +21,9 @@ public static class CandyInventory
     public static int Candies => _candies;
     public static bool HasUnsavedChanges => _dirty;
 
-    // Preserve the existing story unlock sequence: a starter is always
-    // available, and each cleared level expands the party by one slot.
-    public static int AvailablePartners => Math.Clamp(GameProgress.CompletedLevels + 1, 1, PartnerCount);
+    // Whisper is the starter. Every other Yokai joins only AFTER its own
+    // level is won: escaping a battle must never unlock the opponent.
+    public static int AvailablePartners => Math.Clamp(GameProgress.CompletedLevels, 1, PartnerCount);
     public static int ActivePartnerIndex => Math.Clamp(_activePartnerIndex, 0, AvailablePartners - 1);
 
     public static string Name(int index) => YokaiRoster.Name(index);
