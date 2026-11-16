@@ -11,14 +11,14 @@ config_version=5
 [application]
 
 config/name="Yokai"
-run/main_scene="uid://b138crnh4uvfe"
+run/main_scene="res://Scenes/Menus/main_menu.tscn"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-SceneManager="*uid://cfw0cu4kxwppc"
-MusicPlayer="*res://MusicPlayer.tscn"
+SceneManager="*res://Scripts/Core/SceneManager.cs"
+MusicPlayer="*res://Scenes/Systems/MusicPlayer.tscn"
 
 [display]
 

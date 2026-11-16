@@ -1,0 +1,22 @@
+digraph YokaiCode {
+  graph [rankdir=TB, bgcolor="#ffffff", pad="0.30", nodesep="0.32", ranksep="0.58", splines=true];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, penwidth=1.4,
+        color="#557e76", fillcolor="#edf4ed", fontcolor="#21362f", margin="0.18,0.12"];
+  edge [color="#688b83", arrowsize=0.65, fontname="DejaVu Sans", fontsize=9];
+  scenes [label="Godot scenes\nMenus / Story / World / Battles", fillcolor="#18312e", fontcolor="#f4dfb5"];
+  world [label="World + building triggers"];
+  battle [label="BattleScene + Result UI"];
+  progress [label="GameProgress"];
+  candy [label="CandyInventory + YokaiRoster"];
+  save [label="GameSaveData + SaveLoadService"];
+  supabase [label="SupabaseSession / Http", fillcolor="#e4edfa"];
+  db [label="Supabase cloud saves", shape=cylinder, fillcolor="#e4edfa"];
+  scene [label="SceneManager\nFades + pause/settings", fillcolor="#fae5bd"];
+  music [label="MusicPlayer\nOpening / world / battle", fillcolor="#fae5bd"];
+  scenes -> world; scenes -> battle;
+  scenes -> scene; scenes -> music;
+  world -> progress; battle -> progress;
+  world -> candy; battle -> candy;
+  progress -> save; candy -> save;
+  save -> supabase; supabase -> db;
+}

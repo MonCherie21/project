@@ -1,0 +1,37 @@
+digraph YokaiGame {
+  graph [rankdir=TB, bgcolor="#ffffff", pad="0.30", nodesep="0.33", ranksep="0.44", splines=ortho];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, penwidth=1.5,
+        color="#567b70", fillcolor="#e7f0e8", fontcolor="#20372f", margin="0.15,0.11"];
+  edge [color="#608378", arrowsize=0.65, fontname="DejaVu Sans", fontsize=9, fontcolor="#44635a"];
+
+  start [label="MAIN MENU", fillcolor="#1d3937", fontcolor="#f6e3b3"];
+  choice [label="New game or Continue?", shape=diamond, fillcolor="#f7e7bd", color="#c59d58"];
+  create [label="Create character\nand account"];
+  opening [label="Opening: Whisper, candy\nand family promise"];
+  load [label="Restore latest\ncheckpoint"];
+  world [label="EXPLORE WAWA\nParty, candy, journal", fillcolor="#e6eff7"];
+  gate [label="Enter next\nmarked building"];
+  battle [label="DIALOGUE  ->  BATTLE", fillcolor="#f9e5db", color="#c67652"];
+  victory [label="Win battle?", shape=diamond, fillcolor="#f7e7bd", color="#c59d58"];
+  progress [label="Record victory and\nnew companion", fillcolor="#d7edd8"];
+  last [label="Final stage 7?", shape=diamond, fillcolor="#f7e7bd", color="#c59d58"];
+  bonding [label="Optional candy gift\nor welcoming hug"];
+  ending [label="ORCANOS DEFEATED\nEpilogue / Restored Wawa", fillcolor="#1d3937", fontcolor="#f6e3b3"];
+
+  start -> choice;
+  choice -> create [label="New"];
+  choice -> load [label="Continue"];
+  create -> opening;
+  opening -> world;
+  load -> world;
+  world -> gate;
+  gate -> battle;
+  battle -> victory;
+  victory -> world [label="Run / lose", color="#b95c55", fontcolor="#b95c55", constraint=false];
+  victory -> progress [label="Yes"];
+  progress -> last;
+  last -> bonding [label="Stages 2-6"];
+  bonding -> world [constraint=false];
+  last -> ending [label="Stage 7"];
+  ending -> world [constraint=false];
+}
