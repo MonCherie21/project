@@ -10,12 +10,13 @@ public static class YokaiRoster
         "ENMA", "WOBBLEWOK", "ORCANOS"
     };
 
+    // Characters/ filenames follow upload order, not the M1-M7 Yokai names.
     private static readonly string[] PortraitPaths =
     {
         "res://Characters/one.png", "res://Characters/two.png",
-        "res://Characters/three.png", "res://Characters/four.png",
-        "res://Characters/five.png", "res://Characters/six.jpg",
-        "res://Characters/seven.jpg"
+        "res://Characters/six.jpg", "res://Characters/three.png",
+        "res://Characters/seven.jpg", "res://Characters/five.png",
+        "res://Characters/four.png"
     };
 
     private static readonly string[] BattleSpritePaths =
