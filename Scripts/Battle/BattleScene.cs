@@ -23,10 +23,10 @@ public partial class BattleScene : Node2D
 	[Export] public int GhostPunchDamage = 16;
 
 	[Export] public int EnemyDamage = 6;
-	// Story enemies grow tougher by district. The last battle is a boss fight,
-	// but the first two remain approachable without feeding any candy.
-	private static readonly int[] EnemyHealthByStage = { 70, 90, 110, 125, 145, 165, 190 };
-	private static readonly int[] EnemyAttackByStage = { 10, 12, 14, 15, 16, 18, 19 };
+	// Each new district raises the stakes. Early stages can still be beaten
+	// without candy, while late battles reward investing in friendship.
+	private static readonly int[] EnemyHealthByStage = { 75, 95, 120, 142, 165, 188, 215 };
+	private static readonly int[] EnemyAttackByStage = { 11, 12, 14, 16, 18, 20, 21 };
 
 
 	// =========================================
@@ -47,7 +47,7 @@ public partial class BattleScene : Node2D
 	private bool playerTurn = true;
 	private const int UltimateChargeRequired = 2;
 	private const double FriendlyCriticalChance = 0.16;
-	private const double EnemyCriticalChance = 0.20;
+	private const double EnemyCriticalChance = 0.28;
 	private int ultimateCharge = 0;
 	private int ghostPunchCooldown = 0;
 
@@ -1059,8 +1059,9 @@ public partial class BattleScene : Node2D
 		await PlayEnemyLunge(() =>
 		{
 			bool critical = random.NextDouble() < EnemyCriticalChance;
-			// Stronger regular hits with fewer, less punishing critical spikes.
-			int actualDamage = critical ? (int)Math.Ceiling(EnemyDamage * 1.5) : EnemyDamage;
+			// Restore the original dangerous enemy critical hits. The player
+			// keeps their own 16% / 1.5x critical chance for exciting comebacks.
+			int actualDamage = critical ? EnemyDamage * 2 : EnemyDamage;
 			if (critical)
 				ShowCriticalHit(friendlyYokaiSprite, actualDamage, false);
 			yokaiHP = Math.Max(0, yokaiHP - actualDamage);
