@@ -87,7 +87,7 @@ public partial class CharacterCreation : Control
         }
         if (!SupabaseConfig.IsConfigured)
         {
-            ShowError("The game cannot connect right now. Please try again later.");
+            ShowError("The shared Supabase connection is not configured. Please ask the team to check supabase.shared.json.");
             return;
         }
 
@@ -100,6 +100,7 @@ public partial class CharacterCreation : Control
             request.QueueFree();
             if (result != (long)HttpRequest.Result.Success || code < 200 || code >= 300)
             {
+                GD.PushWarning("Supabase sign-in failed (HTTP " + code + ", request result " + result + ").");
                 ShowError("Could not start your adventure. Check your connection and try again.");
                 return;
             }

@@ -6,12 +6,14 @@ using System.Text.Json.Serialization;
 // Public Supabase URL and publishable/anon key only.
 // NEVER use a database password, secret API key, or service_role key in Godot.
 //
-// Set your real values ONCE in res://supabase.local.json. That file is ignored
-// by Git, so updating World.cs or pulling a branch won't overwrite it.
+// Commit only the public project URL and publishable/anon key in
+// res://supabase.shared.json so a teammate can connect after pulling.
+// A Git-ignored supabase.local.json can override it on a developer's device.
 public static class SupabaseConfig
 {
     private const string LocalProjectFile = "res://supabase.local.json";
     private const string LocalUserFile = "user://supabase.local.json";
+    private const string SharedProjectFile = "res://supabase.shared.json";
 
     public sealed class LocalSettings
     {
@@ -29,12 +31,43 @@ public static class SupabaseConfig
     public static string ProjectUrl => Settings.ProjectUrl;
     public static string PublishableKey => Settings.PublishableKey;
 
-    public static bool IsConfigured =>
-        Uri.TryCreate(ProjectUrl, UriKind.Absolute, out Uri uri) &&
-        uri.Scheme == Uri.UriSchemeHttps &&
-        !ProjectUrl.Contains("YOUR-PROJECT", StringComparison.OrdinalIgnoreCase) &&
-        !string.IsNullOrWhiteSpace(PublishableKey) &&
-        !PublishableKey.Contains("YOUR_", StringComparison.OrdinalIgnoreCase);
+    public static bool IsConfigured => IsValidClientSettings(Settings);
+
+    private static bool IsValidClientSettings(LocalSettings settings)
+    {
+        return Uri.TryCreate(settings.ProjectUrl, UriKind.Absolute, out Uri uri) &&
+            uri.Scheme == Uri.UriSchemeHttps &&
+            !settings.ProjectUrl.Contains("YOUR-PROJECT", StringComparison.OrdinalIgnoreCase) &&
+            IsPublicClientKey(settings.PublishableKey);
+    }
+
+    // The older Supabase anon key is a JWT with role "anon". Checking the
+    // role prevents accidentally placing a service_role JWT in the game.
+    private static bool IsPublicClientKey(string key)
+    {
+        if (key.StartsWith("sb_publishable_", StringComparison.Ordinal))
+            return key.Length > "sb_publishable_".Length;
+
+        if (!key.StartsWith("eyJ", StringComparison.Ordinal))
+            return false;
+
+        string[] segments = key.Split('.');
+        if (segments.Length != 3)
+            return false;
+
+        try
+        {
+            string payload = segments[1].Replace('-', '+').Replace('_', '/');
+            payload = payload.PadRight((payload.Length + 3) / 4 * 4, '=');
+            using var json = JsonDocument.Parse(Convert.FromBase64String(payload));
+            return json.RootElement.TryGetProperty("role", out JsonElement role) &&
+                role.GetString() == "anon";
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
 
     public static string AuthUrl => ProjectUrl.TrimEnd('/') + "/auth/v1";
     public static string DataUrl => ProjectUrl.TrimEnd('/') + "/rest/v1";
@@ -44,10 +77,9 @@ public static class SupabaseConfig
 
     private static LocalSettings LoadSettings()
     {
-        // Project-local values take priority during development. A user-data
-        // copy is supported for exported builds. Environment variables are
-        // an optional fallback for testers and CI.
-        foreach (string path in new[] { LocalProjectFile, LocalUserFile })
+        // Personal overrides come first. The shared tracked file lets a
+        // fresh Git clone run without making each teammate copy a JSON file.
+        foreach (string path in new[] { LocalProjectFile, LocalUserFile, SharedProjectFile })
         {
             if (!Godot.FileAccess.FileExists(path))
                 continue;
@@ -64,7 +96,14 @@ public static class SupabaseConfig
 
                 settings.ProjectUrl = (settings.ProjectUrl ?? "").Trim().TrimEnd('/');
                 settings.PublishableKey = (settings.PublishableKey ?? "").Trim();
-                return settings;
+                if (IsValidClientSettings(settings))
+                    return settings;
+
+                // A placeholder or invalid override should not hide a valid
+                // shared configuration further down this list.
+                if (path != SharedProjectFile)
+                    GD.PushWarning("Supabase settings in " + path +
+                        " are incomplete or are not a public client key.");
             }
             catch (Exception ex)
             {
@@ -72,10 +111,11 @@ public static class SupabaseConfig
             }
         }
 
-        return new LocalSettings
+        var environmentSettings = new LocalSettings
         {
             ProjectUrl = (System.Environment.GetEnvironmentVariable("YOKAI_SUPABASE_URL") ?? "").Trim(),
             PublishableKey = (System.Environment.GetEnvironmentVariable("YOKAI_SUPABASE_KEY") ?? "").Trim()
         };
+        return IsValidClientSettings(environmentSettings) ? environmentSettings : new LocalSettings();
     }
 }
