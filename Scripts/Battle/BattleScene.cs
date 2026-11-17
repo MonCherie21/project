@@ -23,6 +23,10 @@ public partial class BattleScene : Node2D
 	[Export] public int GhostPunchDamage = 16;
 
 	[Export] public int EnemyDamage = 6;
+	// Story enemies grow tougher by district. The last battle is a boss fight,
+	// but the first two remain approachable without feeding any candy.
+	private static readonly int[] EnemyHealthByStage = { 70, 90, 110, 125, 145, 165, 190 };
+	private static readonly int[] EnemyAttackByStage = { 10, 12, 14, 15, 16, 18, 19 };
 
 
 	// =========================================
@@ -43,7 +47,7 @@ public partial class BattleScene : Node2D
 	private bool playerTurn = true;
 	private const int UltimateChargeRequired = 2;
 	private const double FriendlyCriticalChance = 0.16;
-	private const double EnemyCriticalChance = 0.28;
+	private const double EnemyCriticalChance = 0.20;
 	private int ultimateCharge = 0;
 	private int ghostPunchCooldown = 0;
 
@@ -451,18 +455,19 @@ public partial class BattleScene : Node2D
 
 
 	// =========================================
-	// 12. FRIENDSHIP POWER — BOTH SIDES SCALE WITH STORY PROGRESS
+	// 12. STORY DIFFICULTY AND FRIENDSHIP POWER
 	// =========================================
 
 	private void ApplyFriendshipPower()
 	{
 		FriendshipLevel = Math.Clamp(FriendshipLevel, 0, CandyInventory.MaxFriendshipLevel);
-		// Opponents scale up with stage and slightly with friendship, never down.
-		// Feeding always improves the friendly Yokai's advantage in a matchup.
-		EnemyMaxHP = Math.Max(EnemyMaxHP, 70 + 10 * (_battleStage - 1) + 5 * FriendshipLevel);
-		EnemyDamage = Math.Max(EnemyDamage, 10 + (_battleStage - 1) + FriendshipLevel / 2);
-		YokaiMaxHP = Math.Max(YokaiMaxHP + 9 * (_battleStage - 1) + 8 * FriendshipLevel,
-			EnemyMaxHP + 20);
+		int stageIndex = Math.Clamp(_battleStage - 1, 0, EnemyHealthByStage.Length - 1);
+		// Candy should reward the player, not make the opponent stronger.
+		// Also do not tie friendly HP to enemy HP: that used to cancel out
+		// much of the difficulty increase in later levels.
+		EnemyMaxHP = Math.Max(EnemyMaxHP, EnemyHealthByStage[stageIndex]);
+		EnemyDamage = Math.Max(EnemyDamage, EnemyAttackByStage[stageIndex]);
+		YokaiMaxHP = Math.Max(1, YokaiMaxHP + 9 * stageIndex + 12 * FriendshipLevel);
 	}
 
 	private int NormalAttackDamage() => SlapDamage + (_battleStage - 1) + FriendshipLevel * 3;
@@ -1054,7 +1059,8 @@ public partial class BattleScene : Node2D
 		await PlayEnemyLunge(() =>
 		{
 			bool critical = random.NextDouble() < EnemyCriticalChance;
-			int actualDamage = critical ? EnemyDamage * 2 : EnemyDamage;
+			// Stronger regular hits with fewer, less punishing critical spikes.
+			int actualDamage = critical ? (int)Math.Ceiling(EnemyDamage * 1.5) : EnemyDamage;
 			if (critical)
 				ShowCriticalHit(friendlyYokaiSprite, actualDamage, false);
 			yokaiHP = Math.Max(0, yokaiHP - actualDamage);
@@ -1285,7 +1291,7 @@ public partial class BattleScene : Node2D
 		GD.Print("DEFEAT!");
 		PlaySound("Defeat", -8);
 		GD.Print("Your team can no longer fight.");
-		ShowResult("DEFEAT", "Your team can no longer fight. Return to Wawa and try again.");
+		ShowResult("DEFEAT", "Your team can no longer fight. Return to Wawa, share candy to strengthen friendship, and try again.");
 	}
 
 	private void ShowResult(string title, string message)

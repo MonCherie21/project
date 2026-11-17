@@ -30,6 +30,9 @@ This is the review checklist before merging `feature/organized-wawa-polish` into
 - [ ] Winning stage 1 unlocks stage 2, and every subsequent stage requires its prior win.
 - [ ] **Run** from a Yokai battle: no story advancement, no new companion, no cleared marker.
 - [ ] Lose a battle: no level advancement, and retry works.
+- [ ] Stages 1 and 2 remain beatable without candy; stages 4 through 7 require more careful play.
+- [ ] Compare a later battle at friendship levels 0, 1, and 2: candy raises friendly HP and attack power without increasing enemy stats.
+- [ ] Enemy critical hits are stronger than ordinary hits but no longer deal double damage.
 - [ ] Change active Yokai in Party; next battle uses the correct Yokai name and sprite (verify Cheeksqueek in particular).
 - [ ] Candy pickups cannot be collected repeatedly after loading a save.
 - [ ] Player does not walk through buildings, trees, water or hill boundaries; previous collision edits remain intact.
