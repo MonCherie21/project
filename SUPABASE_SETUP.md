@@ -1,19 +1,17 @@
-# Supabase connection (one-time setup)
+# Supabase connection for the team
 
-SupabaseConfig.cs now reads connection settings from a separate file that Git
-ignores. Your local values will not be replaced by future pulls.
+The game can now read a shared JSON file committed to Git. When the project
+owner fills in `supabase.shared.json` and commits it, teammates only need to
+pull the latest branch. They do not need separate Supabase dashboard accounts.
 
-1. In PowerShell, open the Godot project folder (D:\project\project).
-2. Copy the sample file, then open it:
+## One-time setup for the project owner
 
-   ~~~powershell
-   Copy-Item supabase.example.json supabase.local.json
-   notepad supabase.local.json
-   ~~~
-
-3. Replace the example URL and key with your project's URL and
-   **publishable/anon key** from Supabase.
-4. Save the file and restart the game.
+1. Open `supabase.shared.json` in the Godot project folder.
+2. Replace both placeholders with the **Project URL** and the **publishable
+   API key** (`sb_publishable_...`) from Supabase Project Settings > API Keys.
+   An older **anon** key also works.
+3. Commit only this JSON file and the accompanying code changes to Git.
+4. Ask a teammate to pull the branch and try New Game, Continue, and saving.
 
 Example structure (placeholders, not real credentials):
 
@@ -24,13 +22,38 @@ Example structure (placeholders, not real credentials):
 }
 ~~~
 
-**Never use a Supabase service_role/secret key or a database password in a
-client game.** The local file is ignored by Git. Do not force-add it.
+**Never put a secret key, service_role key, or database password in this file.**
+It is tracked by Git and becomes visible to everyone with repository access.
+Only the URL and public client key belong in this file. Ensure Row Level
+Security (RLS) protects the `players` and `player_saves` tables.
 
-For an exported build, the same format also works in the Godot
-user://supabase.local.json path. Environment variables YOKAI_SUPABASE_URL and
-YOKAI_SUPABASE_KEY are supported if neither local file exists.
+## Optional personal override
 
-If you previously edited SupabaseConfig.cs, copy only the URL and
-publishable/anon key into the new local JSON file. Do not restore the old
-SupabaseConfig.cs from a stash.
+If a developer needs a different Supabase project, they can use an ignored
+`supabase.local.json` file. This takes priority over the shared team file.
+In PowerShell, open the project folder, then run:
+
+~~~powershell
+Copy-Item supabase.example.json supabase.local.json
+notepad supabase.local.json
+~~~
+
+Enter your personal public connection values in that file. The file is ignored
+by Git and will not be replaced during a pull. Another option for an exported
+build is `user://supabase.local.json`. Environment variables `YOKAI_SUPABASE_URL`
+and `YOKAI_SUPABASE_KEY` are a fallback if neither JSON file contains a valid
+public configuration.
+
+Loading order: `res://supabase.local.json`, then
+`user://supabase.local.json`, then `res://supabase.shared.json`, then
+environment variables. Invalid placeholders are skipped.
+
+## If New Game still cannot connect
+
+1. Confirm that `supabase.shared.json` has real values, not `YOUR-PROJECT`.
+2. Ensure the key is a publishable (`sb_publishable_...`) or legacy anon key.
+3. Open the game with the Godot .NET editor and check its Output panel.
+4. In the Supabase dashboard, confirm anonymous sign-in is enabled under
+   Authentication, and that the project's API is reachable.
+5. Confirm the `players` and `player_saves` tables exist and their RLS policies
+   permit each signed-in player to access their own data.
