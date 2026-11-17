@@ -1,0 +1,97 @@
+using Godot;
+using System;
+
+// Seven story battles in order. Progress is saved separately inside each slot.
+public static class GameProgress
+{
+    public const int TotalLevels = 7;
+
+    private static readonly string[] BuildingNames =
+    {
+        "House 2", "Sari-Sari Store", "Gas Station", "Puregold",
+        "McDonald's", "School", "Haunted House"
+    };
+
+    public static int CompletedLevels { get; private set; }
+    public static int ActiveSlot { get; private set; } = 1;
+    public static bool PendingAutoSave { get; private set; }
+    public static bool HasSeenBattleTutorial { get; private set; }
+
+    public static string NextBuilding => CompletedLevels >= TotalLevels
+        ? "All levels completed"
+        : BuildingNames[CompletedLevels];
+
+    public static void StartNewGame()
+    {
+        CandyInventory.StartNewGame();
+        CompletedLevels = 0;
+        ActiveSlot = 1;
+        PendingAutoSave = false;
+        HasSeenBattleTutorial = false;
+    }
+
+    public static void LoadProgress(int completed, int slot)
+    {
+        CompletedLevels = Math.Clamp(completed, 0, TotalLevels);
+        SetActiveSlot(slot);
+        PendingAutoSave = false;
+    }
+
+    public static void SetActiveSlot(int slot)
+    {
+        if (slot is < 1 or > 3)
+            throw new ArgumentOutOfRangeException(nameof(slot));
+        ActiveSlot = slot;
+    }
+
+    public static void MarkSaved(int capturedLevel)
+    {
+        if (capturedLevel == CompletedLevels)
+            PendingAutoSave = false;
+    }
+
+    public static bool CompleteLevel(int level)
+    {
+        // Prevent replaying or skipping levels from changing progress.
+        if (level != CompletedLevels + 1 || level > TotalLevels)
+            return false;
+
+        CompletedLevels = level;
+        PendingAutoSave = true;
+        return true;
+    }
+
+    public static void MarkBattleTutorialSeen() => HasSeenBattleTutorial = true;
+
+    // Seed the first checkpoint so Continue works immediately after creation.
+    public static void QueueAutoSave() => PendingAutoSave = true;
+
+    public static int LevelFromBattleScene(string path)
+    {
+        string file = System.IO.Path.GetFileName(path);
+        if (string.Equals(file, "BattleScene.tscn", StringComparison.OrdinalIgnoreCase))
+            return 1;
+
+        for (int level = 2; level <= TotalLevels; level++)
+        {
+            if (string.Equals(file, $"BattleScene{level}.tscn",
+                StringComparison.OrdinalIgnoreCase))
+                return level;
+        }
+        return 0;
+    }
+
+    public static void EnterBuilding(Node caller, int level, string dialogueScene)
+    {
+        if (level == CompletedLevels + 1)
+        {
+            caller.GetNode<SceneManager>("/root/SceneManager").TransitionTo(dialogueScene);
+            return;
+        }
+
+        StoryNoticeUI.ShowProgress(caller, level);
+    }
+
+    public static string BuildingName(int level) =>
+        level >= 1 && level <= TotalLevels ? BuildingNames[level - 1] : "Wawa";
+}

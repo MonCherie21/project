@@ -1,2 +1,6 @@
-# Normalize EOL for all files that Git considers text files.
-* text=auto eol=lf
+# Binary artifacts should not be interpreted as text patches.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ogg binary
