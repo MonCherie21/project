@@ -420,8 +420,34 @@ public partial class BattleScene : Node2D
 			ghostPunchButton.TooltipText = $"{YokaiRoster.UltimateMoveName(_activePartnerIndex)}: " +
 				$"{UltimateAttackDamage()} damage (charges in two normal attacks)";
 		}
+		ArrangeSkillButtonsForActiveYokai();
 		GD.Print("Active battle companion: " + YokaiRoster.Name(_activePartnerIndex));
 	}
+
+	private void ArrangeSkillButtonsForActiveYokai()
+	{
+		if (_battleStage < 5 || slapButton == null || ghostPunchButton == null)
+			return;
+
+		// The McDo and school scenes have wide slots for Enma and Wobblewok.
+		// Earlier circular skill art must use Whisper's full-size slots instead,
+		// even when that companion is taken into a later story battle.
+		if (!IsCircularSkill(slapButton.TextureNormal) ||
+			!IsCircularSkill(ghostPunchButton.TextureNormal))
+			return; // Preserve the original wide buttons for later Yokai.
+
+		slapButton.Position = new Vector2(452, 457);
+		slapButton.Size = new Vector2(197, 199);
+		ghostPunchButton.Position = new Vector2(667, 457);
+		ghostPunchButton.Size = new Vector2(197, 199);
+		slapButton.IgnoreTextureSize = true;
+		ghostPunchButton.IgnoreTextureSize = true;
+		slapButton.StretchMode = TextureButton.StretchModeEnum.KeepAspectCentered;
+		ghostPunchButton.StretchMode = TextureButton.StretchModeEnum.KeepAspectCentered;
+	}
+
+	private static bool IsCircularSkill(Texture2D texture) =>
+		texture != null && texture.GetWidth() <= texture.GetHeight() * 1.4f;
 
 
 	// =========================================
