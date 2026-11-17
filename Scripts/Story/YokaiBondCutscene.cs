@@ -21,7 +21,7 @@ public partial class YokaiBondCutscene : CanvasLayer
     private bool _chosen;
     private TextureRect _yokai;
     private TextureRect _trainer;
-    private Label _story;
+    private RichTextLabel _story;
     private Button _gift;
     private Button _welcome;
     private Button _continue;
@@ -88,12 +88,33 @@ public partial class YokaiBondCutscene : CanvasLayer
             Size = new Vector2(44, 44)
         });
 
-        _story = Text(FirstWords[_index], null, 18, YokaiTheme.Parchment,
-            new Vector2(250, 170), new Vector2(402, 147));
-        _story.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        _story.HorizontalAlignment = HorizontalAlignment.Center;
-        _story.VerticalAlignment = VerticalAlignment.Center;
-        card.AddChild(_story);
+        // Keep dialogue between the portraits. A regular Label can draw its
+        // long lines over the Yokai sprite when its minimum size grows.
+        var storyFrame = new Panel
+        {
+            Position = new Vector2(249, 169),
+            Size = new Vector2(402, 166),
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+        storyFrame.AddThemeStyleboxOverride("panel",
+            YokaiTheme.Box(YokaiTheme.Inset, YokaiTheme.FrameEdge, 2));
+        card.AddChild(storyFrame);
+
+        _story = new RichTextLabel
+        {
+            Position = new Vector2(14, 13),
+            Size = new Vector2(374, 140),
+            BbcodeEnabled = true,
+            FitContent = false,
+            ScrollActive = false,
+            AutowrapMode = TextServer.AutowrapMode.WordSmart,
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+        _story.AddThemeFontSizeOverride("normal_font_size", 17);
+        _story.AddThemeColorOverride("default_color", YokaiTheme.Parchment);
+        _story.AddThemeConstantOverride("line_separation", 6);
+        SetStory(FirstWords[_index]);
+        storyFrame.AddChild(_story);
 
         _gift = Button("SHARE A CANDY", font,
             new Vector2(85, 386), new Vector2(340, 56));
@@ -135,9 +156,9 @@ public partial class YokaiBondCutscene : CanvasLayer
         _welcome.Hide();
         _continue.Show();
         string name = YokaiRoster.Name(_index);
-        _story.Text = candy
+        SetStory(candy
             ? $"You share a candy with {name}. It takes the gift carefully, then reaches for your hand. Friendship is stronger than fear."
-            : $"You kneel and gently embrace {name}. For a moment Wawa is quiet. A new friend knows they will never have to face the darkness alone.";
+            : $"You kneel and gently embrace {name}. For a moment Wawa is quiet. A new friend knows they will never have to face the darkness alone.");
 
         var friendship = CreateTween().SetTrans(Tween.TransitionType.Sine)
             .SetEase(Tween.EaseType.InOut);
@@ -148,6 +169,13 @@ public partial class YokaiBondCutscene : CanvasLayer
         friendship.Parallel().TweenProperty(_yokai, "modulate",
             new Color(0.77f, 1f, 0.81f), 0.35);
         friendship.TweenProperty(_yokai, "modulate", Colors.White, 0.35);
+    }
+
+    private void SetStory(string text)
+    {
+        // RichTextLabel wraps inside its own rectangle and clips excess text.
+        // Center each paragraph without allowing text to cover either sprite.
+        _story.Text = $"[center]{text}[/center]";
     }
 
     private static TextureRect Portrait(string path, Vector2 position, Vector2 size) => new()
