@@ -45,13 +45,13 @@ flowchart TD
 - In-world UI (journal/party) are runtime CanvasLayer controls: their distinct dark teal, brass, parchment and moss theme comes from `YokaiTheme`.
 - `BossTitleCard` is injected for stage 7 (Orcanos) only. The battle continues after its cinematic overlay fades or the player skips it.
 - `YokaiBondCutscene` does not create a second Yokai or progress trigger. It only celebrates a first-time unlock already recorded by GameProgress; feeding uses the existing single-source CandyInventory.
-- The new soundtrack is generated reproducibly by `tools/generate_opening_score.py` as an original OGG. It lives at `Music/WhisperPromise.ogg` and is used on new-game opening scenes.
+- The original opening soundtrack is included as `Music/WhisperPromise.ogg` and plays during new-game opening scenes. The game uses this finished audio asset directly.
 - Main scene is explicitly `res://Scenes/Menus/main_menu.tscn`; autoload paths are specified directly so stale UID caches cannot point at the old root filenames.
 
 ## Stability precautions
 
 - `.cs.uid` files moved alongside scripts, and the missing collision-generator sidecar is restored with its original scene-referenced UID.
-- `tools/verify_project_paths.py` scans all static `res://` links and script UID references.
+- Static `res://` links and script UID references were checked after the one-time folder migration. Future edits should be validated in the Godot .NET editor.
 - Prior cloud saves keep working because the loader recognizes both old and new world scene strings.
 - Existing collision geometry and building layouts are preserved; organization changes do not reauthor the Wawa map.
 - New C# functionality requires a Godot **.NET** editor build to compile and test; the non-.NET Godot command-line executable cannot validate C# loading.

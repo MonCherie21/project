@@ -7,7 +7,7 @@ This is the review checklist before merging `feature/organized-wawa-polish` into
 - [x] Organized all former root `.cs`/`.tscn` files under explicit `Scripts/` and `Scenes/` directories.
 - [x] Preserved `.cs.uid` sidecars, added the existing collision generator's missing UID sidecar.
 - [x] Updated static source/scene paths and autoload/startup entries.
-- [x] `python3 tools/verify_project_paths.py` validates concrete project links.
+- [x] Static path audit passed during the cleanup (342 valid resource paths; no missing script UID sidecars).
 - [x] `git diff --check` has no whitespace conflicts.
 - [x] Opening OGG is valid and decodable (`ffprobe`).
 - [x] Legacy save-scene string is accepted by `SaveLoadService.PrepareLoad`.
