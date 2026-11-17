@@ -96,8 +96,11 @@ public partial class YokaiBondCutscene : CanvasLayer
             Size = new Vector2(402, 166),
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
+        // Let the trainer and Yokai remain visible as they approach each other
+        // during the friendship animation. Keep only a faint outline.
         storyFrame.AddThemeStyleboxOverride("panel",
-            YokaiTheme.Box(YokaiTheme.Inset, YokaiTheme.FrameEdge, 2));
+            YokaiTheme.Box(Colors.Transparent,
+                new Color(0.33f, 0.40f, 0.36f, 0.25f), 1));
         card.AddChild(storyFrame);
 
         _story = new RichTextLabel
