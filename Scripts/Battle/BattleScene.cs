@@ -23,6 +23,10 @@ public partial class BattleScene : Node2D
 	[Export] public int GhostPunchDamage = 16;
 
 	[Export] public int EnemyDamage = 6;
+	// Each new district raises the stakes. Early stages can still be beaten
+	// without candy, while late battles reward investing in friendship.
+	private static readonly int[] EnemyHealthByStage = { 75, 95, 120, 142, 165, 188, 215 };
+	private static readonly int[] EnemyAttackByStage = { 11, 12, 14, 16, 18, 20, 21 };
 
 
 	// =========================================
@@ -451,18 +455,19 @@ public partial class BattleScene : Node2D
 
 
 	// =========================================
-	// 12. FRIENDSHIP POWER — BOTH SIDES SCALE WITH STORY PROGRESS
+	// 12. STORY DIFFICULTY AND FRIENDSHIP POWER
 	// =========================================
 
 	private void ApplyFriendshipPower()
 	{
 		FriendshipLevel = Math.Clamp(FriendshipLevel, 0, CandyInventory.MaxFriendshipLevel);
-		// Opponents scale up with stage and slightly with friendship, never down.
-		// Feeding always improves the friendly Yokai's advantage in a matchup.
-		EnemyMaxHP = Math.Max(EnemyMaxHP, 70 + 10 * (_battleStage - 1) + 5 * FriendshipLevel);
-		EnemyDamage = Math.Max(EnemyDamage, 10 + (_battleStage - 1) + FriendshipLevel / 2);
-		YokaiMaxHP = Math.Max(YokaiMaxHP + 9 * (_battleStage - 1) + 8 * FriendshipLevel,
-			EnemyMaxHP + 20);
+		int stageIndex = Math.Clamp(_battleStage - 1, 0, EnemyHealthByStage.Length - 1);
+		// Candy should reward the player, not make the opponent stronger.
+		// Also do not tie friendly HP to enemy HP: that used to cancel out
+		// much of the difficulty increase in later levels.
+		EnemyMaxHP = Math.Max(EnemyMaxHP, EnemyHealthByStage[stageIndex]);
+		EnemyDamage = Math.Max(EnemyDamage, EnemyAttackByStage[stageIndex]);
+		YokaiMaxHP = Math.Max(1, YokaiMaxHP + 9 * stageIndex + 12 * FriendshipLevel);
 	}
 
 	private int NormalAttackDamage() => SlapDamage + (_battleStage - 1) + FriendshipLevel * 3;
@@ -1054,6 +1059,8 @@ public partial class BattleScene : Node2D
 		await PlayEnemyLunge(() =>
 		{
 			bool critical = random.NextDouble() < EnemyCriticalChance;
+			// Restore the original dangerous enemy critical hits. The player
+			// keeps their own 16% / 1.5x critical chance for exciting comebacks.
 			int actualDamage = critical ? EnemyDamage * 2 : EnemyDamage;
 			if (critical)
 				ShowCriticalHit(friendlyYokaiSprite, actualDamage, false);
@@ -1285,7 +1292,7 @@ public partial class BattleScene : Node2D
 		GD.Print("DEFEAT!");
 		PlaySound("Defeat", -8);
 		GD.Print("Your team can no longer fight.");
-		ShowResult("DEFEAT", "Your team can no longer fight. Return to Wawa and try again.");
+		ShowResult("DEFEAT", "Your team can no longer fight. Return to Wawa, share candy to strengthen friendship, and try again.");
 	}
 
 	private void ShowResult(string title, string message)

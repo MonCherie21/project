@@ -37,18 +37,16 @@ A story-driven, top-down 2D Godot RPG about an exorcist family protecting Wawa t
 | `Scenes/Systems` | Persistent music scene |
 | `Assets`, `Sprites`, `Characters`, `Music` | Existing visual and audio resources; `Music/WhisperPromise.ogg` is the new original opening piece |
 | `docs` | Architecture, flowchart, QA checklist, complete file rundown and PDF |
-| `tools` | Original opening-music generator, migration script, and link verifier |
 
 ## Maintenance
 
-After moving or adding scenes/scripts, run:
+After moving or adding scenes/scripts, check resource paths in the Godot .NET editor, build the C# project, and run:
 
 ```bash
-python3 tools/verify_project_paths.py
 git diff --check
 ```
 
-`tools/reorganize_project.py` records the one-time root-folder migration and is **not** meant for repeated use on an already organized tree. The moved `.cs.uid` sidecars preserve Godot's script identities. The save loader accepts both old `res://world.tscn` checkpoints and the new `res://Scenes/World/world.tscn` path.
+The project folder migration is complete. The moved `.cs.uid` sidecars preserve Godot's script identities. The save loader accepts both old `res://world.tscn` checkpoints and the new `res://Scenes/World/world.tscn` path. Generated audio and PDF assets remain in the repository; Python is not required to run the game.
 
 ## Documentation
 

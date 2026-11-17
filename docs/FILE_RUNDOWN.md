@@ -150,9 +150,6 @@ This inventory covers all **C# behavior scripts and Godot scene files** that wer
 | `Sprites/` | Player sprites, enemy battle sprites and move/skill art. |
 | `Assets/` | World/map textures, menu graphics, fonts, dialogue art and other imported assets. |
 | `Music/` | World/battle themes, SFX and new `WhisperPromise.ogg` opening theme. |
-| `tools/generate_opening_score.py` | Reproduces the original 50-second OGG opening soundtrack. |
-| `tools/reorganize_project.py` | One-time explicit file-move manifest with path rewriting. |
-| `tools/verify_project_paths.py` | Audits scene/script/asset links after reorganization. |
 | `docs/` | Architecture, gameplay flowchart, test plan, this rundown and PDF. |
 
 ## Editor-owned / generated material

@@ -7,7 +7,7 @@ This is the review checklist before merging `feature/organized-wawa-polish` into
 - [x] Organized all former root `.cs`/`.tscn` files under explicit `Scripts/` and `Scenes/` directories.
 - [x] Preserved `.cs.uid` sidecars, added the existing collision generator's missing UID sidecar.
 - [x] Updated static source/scene paths and autoload/startup entries.
-- [x] `python3 tools/verify_project_paths.py` validates concrete project links.
+- [x] Static path audit passed during the cleanup (342 valid resource paths; no missing script UID sidecars).
 - [x] `git diff --check` has no whitespace conflicts.
 - [x] Opening OGG is valid and decodable (`ffprobe`).
 - [x] Legacy save-scene string is accepted by `SaveLoadService.PrepareLoad`.
@@ -30,6 +30,10 @@ This is the review checklist before merging `feature/organized-wawa-polish` into
 - [ ] Winning stage 1 unlocks stage 2, and every subsequent stage requires its prior win.
 - [ ] **Run** from a Yokai battle: no story advancement, no new companion, no cleared marker.
 - [ ] Lose a battle: no level advancement, and retry works.
+- [ ] Stages 1 and 2 remain beatable without candy, while stages 4 through 7 increasingly reward friendship and smart ultimate timing.
+- [ ] Compare a later battle at friendship levels 0, 1, and 2: candy raises friendly HP and attack power without increasing enemy stats.
+- [ ] Verify player critical hits still deal 1.5x damage (16% chance) and enemy critical hits again deal 2x damage (28% chance).
+- [ ] With friendship level 3, clear stages 5 through 7 multiple times to confirm the harder fights are still beatable.
 - [ ] Change active Yokai in Party; next battle uses the correct Yokai name and sprite (verify Cheeksqueek in particular).
 - [ ] Candy pickups cannot be collected repeatedly after loading a save.
 - [ ] Player does not walk through buildings, trees, water or hill boundaries; previous collision edits remain intact.
